@@ -1,0 +1,76 @@
+import type { IconType } from "react-icons";
+// Heroicons v2, solid style (react-icons "Hi*"; outline versions are "HiOutline*").
+import {
+  HiCog6Tooth,
+  HiCube,
+  HiEnvelope,
+  HiIdentification,
+  HiShoppingCart,
+  HiSquares2X2,
+} from "react-icons/hi2";
+import type { Permissions } from "@/server/auth/permissions";
+
+export type NavItem = {
+  title: string;
+  href: string;
+  icon: IconType;
+  /** Hidden from roles that lack this permission. */
+  permission?: Permissions;
+};
+
+export const navGroups: { label: string; items: NavItem[] }[] = [
+  {
+    label: "Store",
+    items: [
+      { title: "Overview", href: "/admin", icon: HiSquares2X2 },
+      {
+        title: "Orders",
+        href: "/admin/orders",
+        icon: HiShoppingCart,
+        permission: { order: ["read"] },
+      },
+      {
+        title: "Products",
+        href: "/admin/products",
+        icon: HiCube,
+        permission: { product: ["read"] },
+      },
+      {
+        title: "Subscribers",
+        href: "/admin/subscribers",
+        icon: HiEnvelope,
+        permission: { subscriber: ["read"] },
+      },
+    ],
+  },
+  {
+    label: "Administration",
+    items: [
+      {
+        title: "Team",
+        href: "/admin/team",
+        icon: HiIdentification,
+        permission: { user: ["list"] },
+      },
+      {
+        title: "Settings",
+        href: "/admin/settings",
+        icon: HiCog6Tooth,
+        permission: { settings: ["read"] },
+      },
+    ],
+  },
+];
+
+export const allNavItems = navGroups.flatMap((g) => g.items);
+
+/** The nav item matching the current path (longest href wins). */
+export function findNavItem(pathname: string) {
+  return allNavItems
+    .filter((i) =>
+      i.href === "/admin"
+        ? pathname === "/admin"
+        : pathname === i.href || pathname.startsWith(`${i.href}/`),
+    )
+    .sort((a, b) => b.href.length - a.href.length)[0];
+}
