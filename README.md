@@ -13,6 +13,7 @@ pnpm install
 cp .env.example .env.local   # fill DATABASE_URL, BETTER_AUTH_SECRET
 createdb parentkeeping       # local Postgres, or use a Neon URL
 pnpm db:migrate
+pnpm db:seed               # 4 products, their files, default settings
 pnpm auth:create-owner       # first admin account
 pnpm dev                     # http://localhost:3001/admin
 ```
