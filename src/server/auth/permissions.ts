@@ -7,7 +7,7 @@ export const statements = {
   ...defaultStatements, // user + session management (team accounts)
   product: ["create", "read", "update", "delete"], // includes product files & pre-sale dates
   order: ["read", "update", "refund"], // update = resend email, reissue download link
-  subscriber: ["read", "export"],
+  subscriber: ["read", "export", "delete"], // delete = privacy erasure requests
   settings: ["read", "update"],
   finance: ["read"], // revenue figures
 } as const;
@@ -19,7 +19,7 @@ export const owner = ac.newRole({
   ...adminAc.statements,
   product: ["create", "read", "update", "delete"],
   order: ["read", "update", "refund"],
-  subscriber: ["read", "export"],
+  subscriber: ["read", "export", "delete"],
   settings: ["read", "update"],
   finance: ["read"],
 });
