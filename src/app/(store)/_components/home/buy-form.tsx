@@ -1,3 +1,4 @@
+import { BUY_LABELS } from "@/lib/catalog";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { formatStorePrice } from "@/lib/money";
 import { cn } from "@/lib/utils";
@@ -36,7 +37,7 @@ export function BuyForm({
 		<form action="/api/checkout" method="post" className="contents">
 			<input type="hidden" name="slug" value={product.slug} />
 			<button type="submit" className={className}>
-				{label ?? `Buy now · ${formatStorePrice(product.price)}`}
+				{label ?? BUY_LABELS[product.slug] ?? `Buy now · ${formatStorePrice(product.price)}`}
 			</button>
 		</form>
 	);

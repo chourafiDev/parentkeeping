@@ -33,3 +33,6 @@ export function storeDate(date: Date): string {
   const p = partsIn(date, STORE_TIME_ZONE);
   return `${p.y}-${String(p.m).padStart(2, "0")}-${String(p.d).padStart(2, "0")}`;
 }
+
+/** "October 31" in the store's time zone (founding and "arrives by" dates in copy). */
+export const formatStoreDay = (date: Date) => date.toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: STORE_TIME_ZONE });

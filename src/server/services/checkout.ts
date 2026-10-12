@@ -8,6 +8,7 @@ import { db } from "@/server/db";
 import { files, productFiles, products } from "@/server/db/schema";
 import { getStripe } from "@/server/lib/stripe";
 import { getFoundingPrice, getSettings } from "@/server/queries/settings";
+import { hasFiles } from "@/server/queries/storefront";
 
 export class CheckoutError extends Error {
   constructor(
@@ -53,7 +54,10 @@ export async function createCheckoutSession({
   if (country && country !== "US") throw new CheckoutError("Our paid products are available to US customers only for now.", 403);
 
   const [product] = await db.select().from(products).where(eq(products.slug, slug));
-  if (!product || product.status !== "active" || product.kind === "bump") throw new CheckoutError("This product isn't for sale.", 404);
+  // The bump sells on its own only once its page is live (it has files).
+  const standaloneBump = product?.kind === "bump" && (await hasFiles(product.id));
+  if (!product || product.status !== "active" || (product.kind === "bump" && !standaloneBump))
+    throw new CheckoutError("This product isn't for sale.", 404);
 
   const founding = await getFoundingPrice();
   const useFounding = founding.active && !!product.foundingPriceId;

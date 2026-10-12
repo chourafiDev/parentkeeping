@@ -5,9 +5,16 @@ import { db } from "@/server/db";
 import { files, productFiles, productImages, products } from "@/server/db/schema";
 import { getFoundingPrice } from "./settings";
 
+/** Has at least one file (uploaded or on pre-sale). */
+export async function hasFiles(productId: string) {
+	const [row] = await db.select({ id: productFiles.fileId }).from(productFiles).where(eq(productFiles.productId, productId)).limit(1);
+	return !!row;
+}
+
 /**
- * A product as the store shows it: only active products with a page (not
- * the bump), the price charged now (founding price while the window is
+ * A product as the store shows it: only active products with a page (the
+ * bump only once it has files: the spec holds its page back until the
+ * product exists), the price charged now (founding price while the window is
  * open), gallery, files with their pre-sale dates, and the System for the
  * upgrade block on single-product pages.
  */
@@ -16,7 +23,7 @@ export async function getStoreProduct(slug: string) {
 		.select()
 		.from(products)
 		.where(and(eq(products.slug, slug), eq(products.status, "active")));
-	if (!product || product.kind === "bump") return null;
+	if (!product || (product.kind === "bump" && !(await hasFiles(product.id)))) return null;
 
 	const [images, assets, founding, [system]] = await Promise.all([
 		db

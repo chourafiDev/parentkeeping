@@ -23,5 +23,11 @@ export type HomeData = {
 	foundingEndsAt: Date | null;
 	/** "Arrives by" date per part file label prefix. */
 	presaleDates: { label: string; availableAt: Date }[];
+	/** Settings → contact; used by the guarantee line. */
+	supportEmail: string | null;
 	checkoutError: string | null;
 };
+
+/** Latest "arrives by" date of the System's pre-sale parts (the copy's [delivery date]). */
+export const deliveryDate = (data: HomeData) =>
+	data.presaleDates.reduce<Date | null>((max, d) => (!max || d.availableAt > max ? d.availableAt : max), null);

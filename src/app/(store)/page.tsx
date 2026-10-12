@@ -4,13 +4,14 @@ import { cookies } from "next/headers";
 import { BUNDLE_SLUG, PRODUCT_PATHS, VARIANT_COOKIE } from "@/lib/catalog";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { MARQUEE } from "@/lib/home";
-import { OFFER_HEADLINES, OFFER_SUBHEAD } from "@/lib/offer";
+import { HOME_SEO, OFFER_SUBHEAD } from "@/lib/offer";
 import { siteUrl } from "@/lib/site-url";
 import { db } from "@/server/db";
 import { files, productFiles, products } from "@/server/db/schema";
-import { getFoundingPrice } from "@/server/queries/settings";
+import { getFoundingPrice, getSettings } from "@/server/queries/settings";
 import { Bundle } from "./_components/home/bundle";
 import { ClosingBanner } from "./_components/home/closing-banner";
+import { ClosingStrips } from "./_components/home/closing-strips";
 import { Faq } from "./_components/home/faq";
 import { HomeHero } from "./_components/home/hero";
 import { HowItWorks } from "./_components/home/how-it-works";
@@ -25,18 +26,21 @@ import { Why } from "./_components/home/why";
 import { jsonLdHtml, productJsonLd, visitorCountry } from "./_components/product-data";
 
 export const metadata: Metadata = {
-	title: { absolute: `Parentkeeping · ${OFFER_HEADLINES.one_place}` },
-	description: OFFER_SUBHEAD,
+	title: { absolute: HOME_SEO.title },
+	description: HOME_SEO.description,
+	alternates: { canonical: "/" },
+	openGraph: { title: HOME_SEO.title, description: HOME_SEO.description, url: "/", type: "website" },
 };
 // Prices, the founding window, the visitor's country and headline variant are per request.
 export const dynamic = "force-dynamic";
 
 async function loadHome(searchParams: Record<string, string | string[] | undefined>): Promise<HomeData> {
-	const [rows, founding, country, jar] = await Promise.all([
+	const [rows, founding, country, jar, { contact }] = await Promise.all([
 		db.select().from(products).where(inArray(products.slug, [BUNDLE_SLUG, "medical-binder", "caregiver-agreement"])),
 		getFoundingPrice(),
 		visitorCountry(searchParams.country),
 		cookies(),
+		getSettings("contact"),
 	]);
 	const presale = await db
 		.select({ productId: productFiles.productId, label: files.label, availableAt: files.availableAt })
@@ -69,6 +73,7 @@ async function loadHome(searchParams: Record<string, string | string[] | undefin
 		agreement: toHome("caregiver-agreement"),
 		foundingEndsAt: system.compareAt !== null ? founding.endsAt : null,
 		presaleDates: presale.map((f) => ({ label: f.label, availableAt: f.availableAt! })),
+		supportEmail: contact.supportEmail,
 		checkoutError: typeof searchParams.checkout_error === "string" ? searchParams.checkout_error : null,
 	};
 }
@@ -112,7 +117,8 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			<SoundFamiliar />
 			<PromoPair data={data} />
 			<Why />
-			<Faq />
+			<Faq data={data} />
+			<ClosingStrips data={data} />
 			<ClosingBanner data={data} />
 		</main>
 	);

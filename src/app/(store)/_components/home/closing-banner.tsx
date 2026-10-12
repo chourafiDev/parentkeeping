@@ -1,6 +1,6 @@
 import { ShieldCheck } from "lucide-react";
-import { PRODUCT_DISCLAIMER_SHORT } from "@/lib/legal";
-import { GUARANTEE_TEXT } from "@/lib/offer";
+import { BUY_GUARANTEE_LINE, PRODUCT_DISCLAIMER_SHORT } from "@/lib/legal";
+import { GUARANTEE_TITLE, guaranteeText } from "@/lib/offer";
 import { container, eyebrow, media, pillLight } from "../ui";
 import { BuyForm } from "./buy-form";
 import { MediaSlot } from "./media-slot";
@@ -18,12 +18,15 @@ export function ClosingBanner({ data }: { data: HomeData }) {
 				<div className="grid max-w-[560px] justify-items-center gap-4">
 					<ShieldCheck className="size-9" strokeWidth={1.5} />
 					<p className={eyebrow}>14-day “if it doesn&apos;t help” guarantee</p>
-					<h2 className="text-[32px] leading-[1.15] font-semibold tracking-[-0.034em] md:text-[40px]">Try it for two weeks.</h2>
-					<p className="text-[16px] leading-relaxed text-white/85">{GUARANTEE_TEXT}</p>
+					<h2 className="text-[32px] leading-[1.15] font-semibold tracking-[-0.034em] md:text-[40px]">{GUARANTEE_TITLE}</h2>
+					<p className="text-[16px] leading-relaxed text-white/85">{guaranteeText(data.supportEmail)}</p>
 					<div className="mt-3">
 						<BuyForm product={data.system} usVisitor={data.usVisitor} className={pillLight} />
 					</div>
-					<p className="text-xs text-white/70">{PRODUCT_DISCLAIMER_SHORT}</p>
+					<div className="grid gap-1 text-xs text-white/70">
+						<p>{PRODUCT_DISCLAIMER_SHORT}</p>
+						<p>{BUY_GUARANTEE_LINE}</p>
+					</div>
 				</div>
 			</div>
 		</section>

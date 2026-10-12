@@ -1,47 +1,59 @@
-// Family Care System sales page (home + /products/family-care-system).
-// DRAFT COPY from the Main Offer doc: final words come from the copy work.
-// Rules: no reviews or customer counts until real; never "keeps your parent
-// safe" or "command center".
+// Family Care System copy (home + /products/family-care-system), word for word
+// from "Family Care System (home)" in the Phase 1 page copy.
+// Rules: no reviews, customer counts or founder story until real; never
+// "command center", "keeps your parent safe", "app" for the brand, etc.
 
+/** Title tags and metas (SEO plan). The product URL canonicals to "/". */
+export const HOME_SEO = {
+  title: "Parentkeeping: Your Parent's Care in One Place, Shared Fairly",
+  description:
+    "One binder and one shared Google Sheet for Mom or Dad's medications, doctors, jobs and costs. Split fairly between siblings. No app. One price.",
+};
+
+/** H1 test: variant A (fairness) and variant B (one place). */
 export const OFFER_HEADLINES: Record<"fairness" | "one_place", string> = {
-  one_place: "Your parent's care, kept in one place. And shared fairly.",
-  fairness: "Your parent's care, shared fairly. And kept in one place.",
+  fairness: "Your parent's care, kept in one place. And shared fairly.",
+  one_place: "Stop carrying your parent's care in your head.",
 };
 
 export const OFFER_SUBHEAD =
-  "Get every medication, doctor and job out of your head and split fairly with your siblings. Set up in one weekend, without a new app or a subscription.";
+  "The Parentkeeping Family Care System puts Mom or Dad's medications, doctors and paperwork in one binder, and the jobs and costs in one sheet your siblings can see. Set it up in a weekend. No new app, no subscription.";
+
+export const SYSTEM_BUTTON = "Get the Family Care System";
 
 export const ONE_PRICE_BADGE = "One price. No app. No subscription.";
 
-/** "The moment": the sibling hook, paraphrased into her situation. */
+/** "The moment": the sibling hook. */
 export const OFFER_MOMENT = {
   title: "“Do whatever you think is best.”",
   paragraphs: [
-    "You asked your brother to help. That's what he said. And just like that, the pills, the appointments, the insurance calls and the worrying all landed on you. Again.",
-    "It isn't that your family doesn't care. It's that nobody can see what you're carrying, so nobody knows what to pick up.",
-    "The Family Care System puts it all on paper and in one shared sheet, so the work is visible and can finally be split.",
+    "You asked your brother what to do about Dad's new prescription. That was his whole answer.",
+    "So it lands on you again. You know every pill, every doctor, every refill date and where the insurance card is. Nobody asked you to. It just happened, one phone call at a time.",
+    "You're not failing. The job is too big for one head. It needs one place to live, and it needs to be shared.",
   ],
 };
+
+export const PARTS_TITLE = "Four parts that work together";
 
 /** The four parts. `fileLabel` links a part to its file for "arrives by" dates. */
 export const OFFER_PARTS = [
   {
     name: "Medical Binder for an Elderly Parent",
-    what: "Medications, doctors, appointments, insurance and paperwork in one binder, plus a “Who does what” page and a weekly Sunday check-in.",
+    what: "Medications, doctors, appointments, insurance and paperwork in one place, plus a “Who does what” page and a weekly Sunday check-in page. Anyone can pick it up and find the answer.",
     format: "Fillable PDF + printable",
     pillar: "One place",
     fileLabel: "Medical Binder",
   },
   {
     name: "Shared Family Care Sheet",
-    what: "One Google Sheet with three tabs: a medication tracker, a job board (who does what, by when) and a cost tracker that shows each sibling's share.",
-    format: "Google Sheets, “Make a copy” link",
+    what: "One Google Sheet with three tabs: a medication tracker, a job board (who does what, by when) and a cost tracker that shows each sibling's share. Everyone sees the same page.",
+    format: "Google Sheets, your own copy",
     pillar: "Shared fairly · No new app",
     fileLabel: "Shared Family Care Sheet",
   },
   {
     name: "Family Caregiver Agreement Template",
-    what: "Writes down who provides care, paid or unpaid, so everyone agrees on the same thing. A template to start the conversation and take to your attorney.",
+    what: "Writes down who provides care, whether anyone is paid, and how. A template to start the conversation and take to your attorney.",
     format: "Fillable PDF + editable doc",
     pillar: "Shared fairly",
     fileLabel: "Family Caregiver Agreement",
@@ -55,37 +67,76 @@ export const OFFER_PARTS = [
   },
 ] as const;
 
+/** Shown while some parts are on pre-sale. */
+export const presaleNote = (deliveryDate: string) =>
+  `The Medical Binder and Family Meeting Kit download right away. The Shared Family Care Sheet and the Agreement arrive by ${deliveryDate}. If we miss that date, you can have a full refund.`;
+
+export const SHARING_TITLE = "Sharing takes about 30 seconds. Nobody installs anything.";
+
 export const SHARING_STEPS = [
-  { title: "Make your copy of the sheet", text: "One click copies the Shared Family Care Sheet into your own Google account." },
-  { title: "Add your siblings", text: "Share it like any Google Sheet. Nobody installs anything or creates an account with us." },
-  { title: "Split jobs and costs at the first meeting", text: "Use the Meeting Kit's agenda to agree who does what, by when, and who pays for what." },
+  { title: "Make your copy", text: "Click the “Make a copy” link and the sheet lands in your own Google account. We never see it." },
+  { title: "Add your siblings", text: "Share it like any Google Sheet. They open it on their phone or laptop." },
+  {
+    title: "Split the jobs and costs",
+    text: "Use the Family Meeting Kit for the first conversation. Each person takes named jobs, and the cost tracker shows everyone's share.",
+  },
 ] as const;
 
 export const ONLY_CHILD_NOTE =
-  "Only child? It works for you too: the job board becomes a list of tasks to hand to a friend, a neighbor or paid help.";
+  "Only child, or siblings far away? The job board works the same way with a friend, a neighbor or paid help.";
 
-export const GUARANTEE_TEXT =
-  "Use the System for 14 days. If it doesn't help you get your parent's care organized and shared, email us and we'll refund you in full. No forms, no hoops.";
+/** Price anchor. Prices come from the catalog so the sentence never drifts. */
+export const PRICE_ANCHOR_TITLE = "Less than buying the pieces";
 
-export const OFFER_FAQ = [
+export const GUARANTEE_TITLE = "If it doesn't help, you get your money back";
+/** `email` = the support address from Settings (falls back to "us"). */
+export const guaranteeText = (email: string | null) =>
+  `Use it for 14 days. If it doesn't help your family, email ${email ?? "us"} and we'll refund you. No forms, no hard feelings.`;
+
+export type FaqItem = { q: string; a: string; link?: { label: string; href: string } };
+
+export const OFFER_FAQ: FaqItem[] = [
   {
-    q: "Is it an app?",
-    a: "No. It's printable and fillable PDFs plus one Google Sheet you copy into your own account. Nothing to install, no logins with us, no subscription.",
+    q: "Is this an app?",
+    a: "No. It's a printable binder and a Google Sheet. Your family already knows how to use both, and there's nothing to install or pay for each month.",
   },
   {
     q: "Do my siblings need to buy it too?",
-    a: "No. Your license covers relatives caring for the same parent. Share your copy of the sheet and print pages for whoever needs them.",
+    a: "No. Your purchase covers relatives who help care for the same parent. Print as many copies as you need and share the sheet with them.",
+  },
+  {
+    q: "My siblings won't use anything. Is it still worth it?",
+    a: "Yes. The binder gets everything out of your head even if you're the only one using it. And a job written on a shared sheet, with a name and a date beside it, is much harder to ignore than a group text.",
   },
   {
     q: "Is the Caregiver Agreement legal advice?",
-    a: "No. It's a template to start the conversation and write things down. Have it reviewed by an elder-law attorney in your state before anyone signs.",
+    a: "No. It's a template to help your family talk through and write down care arrangements. Paying a family caregiver can affect taxes and Medicaid eligibility, so have an elder-law attorney in your parent's state review it before anyone signs.",
+  },
+  {
+    q: "Does it tell me what medications or doses to give?",
+    a: "No. You record what the doctor or pharmacist prescribed, exactly as prescribed. Bring the list to appointments and ask the pharmacist to review it whenever something changes.",
+  },
+  {
+    q: "Who can see my family's information?",
+    a: "Only the people you share it with. You fill in the binder on paper or your own device, and the sheet lives in your own Google account. We never receive what you write.",
   },
   {
     q: "When do the pre-sale parts arrive?",
-    a: "You get everything that's ready right away. Parts marked “arrives by” come on that date, by email, at no extra cost. If a date is missed, you can ask for a full refund.",
+    a: "By the date shown on the page. We'll email you the moment each part is ready. If we miss the date, ask for a full refund.",
   },
   {
-    q: "I live outside the US. Can I buy it?",
-    a: "Not yet: paid products are US-only for now because of US-specific forms and sales tax. The free Medication List works anywhere.",
+    q: "I'm not in the US. Can I buy it?",
+    a: "Not yet. Paid products are for US customers for now.",
+    link: { label: "Join the list for the UK edition.", href: "/pages/free-medication-list" },
   },
-] as const;
+];
+
+/** Strips at the end of the home page. */
+export const DOWNSELL_STRIP = {
+  text: "Just need the binder? Get the Medical Binder for an Elderly Parent on its own for",
+  cta: "See the Medical Binder",
+};
+export const FREE_LIST_STRIP = {
+  text: "Not ready to buy? Start with our free printable Medication List & Daily Medication Chart.",
+  cta: "Get the free list",
+};

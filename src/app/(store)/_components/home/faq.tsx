@@ -1,10 +1,12 @@
 import { Plus } from "lucide-react";
-import { AGREEMENT_LEGAL_LINE, BINDER_LEGAL_LINE, SHEET_LEGAL_LINE } from "@/lib/legal";
 import { OFFER_FAQ } from "@/lib/offer";
+import { formatStoreDay } from "@/lib/store-time";
 import { container, section, sectionTitle } from "../ui";
+import { deliveryDate, type HomeData } from "./types";
 
-/** FAQ (spec) in Glozin's flat accordion style, with the product legal lines. */
-export function Faq() {
+/** FAQ (spec) in Glozin's flat accordion style. */
+export function Faq({ data }: { data: HomeData }) {
+	const delivery = deliveryDate(data);
 	return (
 		<section className={`${container} ${section}`}>
 			<div className="mx-auto grid max-w-[860px] gap-8">
@@ -16,14 +18,19 @@ export function Faq() {
 								{item.q}
 								<Plus className="size-5 shrink-0 transition-transform group-open:rotate-45" />
 							</summary>
-							<p className="text-body mt-3 text-[15px] leading-[1.714]">{item.a}</p>
+							<p className="text-body mt-3 text-[15px] leading-[1.714]">
+								{delivery ? item.a.replace("By the date shown on the page.", `By ${formatStoreDay(delivery)}.`) : item.a}
+								{item.link && (
+									<>
+										{" "}
+										<a href={item.link.href} className="text-foreground font-semibold underline underline-offset-2 hover:text-primary">
+											{item.link.label}
+										</a>
+									</>
+								)}
+							</p>
 						</details>
 					))}
-				</div>
-				<div className="text-body grid gap-1 text-xs">
-					<p>{BINDER_LEGAL_LINE}</p>
-					<p>{AGREEMENT_LEGAL_LINE}</p>
-					<p>{SHEET_LEGAL_LINE}</p>
 				</div>
 			</div>
 		</section>

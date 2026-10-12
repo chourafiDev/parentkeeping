@@ -1,13 +1,13 @@
-import { ONLY_CHILD_NOTE, SHARING_STEPS } from "@/lib/offer";
-import { container, section, sectionSubtitle, sectionTitle } from "../ui";
+import { ONLY_CHILD_NOTE, SHARING_STEPS, SHARING_TITLE } from "@/lib/offer";
+import { container, eyebrow, section, sectionTitle } from "../ui";
 
 /** How sharing works: three numbered steps (Glozin icon-box rhythm). */
 export function HowItWorks() {
 	return (
 		<section id="how-it-works" className={`${container} ${section} scroll-mt-28`}>
 			<div className="mb-8 grid gap-2 text-center md:mb-10">
-				<h2 className={sectionTitle}>How sharing works</h2>
-				<p className={sectionSubtitle}>Set up in one weekend. Nothing to install.</p>
+				<p className={`${eyebrow} text-primary`}>How sharing works</p>
+				<h2 className={sectionTitle}>{SHARING_TITLE}</h2>
 			</div>
 			<ol className="grid gap-[30px] md:grid-cols-3">
 				{SHARING_STEPS.map((step, i) => (

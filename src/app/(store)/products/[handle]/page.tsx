@@ -3,12 +3,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { assetStatus, formatBytes } from "@/lib/assets";
-import { fileMatchesPart, PRODUCT_PATHS, SLUG_BY_HANDLE } from "@/lib/catalog";
+import { BUNDLE_SLUG, BUY_LABELS, fileMatchesPart, PRODUCT_PATHS, SLUG_BY_HANDLE } from "@/lib/catalog";
 import { FREE_LIST_PATH } from "@/lib/free-list";
-import { AGREEMENT_LEGAL_LINE, BINDER_LEGAL_LINE, PRODUCT_DISCLAIMER_SHORT, SHEET_LEGAL_LINE } from "@/lib/legal";
+import { BUY_GUARANTEE_LINE } from "@/lib/legal";
 import { formatStorePrice } from "@/lib/money";
-import { GUARANTEE_TEXT, OFFER_FAQ, OFFER_PARTS, OFFER_SUBHEAD } from "@/lib/offer";
+import { guaranteeText, OFFER_PARTS, ONE_PRICE_BADGE } from "@/lib/offer";
+import { type CopySection, PRODUCT_COPY, type ProductCopy } from "@/lib/product-copy";
 import { siteUrl } from "@/lib/site-url";
+import { formatStoreDay } from "@/lib/store-time";
 import { cn } from "@/lib/utils";
 import { getSettings } from "@/server/queries/settings";
 import { getStoreProduct, type StoreProduct } from "@/server/queries/storefront";
@@ -16,45 +18,42 @@ import { DocMockup, type DocKind } from "../../_components/home/doc-mockup";
 import { ProductGallery } from "../../_components/product/gallery";
 import { ShareButton } from "../../_components/product/share-button";
 import { jsonLdHtml, productJsonLd, visitorCountry } from "../../_components/product-data";
-import { container } from "../../_components/ui";
+import { container, eyebrow, media, pillLight, section, sectionTitle } from "../../_components/ui";
 
 export const dynamic = "force-dynamic";
 
-const fmtDay = (d: Date) => d.toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "America/New_York" });
 const textOf = (html: string) => html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 
-const DOC_KIND: Record<string, DocKind> = { "family-care-system": "bundle", "medical-binder": "binder", "caregiver-agreement": "agreement" };
-
-/** The product's own legal lines (the System shows all three). */
-const LEGAL_LINES: Record<string, string[]> = {
-	"family-care-system": [BINDER_LEGAL_LINE, AGREEMENT_LEGAL_LINE, SHEET_LEGAL_LINE],
-	"medical-binder": [BINDER_LEGAL_LINE],
-	"caregiver-agreement": [AGREEMENT_LEGAL_LINE],
+const DOC_KIND: Record<string, DocKind> = {
+	"family-care-system": "bundle",
+	"medical-binder": "binder",
+	"caregiver-agreement": "agreement",
+	"emergency-binder": "binder",
 };
 
 async function load(params: Promise<{ handle: string }>) {
 	const slug = SLUG_BY_HANDLE[(await params).handle];
 	const data = slug ? await getStoreProduct(slug) : null;
-	if (!data) notFound();
-	return data;
+	const copy = slug ? PRODUCT_COPY[slug] : undefined;
+	if (!data || !copy) notFound();
+	return { ...data, copy };
 }
 
-/** Short text under the price: SEO description, else the description's first paragraph. */
-function shortText({ product }: StoreProduct) {
-	if (product.seoDescription) return product.seoDescription;
-	const first = product.description.match(/<p>(.*?)<\/p>/)?.[1];
-	if (first && textOf(first)) return textOf(first);
-	return product.kind === "bundle" ? OFFER_SUBHEAD : "";
+/** Admin SEO fields win; the page copy is the default. */
+function seoOf({ product, copy }: StoreProduct & { copy: ProductCopy }) {
+	return { title: product.seoTitle || copy.seo.title, description: product.seoDescription || copy.seo.description };
 }
 
 export async function generateMetadata({ params }: PageProps<"/products/[handle]">): Promise<Metadata> {
 	const data = await load(params);
-	const { product } = data;
+	const seo = seoOf(data);
+	// The System's page repeats the home page: canonical to "/" so they don't compete.
+	const canonical = data.product.slug === BUNDLE_SLUG ? "/" : PRODUCT_PATHS[data.product.slug];
 	return {
-		title: product.seoTitle ? { absolute: product.seoTitle } : product.title,
-		description: shortText(data) || undefined,
-		alternates: { canonical: PRODUCT_PATHS[product.slug] },
-		openGraph: data.images[0] ? { images: [{ url: data.images[0].url }] } : undefined,
+		title: { absolute: seo.title },
+		description: seo.description,
+		alternates: { canonical },
+		openGraph: { title: seo.title, description: seo.description, url: canonical, images: data.images[0] ? [{ url: data.images[0].url }] : undefined },
 	};
 }
 
@@ -71,24 +70,69 @@ function Panel({ title, children, open = false }: { title: string; children: Rea
 	);
 }
 
+/** One copy block under "What's inside" (Glozin's text-with-heading rows). */
+function CopyBlock({ block }: { block: CopySection }) {
+	return (
+		<div className="grid content-start gap-4">
+			<h2 className="text-foreground text-[22px] leading-tight font-semibold tracking-[-0.03em] md:text-[24px]">{block.title}</h2>
+			{block.steps && (
+				<ol className="grid gap-5">
+					{block.steps.map((step, i) => (
+						<li key={step.title} className="grid grid-cols-[auto_1fr] gap-x-4">
+							<span className="text-primary text-[28px] leading-none font-semibold tracking-[-0.04em]">0{i + 1}</span>
+							<div className="grid gap-1">
+								<h3 className="text-foreground text-[16px] font-semibold">{step.title}</h3>
+								<p className="text-body text-[15px] leading-[1.714]">{step.text}</p>
+							</div>
+						</li>
+					))}
+				</ol>
+			)}
+			{block.paragraphs?.map((p) => (
+				<p key={p} className="text-body text-[15px] leading-[1.714]">
+					{p}
+				</p>
+			))}
+			{block.bullets && (
+				<ul className="grid gap-3">
+					{block.bullets.map((b) => (
+						<li key={b.text} className="text-body flex gap-3 text-[15px] leading-[1.714]">
+							<span aria-hidden className="bg-primary mt-[0.7em] size-1.5 shrink-0 rounded-full" />
+							<span>
+								{b.lead && <strong className="text-foreground font-semibold">{b.lead} </strong>}
+								{b.text}
+							</span>
+						</li>
+					))}
+				</ul>
+			)}
+			{block.sample && (
+				<figure className="grid gap-2 rounded-[10px] bg-[#f5f5f5] p-5 md:p-6">
+					<figcaption className={`${eyebrow} text-body`}>{block.sample.label}</figcaption>
+					<blockquote className="text-foreground text-[16px] leading-[1.7] italic">{block.sample.text}</blockquote>
+				</figure>
+			)}
+		</div>
+	);
+}
+
 /**
  * Store product page in the Glozin product layout: gallery left, buy column
- * right, accordions under the buy box. Same template for the System, the
- * Medical Binder and the Caregiver Agreement (spec routes).
+ * right with the accordions, then the page copy full width (what's inside,
+ * the copy sections, FAQ, legal lines) and the upgrade banner last.
  */
 export default async function ProductPage({ params, searchParams }: PageProps<"/products/[handle]">) {
 	const [data, query] = await Promise.all([load(params), searchParams]);
 	const [country, { contact }] = await Promise.all([visitorCountry(query.country), getSettings("contact")]);
-	const { product, images, assets, system } = data;
+	const { product, images, assets, system, copy } = data;
 	const usVisitor = !country || country === "US";
-	const isBundle = product.kind === "bundle";
-	const isAgreement = product.slug === "caregiver-agreement";
+	const isBundle = product.slug === BUNDLE_SLUG;
 	const discount = data.compareAt ? Math.round((1 - data.price / data.compareAt) * 100) : 0;
 	const presale = assets.some((a) => assetStatus(a) === "presale");
 	const checkoutError = typeof query.checkout_error === "string" ? query.checkout_error : null;
-	const short = shortText(data);
-	const url = `${siteUrl()}${PRODUCT_PATHS[product.slug]}`;
+	const url = `${siteUrl()}${isBundle ? "/" : PRODUCT_PATHS[product.slug]}`;
 	const upgradeBy = system ? system.price - data.price : 0;
+	const description = product.description && textOf(product.description) ? product.description : null;
 
 	const buyButton = !usVisitor ? (
 		<div className="bg-muted/70 grid gap-1 rounded-[10px] p-4 text-sm">
@@ -104,7 +148,8 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 				type="submit"
 				className="bg-foreground hover:bg-primary flex h-[50px] w-full items-center justify-center rounded-full text-[15px] font-semibold tracking-[-0.024em] text-white transition-colors"
 			>
-				{presale ? "Pre-order" : "Buy now"} · {formatStorePrice(data.price)}
+				{BUY_LABELS[product.slug] ?? "Buy now"}
+				{presale ? " · Pre-order" : ""}
 			</button>
 		</form>
 	) : (
@@ -115,20 +160,25 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 
 	return (
 		<main className="flex-1">
-			<script type="application/ld+json" dangerouslySetInnerHTML={jsonLdHtml(productJsonLd({ title: product.title, description: short || product.title, price: data.price, url, image: images[0]?.url, inStock: data.sellable }))} />
+			<script
+				type="application/ld+json"
+				dangerouslySetInnerHTML={jsonLdHtml(
+					productJsonLd({ title: copy.schemaName ?? copy.h1, description: copy.seo.description, price: data.price, url, image: images[0]?.url, inStock: data.sellable }),
+				)}
+			/>
 
-			<div className={`${container} pt-6 pb-16 md:pb-[70px]`}>
+			<div className={`${container} pt-6 pb-12 md:pb-[70px]`}>
 				<nav aria-label="Breadcrumb" className="text-body mb-6 text-[13px]">
 					<Link href="/" className="hover:text-foreground">
 						Home
 					</Link>
 					<span className="mx-2">·</span>
-					<span className="text-foreground">{product.title}</span>
+					<span className="text-foreground">{copy.h1}</span>
 				</nav>
 
 				<div className="grid items-start gap-8 md:grid-cols-2 lg:gap-[60px]">
 					<div className="md:sticky md:top-[130px]">
-						<ProductGallery images={images} title={product.title} fallback={<DocMockup kind={DOC_KIND[product.slug] ?? "binder"} title={product.title} />} />
+						<ProductGallery images={images} title={copy.h1} fallback={<DocMockup kind={DOC_KIND[product.slug] ?? "binder"} title={product.title} />} />
 					</div>
 
 					<div className="grid gap-6">
@@ -140,39 +190,38 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 								</div>
 							)}
 							<p className="text-body text-[13px]">Parentkeeping</p>
-							<h1 className="text-foreground text-[26px] leading-tight font-semibold tracking-[-0.034em] md:text-[30px]">{product.title}</h1>
+							<h1 className="text-foreground text-[26px] leading-tight font-semibold tracking-[-0.034em] md:text-[30px]">{copy.h1}</h1>
 							<p className="flex flex-wrap items-baseline gap-x-2.5 tabular-nums">
 								<span className={cn("text-[24px] font-semibold", data.compareAt && "text-[#dc3545]")}>{formatStorePrice(data.price)}</span>
 								{data.compareAt && <span className="text-body text-[17px] line-through">{formatStorePrice(data.compareAt)}</span>}
-								<span className="text-body text-[13px]">USD · Available to US customers</span>
+								{data.foundingEndsAt && <span className="text-foreground text-[14px] font-medium">founding price until {formatStoreDay(data.foundingEndsAt)}</span>}
 							</p>
-							{data.foundingEndsAt && (
-								<p className="text-[14px]">
-									<span className="font-semibold">Founding price</span> until {fmtDay(data.foundingEndsAt)}. Then {formatStorePrice(data.compareAt!)}.
-								</p>
-							)}
-							{short && <p className="text-body text-[15px] leading-[1.714]">{short}</p>}
+							<p className="text-body text-[13px]">{ONE_PRICE_BADGE}</p>
+							<p className="text-body text-[15px] leading-[1.714]">{copy.subhead}</p>
 						</div>
 
 						<div className="flex flex-wrap items-center gap-5 border-y py-4">
 							{contact.supportEmail && (
-								<a href={`mailto:${contact.supportEmail}?subject=${encodeURIComponent(`Question about ${product.title}`)}`} className="text-foreground hover:text-primary flex items-center gap-2 text-sm transition-colors">
+								<a
+									href={`mailto:${contact.supportEmail}?subject=${encodeURIComponent(`Question about ${copy.h1}`)}`}
+									className="text-foreground hover:text-primary flex items-center gap-2 text-sm transition-colors"
+								>
 									<CircleHelp className="size-4" />
 									Ask a question
 								</a>
 							)}
-							<ShareButton title={product.title} />
+							<ShareButton title={copy.h1} />
 						</div>
 
 						<div className="grid gap-3">
-							{isAgreement && <p className="rounded-[10px] bg-amber-50 p-3 text-[13px] leading-relaxed text-amber-900">{AGREEMENT_LEGAL_LINE}</p>}
+							{copy.aboveButton && <p className="rounded-[10px] bg-amber-50 p-3 text-[13px] leading-relaxed text-amber-900">{copy.aboveButton}</p>}
 							{checkoutError && <p className="bg-destructive/10 text-destructive rounded-[10px] p-3 text-sm">{checkoutError}</p>}
 							{buyButton}
 							<div className="text-body grid gap-1 text-[13px]">
-								<p>{PRODUCT_DISCLAIMER_SHORT}</p>
+								<p>{copy.underButton}</p>
 								<p className="flex items-center gap-1.5">
-									<ShieldCheck className="text-primary size-4" />
-									14-day “if it doesn&apos;t help” guarantee
+									<ShieldCheck className="text-primary size-4 shrink-0" />
+									{BUY_GUARANTEE_LINE}
 								</p>
 							</div>
 						</div>
@@ -205,25 +254,16 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 							<p className="text-body text-xs">Secure payment by Stripe. Sales tax is calculated at checkout.</p>
 						</div>
 
-						{system && upgradeBy > 0 && (
-							<Link href={PRODUCT_PATHS["family-care-system"]} className="group hover:border-foreground grid gap-1 rounded-[10px] border p-5 transition-colors">
-								<span className="text-primary text-xs font-bold tracking-[0.02em] uppercase">Upgrade to the Family Care System</span>
-								<span className="text-foreground text-[17px] font-semibold tracking-[-0.02em]">
-									Get this plus the shared sheet, agreement and meeting kit for {formatStorePrice(upgradeBy)} more
-								</span>
-								<span className="text-foreground mt-1 flex items-center gap-1 text-sm font-semibold">
-									See the System · {formatStorePrice(system.price)}
-									<ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-								</span>
-							</Link>
-						)}
-
 						<div className="border-t">
 							<Panel title="Description" open>
-								{product.description ? (
-									<div className="rich-text" dangerouslySetInnerHTML={{ __html: product.description }} />
+								{description ? (
+									<div className="rich-text" dangerouslySetInnerHTML={{ __html: description }} />
 								) : (
-									<p>{short || "Details coming soon."}</p>
+									<div className="grid gap-3">
+										{(copy.intro ?? [copy.subhead]).map((p) => (
+											<p key={p}>{p}</p>
+										))}
+									</div>
 								)}
 							</Panel>
 
@@ -236,8 +276,8 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 												<li key={part.name} className="grid gap-0.5">
 													<span className="text-foreground font-semibold">{part.name}</span>
 													<span className="text-[14px]">
-														{part.format} · {part.pillar}
-														{arrives ? ` · arrives by ${fmtDay(arrives)}` : ""}
+														{part.format}
+														{arrives ? ` · arrives by ${formatStoreDay(arrives)}` : ""}
 													</span>
 												</li>
 											);
@@ -251,9 +291,7 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 												<li key={a.id} className="flex items-center gap-2.5">
 													<Icon className="text-foreground size-4 shrink-0" />
 													<span className="text-foreground min-w-0 flex-1">{a.fileName ?? a.label}</span>
-													<span className="shrink-0 text-[13px]">
-														{a.availableAt ? `Arrives by ${fmtDay(a.availableAt)}` : formatBytes(a.sizeBytes)}
-													</span>
+													<span className="shrink-0 text-[13px]">{a.availableAt ? `Arrives by ${formatStoreDay(a.availableAt)}` : formatBytes(a.sizeBytes)}</span>
 												</li>
 											);
 										})}
@@ -276,7 +314,7 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 									{presale && (
 										<li className="flex gap-2.5">
 											<CalendarClock className="text-foreground mt-1 size-4 shrink-0" />
-											Pre-sale parts arrive by email on their date at no extra cost. If a date is missed, you can ask for a full refund.
+											Pre-sale parts arrive by email on their date at no extra cost. If we miss the date, you can have a full refund.
 										</li>
 									)}
 									<li className="flex gap-2.5">
@@ -289,32 +327,104 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 							</Panel>
 
 							<Panel title="Refund policy">
-								<p>{GUARANTEE_TEXT}</p>
+								<p>{guaranteeText(contact.supportEmail)}</p>
 								<Link href="/policies/refund-policy" className="text-foreground mt-2 inline-block font-semibold underline-offset-2 hover:underline">
 									Read the refund policy
 								</Link>
 							</Panel>
-
-							<Panel title="Questions">
-								<dl className="grid gap-4">
-									{OFFER_FAQ.map((item) => (
-										<div key={item.q} className="grid gap-1">
-											<dt className="text-foreground font-semibold">{item.q}</dt>
-											<dd>{item.a}</dd>
-										</div>
-									))}
-								</dl>
-							</Panel>
-						</div>
-
-						<div className="text-body grid gap-1 text-xs">
-							{(LEGAL_LINES[product.slug] ?? []).map((line) => (
-								<p key={line}>{line}</p>
-							))}
 						</div>
 					</div>
 				</div>
 			</div>
+
+			{/* What's inside: Glozin's grey icon-box grid */}
+			<section className={`${container} ${section} border-t`}>
+				<h2 className={`${sectionTitle} mb-8 text-center md:mb-10`}>{copy.inside.title}</h2>
+				<ol className="grid gap-4 sm:grid-cols-2 md:gap-[30px] lg:grid-cols-3">
+					{copy.inside.items.map((item, i) => (
+						<li key={item.name} className="grid content-start gap-2 rounded-[10px] bg-[#f5f5f5] p-6">
+							<span className="text-primary text-[13px] font-semibold tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+							<h3 className="text-foreground text-[18px] leading-snug font-semibold tracking-[-0.02em]">{item.name}</h3>
+							<p className="text-body text-[15px] leading-[1.714]">{item.text}</p>
+							{item.meta && <p className="text-foreground mt-1 text-[13px] font-medium">{item.meta}</p>}
+						</li>
+					))}
+				</ol>
+			</section>
+
+			{copy.sections.length > 0 && (
+				<section className={`${container} pb-12 md:pb-[70px]`}>
+					<div className={cn("grid gap-10 md:gap-[60px]", copy.sections.length > 1 && "md:grid-cols-2")}>
+						{copy.sections.map((block) => (
+							<CopyBlock key={block.title} block={block} />
+						))}
+					</div>
+				</section>
+			)}
+
+			{/* FAQ: the home page's flat accordion */}
+			<section className={`${container} pb-12 md:pb-[70px]`}>
+				<div className="mx-auto grid max-w-[860px] gap-8">
+					<h2 className={`${sectionTitle} text-center`}>Questions</h2>
+					<div className="border-t">
+						{copy.faq.map((item) => (
+							<details key={item.q} className="group border-b py-5">
+								<summary className="text-foreground flex cursor-pointer list-none items-center justify-between gap-4 text-[17px] font-semibold tracking-[-0.02em] [&::-webkit-details-marker]:hidden">
+									{item.q}
+									<Plus className="size-5 shrink-0 transition-transform group-open:rotate-45" />
+								</summary>
+								<p className="text-body mt-3 text-[15px] leading-[1.714]">
+									{item.a}
+									{item.link && (
+										<>
+											{" "}
+											<Link href={item.link.href} className="text-foreground hover:text-primary font-semibold underline underline-offset-2">
+												{item.link.label}
+											</Link>
+										</>
+									)}
+								</p>
+							</details>
+						))}
+					</div>
+					<div className="text-body grid gap-2 text-xs leading-relaxed">
+						{copy.legal.map((line) => (
+							<p key={line.text}>
+								{line.label && <span className="text-foreground font-semibold">{line.label}: </span>}
+								{line.text}
+							</p>
+						))}
+					</div>
+				</div>
+			</section>
+
+			{/* Every product page ends with the upgrade block (Glozin's closing banner). */}
+			{copy.upgrade && system && (copy.upgrade.priceLine ? upgradeBy > 0 : true) && (
+				<section className={`${container} pb-12 md:pb-[70px]`}>
+					<div className={`${media} bg-deep flex min-h-[380px] items-center justify-center px-6 py-14 text-center text-white md:min-h-[440px]`}>
+						<span
+							aria-hidden
+							className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_60%_at_50%_100%,color-mix(in_oklab,var(--brand)_60%,transparent)_0%,transparent_70%)]"
+						/>
+						<div className="grid max-w-[640px] justify-items-center gap-4">
+							<p className={eyebrow}>The Family Care System</p>
+							<h2 className="text-[30px] leading-[1.15] font-semibold tracking-[-0.034em] md:text-[38px]">{copy.upgrade.title}</h2>
+							<p className="text-[16px] leading-relaxed text-white/85">{copy.upgrade.text}</p>
+							{copy.upgrade.priceLine && (
+								<p className="text-[17px] font-semibold">
+									{system.compareAt
+										? `Only ${formatStorePrice(upgradeBy)} more at the founding price (${formatStorePrice(system.price)}).`
+										: `Only ${formatStorePrice(upgradeBy)} more (${formatStorePrice(system.price)}).`}
+								</p>
+							)}
+							<Link href={copy.upgrade.href} className={`${pillLight} mt-2 gap-2`}>
+								{copy.upgrade.cta}
+								<ArrowRight className="size-4" />
+							</Link>
+						</div>
+					</div>
+				</section>
+			)}
 		</main>
 	);
 }
