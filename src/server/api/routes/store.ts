@@ -6,6 +6,8 @@ import { db } from "@/server/db";
 import { orders } from "@/server/db/schema";
 import { getStripe } from "@/server/lib/stripe";
 import { issueDownloadLink } from "@/server/services/download-tokens";
+import { requestNewLinks, startDownload } from "@/server/services/downloads";
+import { z } from "zod";
 import { CheckoutError, createCheckoutSession } from "@/server/services/checkout";
 import { handleStripeEvent } from "@/server/services/stripe-webhook";
 
@@ -53,6 +55,28 @@ export const storeRoutes = new Hono()
     }
     const url = await issueDownloadLink(order.id);
     return c.redirect(new URL(url).pathname, 303);
+  })
+  /**
+   * GET /api/download/[fileId]?t=[link]: checks the link, counts the download,
+   * then redirects to a short-lived signed file URL (or the Sheet copy link).
+   */
+  .get("/download/:fileId", async (c) => {
+    const token = c.req.query("t") ?? "";
+    const fileId = c.req.param("fileId");
+    if (!z.uuid().safeParse(fileId).success) return c.redirect(`/downloads/${encodeURIComponent(token)}?error=not_in_order`, 303);
+    const result = await startDownload(token, fileId);
+    c.header("Cache-Control", "no-store");
+    c.header("Referrer-Policy", "no-referrer");
+    if (!result.ok) return c.redirect(`/downloads/${encodeURIComponent(token)}?error=${result.error}`, 303);
+    return c.redirect(result.url, 302);
+  })
+  /** "Email me a new link" (same answer whether or not the email has orders). */
+  .post("/downloads/request-link", async (c) => {
+    const body = (await c.req.json().catch(() => ({}))) as { email?: string; website?: string };
+    const email = z.email().safeParse(String(body.email ?? "").trim());
+    if (!email.success) return c.json({ error: "Enter the email you used at checkout." }, 400);
+    if (!body.website) await requestNewLinks(email.data); // "website" = honeypot for bots
+    return c.json({ ok: true });
   })
   /** Stripe webhook: verified signature, then idempotent handling. */
   .post("/stripe/webhook", async (c) => {

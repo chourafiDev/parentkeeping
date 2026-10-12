@@ -8,6 +8,7 @@ import { db } from "@/server/db";
 import { orders } from "@/server/db/schema";
 import { getStripe } from "@/server/lib/stripe";
 import { getOrderFiles } from "@/server/queries/orders";
+import { StoreCard } from "../_components/store-card";
 import { Refresher } from "./refresher";
 
 export const metadata: Metadata = { title: "Thank you", robots: { index: false, follow: false } };
@@ -18,35 +19,31 @@ export const dynamic = "force-dynamic";
 const FRESH_MS = 48 * 60 * 60 * 1000;
 const isFresh = (paidAt: Date) => Date.now() - paidAt.getTime() < FRESH_MS;
 
-function Shell({ children }: { children: React.ReactNode }) {
-	return (
-		<main className="flex flex-1 items-center justify-center px-4 py-16">
-			<div className="bg-card w-full max-w-lg rounded-2xl border p-6 text-center sm:p-8">{children}</div>
-		</main>
-	);
-}
-
 export default async function ThankYouPage({ searchParams }: PageProps<"/thank-you">) {
 	const sessionId = (await searchParams).session_id;
 	const stripe = getStripe();
 	if (typeof sessionId !== "string" || !sessionId.startsWith("cs_") || !stripe) {
 		return (
-			<Shell>
+			<StoreCard>
+			<div className="text-center">
 				<h1 className="text-2xl font-semibold tracking-tight">Thank you</h1>
 				<p className="text-muted-foreground mt-2">Your download link is in your order email.</p>
-			</Shell>
+						</div>
+		</StoreCard>
 		);
 	}
 
 	const session = await stripe.checkout.sessions.retrieve(sessionId).catch(() => null);
 	if (!session || session.payment_status !== "paid") {
 		return (
-			<Shell>
+			<StoreCard>
+			<div className="text-center">
 				<h1 className="text-2xl font-semibold tracking-tight">We couldn&apos;t confirm this payment</h1>
 				<p className="text-muted-foreground mt-2">
 					If you were charged, your download link will arrive by email shortly.
 				</p>
-			</Shell>
+						</div>
+		</StoreCard>
 		);
 	}
 
@@ -55,20 +52,23 @@ export default async function ThankYouPage({ searchParams }: PageProps<"/thank-y
 
 	if (!order) {
 		return (
-			<Shell>
+			<StoreCard>
+			<div className="text-center">
 				<CircleCheck className="text-primary mx-auto mb-3 size-10" />
 				<h1 className="text-2xl font-semibold tracking-tight">Thank you for your order</h1>
 				<p className="text-muted-foreground mt-2 mb-6">
 					Your payment went through{email ? `, and a receipt is on its way to ${email}` : ""}.
 				</p>
 				<Refresher />
-			</Shell>
+						</div>
+		</StoreCard>
 		);
 	}
 
 	if (order.status !== "paid") {
 		return (
-			<Shell>
+			<StoreCard>
+			<div className="text-center">
 				<h1 className="text-2xl font-semibold tracking-tight">
 					{order.refundedAt ? "Your order was refunded" : "Your order will be refunded"}
 				</h1>
@@ -77,7 +77,8 @@ export default async function ThankYouPage({ searchParams }: PageProps<"/thank-y
 						? "Our paid products are only available to US customers for now, so we've refunded the full amount. We sent you an email with the details and a free list that works anywhere."
 						: "Our paid products are only available to US customers for now, so we're refunding the full amount. You'll get an email once it's done, with a free list that works anywhere."}
 				</p>
-			</Shell>
+						</div>
+		</StoreCard>
 		);
 	}
 
@@ -85,7 +86,8 @@ export default async function ThankYouPage({ searchParams }: PageProps<"/thank-y
 	const fresh = isFresh(order.paidAt);
 
 	return (
-		<Shell>
+		<StoreCard>
+			<div className="text-center">
 			<CircleCheck className="text-primary mx-auto mb-3 size-10" />
 			<h1 className="text-2xl font-semibold tracking-tight">
 				{files.some((f) => assetStatus(f) === "ready") ? "Thank you, your files are ready" : "Thank you for your order"}
@@ -123,6 +125,7 @@ export default async function ThankYouPage({ searchParams }: PageProps<"/thank-y
 			<p className="text-muted-foreground mt-4 text-xs">
 				{SITE.name} · 14-day “if it doesn&apos;t help” guarantee. An organizing tool, not medical or legal advice.
 			</p>
-		</Shell>
+					</div>
+		</StoreCard>
 	);
 }
