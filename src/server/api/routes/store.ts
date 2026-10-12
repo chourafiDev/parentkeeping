@@ -7,6 +7,9 @@ import { orders } from "@/server/db/schema";
 import { getStripe } from "@/server/lib/stripe";
 import { issueDownloadLink } from "@/server/services/download-tokens";
 import { requestNewLinks, startDownload } from "@/server/services/downloads";
+import { SignupError, subscribeToFreeList, unsubscribe } from "@/server/services/subscribers";
+import { verifyUnsubscribe } from "@/server/lib/unsubscribe";
+import { FREE_LIST_PATH } from "@/lib/free-list";
 import { z } from "zod";
 import { CheckoutError, createCheckoutSession } from "@/server/services/checkout";
 import { handleStripeEvent } from "@/server/services/stripe-webhook";
@@ -77,6 +80,47 @@ export const storeRoutes = new Hono()
     if (!email.success) return c.json({ error: "Enter the email you used at checkout." }, 400);
     if (!body.website) await requestNewLinks(email.data); // "website" = honeypot for bots
     return c.json({ ok: true });
+  })
+  /**
+   * Free list sign-up. Plain form POST (303 to the thank-you page, works
+   * without JavaScript) or JSON. "website" is a honeypot field for bots.
+   */
+  .post("/subscribe", async (c) => {
+    const isForm = (c.req.header("content-type") ?? "").includes("form");
+    const body = (isForm ? await c.req.parseBody() : await c.req.json().catch(() => ({}))) as Record<string, unknown>;
+    const back = (error: string) =>
+      isForm ? c.redirect(`${FREE_LIST_PATH}?error=${encodeURIComponent(error)}#signup`, 303) : c.json({ error }, 400);
+
+    if (body.website) return isForm ? c.redirect(`${FREE_LIST_PATH}/thanks`, 303) : c.json({ ok: true }); // bot: pretend
+    const email = z.email().safeParse(String(body.email ?? "").trim());
+    if (!email.success) return back("Enter a valid email address.");
+
+    // Dev only: ?country=GB on the page is passed through to test the EU/UK box.
+    const devCountry = process.env.NODE_ENV !== "production" ? String(body.country ?? "") : "";
+    try {
+      await subscribeToFreeList({
+        email: email.data,
+        newsletterBox: body.newsletter === "on" || body.newsletter === true,
+        country: (devCountry || c.req.header("x-vercel-ip-country")) ?? null,
+        variant: getCookie(c, VARIANT_COOKIE) ?? null,
+        ip: c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+        turnstileToken: String(body["cf-turnstile-response"] ?? "") || undefined,
+      });
+    } catch (err) {
+      if (err instanceof SignupError) return back(err.message);
+      console.error("Sign-up failed", err);
+      return back("Something went wrong. Please try again.");
+    }
+    return isForm ? c.redirect(`${FREE_LIST_PATH}/thanks`, 303) : c.json({ ok: true });
+  })
+  /** Unsubscribe confirm button (the email link opens a page first, never a GET that acts). */
+  .post("/unsubscribe", async (c) => {
+    const body = await c.req.parseBody();
+    const id = String(body.s ?? "");
+    const sig = String(body.sig ?? "");
+    if (!z.uuid().safeParse(id).success || !verifyUnsubscribe(id, sig)) return c.redirect("/pages/unsubscribe?status=invalid", 303);
+    await unsubscribe(id);
+    return c.redirect("/pages/unsubscribe?status=done", 303);
   })
   /** Stripe webhook: verified signature, then idempotent handling. */
   .post("/stripe/webhook", async (c) => {

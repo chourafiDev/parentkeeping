@@ -1,5 +1,5 @@
 import "server-only";
-import { ORDER_CONSENT_LINE } from "@/lib/legal";
+import { MEDICATION_LEGAL_LINE, ORDER_CONSENT_LINE } from "@/lib/legal";
 import { SITE } from "@/lib/site";
 
 // Buyer-facing emails (order emails come with the Stripe webhook).
@@ -130,6 +130,32 @@ Our paid products are only available to US customers for now, so we've refunded 
 
 Our free Medication List works anywhere: ${p.freeListUrl}
 ${p.footer.supportEmail ? `\nQuestions? Write to ${p.footer.supportEmail}.` : ""}
+
+${[SITE.name, p.footer.postalAddress].filter(Boolean).join("\n")}`,
+  };
+}
+
+/** Free list delivery (fallback until the email tool sends welcome email 1). */
+export function freeListEmail(p: { pdfUrl: string; unsubscribeUrl: string; footer: EmailFooter; newsletter: boolean }) {
+  return {
+    subject: "Your free Medication List & Daily Medication Chart",
+    html: layout({
+      footer: p.footer,
+      preheader: "Here's your printable list. Fill it in once, keep a copy in your wallet.",
+      body: `<h1 style="font-size:20px;margin:20px 0 8px">Here's your free list</h1>
+<p style="font-size:15px;line-height:1.6;margin:0">Your printable Medication List &amp; Daily Medication Chart is ready. Print it, fill it in with your parent's medications exactly as prescribed, and keep the wallet card with you.</p>
+${button(p.pdfUrl, "Download the list (PDF)")}
+<p style="font-size:13px;line-height:1.6;margin:0;color:${MUTED}">${escape(MEDICATION_LEGAL_LINE)}</p>
+<p style="font-size:12px;line-height:1.6;margin:16px 0 0;color:${MUTED}">${p.newsletter ? "You'll also get our weekly caregiving emails. " : ""}<a href="${escape(p.unsubscribeUrl)}" style="color:${MUTED}">Unsubscribe</a></p>`,
+    }),
+    text: `Here's your free list
+
+Download your printable Medication List & Daily Medication Chart:
+${p.pdfUrl}
+
+${MEDICATION_LEGAL_LINE}
+
+${p.newsletter ? "You'll also get our weekly caregiving emails. " : ""}Unsubscribe: ${p.unsubscribeUrl}
 
 ${[SITE.name, p.footer.postalAddress].filter(Boolean).join("\n")}`,
   };

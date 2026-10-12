@@ -12,3 +12,13 @@ export const ORDER_CONSENT_LINE =
 
 /** Next to the Pay button (Stripe custom_text.submit), from the spec. */
 export const CHECKOUT_SUBMIT_TEXT = "14-day “if it doesn't help” guarantee. An organizing tool, not medical or legal advice.";
+
+/** Under the free-list button, everyone outside the EU/UK (spec wording). */
+export const SIGNUP_NOTICE = "We'll email you the list, then our weekly caregiving emails. Unsubscribe anytime.";
+
+/** EU/UK visitors: an unticked box. Unticked still gets the file, no newsletter. */
+export const EU_NEWSLETTER_CHECKBOX = "Send me Parentkeeping's weekly emails";
+
+/** Medication product legal line (record as prescribed, no dosing, pharmacist review). */
+export const MEDICATION_LEGAL_LINE =
+  "This list is for recording medications exactly as prescribed. It doesn't give dosing advice. Ask your parent's pharmacist to review it.";
