@@ -12,6 +12,8 @@ const SHOP = [
 	{ href: "/products/medical-binder", label: "Medical Binder" },
 	{ href: "/products/caregiver-agreement-template", label: "Caregiver Agreement" },
 	{ href: FREE_LIST_PATH, label: "Free Medication List" },
+	{ href: "/pages/caregiver-checklists", label: "Free Caregiver Checklists" },
+	{ href: "/pages/caregiver-burnout-quiz", label: "Caregiver Burnout Quiz" },
 ];
 const POLICIES = [
 	{ href: "/policies/refund-policy", label: "Refund Policy" },

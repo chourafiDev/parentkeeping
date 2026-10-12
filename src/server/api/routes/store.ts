@@ -7,7 +7,8 @@ import { orders } from "@/server/db/schema";
 import { getStripe } from "@/server/lib/stripe";
 import { issueDownloadLink } from "@/server/services/download-tokens";
 import { requestNewLinks, startDownload } from "@/server/services/downloads";
-import { SignupError, subscribeToLeadMagnet, unsubscribe } from "@/server/services/subscribers";
+import { SignupError, subscribeToLeadMagnet, subscribeToQuizPlans, unsubscribe } from "@/server/services/subscribers";
+import { QUIZ_SOURCE } from "@/lib/burnout-quiz";
 import { verifyUnsubscribe } from "@/server/lib/unsubscribe";
 import { FREE_LIST, LEAD_MAGNETS } from "@/lib/lead-magnets";
 import { z } from "zod";
@@ -100,15 +101,17 @@ export const storeRoutes = new Hono()
     // Dev only: ?country=GB on the page is passed through to test the EU/UK box.
     const devCountry = process.env.NODE_ENV !== "production" ? String(body.country ?? "") : "";
     try {
-      await subscribeToLeadMagnet({
-        magnet,
+      const meta = {
         email: email.data,
         newsletterBox: body.newsletter === "on" || body.newsletter === true,
         country: (devCountry || c.req.header("x-vercel-ip-country")) ?? null,
         variant: getCookie(c, VARIANT_COOKIE) ?? null,
         ip: c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
         turnstileToken: String(body["cf-turnstile-response"] ?? "") || undefined,
-      });
+      };
+      // The quiz box posts JSON and stays on its page (the result lives only in the browser).
+      if (body.source === QUIZ_SOURCE) await subscribeToQuizPlans(meta);
+      else await subscribeToLeadMagnet({ ...meta, magnet });
     } catch (err) {
       if (err instanceof SignupError) return back(err.message);
       console.error("Sign-up failed", err);

@@ -1,6 +1,8 @@
 import "server-only";
+import { QUIZ_RESULTS } from "@/lib/burnout-quiz";
 import type { LeadMagnet } from "@/lib/lead-magnets";
-import { ORDER_CONSENT_LINE } from "@/lib/legal";
+import { ORDER_CONSENT_LINE, QUIZ_RESULT_FOOTER } from "@/lib/legal";
+import { siteUrl } from "@/lib/site-url";
 import { SITE } from "@/lib/site";
 
 // Buyer-facing emails (order emails come with the Stripe webhook).
@@ -156,6 +158,41 @@ ${e.text}
 ${p.pdfUrl}
 
 ${e.legal}
+
+${p.newsletter ? "You'll also get our weekly caregiving emails. " : ""}Unsubscribe: ${p.unsubscribeUrl}
+
+${[SITE.name, p.footer.postalAddress].filter(Boolean).join("\n")}`,
+  };
+}
+
+/** Burnout quiz: the same email for everyone, with the plan for every band (no score, no answers). */
+export function quizPlansEmail(p: { unsubscribeUrl: string; footer: EmailFooter; newsletter: boolean }) {
+  const base = siteUrl();
+  const nextHtml = (next: (typeof QUIZ_RESULTS)[number]["next"]) =>
+    next.map((s) => (s.href ? `<a href="${escape(base + s.href)}" style="color:${SAGE}">${escape(s.text)}</a>` : escape(s.text))).join("");
+  const nextText = (next: (typeof QUIZ_RESULTS)[number]["next"]) => next.map((s) => (s.href ? `${s.text} (${base}${s.href})` : s.text)).join("");
+  return {
+    subject: "Your caregiver burnout quiz plans",
+    html: layout({
+      footer: p.footer,
+      preheader: "A short plan for every result band, so you can find yours.",
+      body: `<h1 style="font-size:20px;margin:20px 0 8px">Your caregiver burnout quiz plans</h1>
+<p style="font-size:15px;line-height:1.6;margin:0">Here is a short plan for each result band. Find the one that matched your result.</p>
+${QUIZ_RESULTS.map(
+  (r) => `<h2 style="font-size:16px;margin:24px 0 6px">${escape(r.title)} (${r.min} to ${r.max})</h2>
+<p style="font-size:15px;line-height:1.6;margin:0 0 8px">${escape(r.text)}</p>
+<p style="font-size:15px;line-height:1.6;margin:0">${nextHtml(r.next)}</p>`,
+).join("\n")}
+<p style="font-size:13px;line-height:1.6;margin:24px 0 0;color:${MUTED}">${escape(QUIZ_RESULT_FOOTER)}</p>
+<p style="font-size:12px;line-height:1.6;margin:16px 0 0;color:${MUTED}">${p.newsletter ? "You'll also get our weekly caregiving emails. " : ""}<a href="${escape(p.unsubscribeUrl)}" style="color:${MUTED}">Unsubscribe</a></p>`,
+    }),
+    text: `Your caregiver burnout quiz plans
+
+Here is a short plan for each result band. Find the one that matched your result.
+
+${QUIZ_RESULTS.map((r) => `${r.title} (${r.min} to ${r.max})\n${r.text}\n${nextText(r.next)}`).join("\n\n")}
+
+${QUIZ_RESULT_FOOTER}
 
 ${p.newsletter ? "You'll also get our weekly caregiving emails. " : ""}Unsubscribe: ${p.unsubscribeUrl}
 
