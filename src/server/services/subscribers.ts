@@ -1,11 +1,12 @@
 import "server-only";
 import { eq } from "drizzle-orm";
-import { FREE_LIST_PDF, FREE_LIST_SOURCE, OPT_IN_COUNTRIES } from "@/lib/free-list";
-import { EU_NEWSLETTER_CHECKBOX, SIGNUP_NOTICE } from "@/lib/legal";
+import { OPT_IN_COUNTRIES } from "@/lib/free-list";
+import type { LeadMagnet } from "@/lib/lead-magnets";
+import { EU_NEWSLETTER_CHECKBOX, signupNotice } from "@/lib/legal";
 import { siteUrl } from "@/lib/site-url";
 import { db } from "@/server/db";
 import { subscribers } from "@/server/db/schema";
-import { freeListEmail } from "@/server/emails/buyer";
+import { leadMagnetEmail } from "@/server/emails/buyer";
 import { buyerFooter } from "@/server/emails/buyer-footer";
 import { sendEmail } from "@/server/lib/email";
 import { rateLimit } from "@/server/lib/rate-limit";
@@ -37,10 +38,12 @@ async function verifyTurnstile(token: string | undefined, ip: string | null) {
 export const needsOptIn = (country: string | null) => !!country && OPT_IN_COUNTRIES.has(country);
 
 /**
- * Free list sign-up. Records exactly what the person saw and agreed to, then
- * emails the PDF. Signing up again never downgrades an existing consent.
+ * Free download sign-up (Medication List, Checklists). Records exactly what
+ * the person saw and agreed to, then emails the PDF. Signing up again never
+ * downgrades an existing consent; the first sign-up's source is kept.
  */
-export async function subscribeToFreeList(input: {
+export async function subscribeToLeadMagnet(input: {
+  magnet: LeadMagnet;
   email: string;
   newsletterBox: boolean;
   country: string | null;
@@ -60,7 +63,7 @@ export async function subscribeToFreeList(input: {
   const marketingConsent = optIn ? input.newsletterBox : true;
   const consentText = optIn
     ? `Checkbox "${EU_NEWSLETTER_CHECKBOX}": ${input.newsletterBox ? "ticked" : "left unticked"}`
-    : `${SIGNUP_NOTICE} [Privacy Policy]`;
+    : `${signupNotice(input.magnet.noticeWhat)} [Privacy Policy]`;
   const now = new Date();
 
   const [existing] = await db.select().from(subscribers).where(eq(subscribers.email, email));
@@ -70,7 +73,7 @@ export async function subscribeToFreeList(input: {
       .insert(subscribers)
       .values({
         email,
-        source: FREE_LIST_SOURCE,
+        source: input.magnet.source,
         country: input.country,
         marketingConsent,
         consentText,
@@ -96,15 +99,16 @@ export async function subscribeToFreeList(input: {
   try {
     await sendEmail({
       to: { email },
-      ...freeListEmail({
-        pdfUrl: `${siteUrl()}${FREE_LIST_PDF}`,
+      ...leadMagnetEmail({
+        magnet: input.magnet,
+        pdfUrl: `${siteUrl()}${input.magnet.pdf}`,
         unsubscribeUrl: unsubscribeUrl(id),
         footer: await buyerFooter(),
         newsletter: marketingConsent,
       }),
     });
   } catch (err) {
-    console.error("Free list email failed", err);
+    console.error(`Free download email failed (${input.magnet.source})`, err);
   }
   return { id };
 }

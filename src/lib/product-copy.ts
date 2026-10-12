@@ -10,7 +10,11 @@ import { type FaqItem, OFFER_FAQ, OFFER_PARTS, OFFER_SUBHEAD, ONLY_CHILD_NOTE, P
 export type CopySection = {
   title: string;
   paragraphs?: string[];
+  numbered?: string[];
   bullets?: { lead?: string; text: string }[];
+  /** Paragraphs after the list. */
+  after?: string[];
+  link?: { label: string; href: string };
   steps?: readonly { title: string; text: string }[];
   /** A quoted sample (the Agreement's clause). */
   sample?: { label: string; text: string };

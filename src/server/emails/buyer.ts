@@ -1,5 +1,6 @@
 import "server-only";
-import { MEDICATION_LEGAL_LINE, ORDER_CONSENT_LINE } from "@/lib/legal";
+import type { LeadMagnet } from "@/lib/lead-magnets";
+import { ORDER_CONSENT_LINE } from "@/lib/legal";
 import { SITE } from "@/lib/site";
 
 // Buyer-facing emails (order emails come with the Stripe webhook).
@@ -135,25 +136,26 @@ ${[SITE.name, p.footer.postalAddress].filter(Boolean).join("\n")}`,
   };
 }
 
-/** Free list delivery (fallback until the email tool sends welcome email 1). */
-export function freeListEmail(p: { pdfUrl: string; unsubscribeUrl: string; footer: EmailFooter; newsletter: boolean }) {
+/** Free download delivery (fallback until the email tool sends welcome email 1). */
+export function leadMagnetEmail(p: { magnet: LeadMagnet; pdfUrl: string; unsubscribeUrl: string; footer: EmailFooter; newsletter: boolean }) {
+  const e = p.magnet.email;
   return {
-    subject: "Your free Medication List & Daily Medication Chart",
+    subject: e.subject,
     html: layout({
       footer: p.footer,
-      preheader: "Here's your printable list. Fill it in once, keep a copy in your wallet.",
-      body: `<h1 style="font-size:20px;margin:20px 0 8px">Here's your free list</h1>
-<p style="font-size:15px;line-height:1.6;margin:0">Your printable Medication List &amp; Daily Medication Chart is ready. Print it, fill it in with your parent's medications exactly as prescribed, and keep the wallet card with you.</p>
-${button(p.pdfUrl, "Download the list (PDF)")}
-<p style="font-size:13px;line-height:1.6;margin:0;color:${MUTED}">${escape(MEDICATION_LEGAL_LINE)}</p>
+      preheader: e.preheader,
+      body: `<h1 style="font-size:20px;margin:20px 0 8px">${escape(e.heading)}</h1>
+<p style="font-size:15px;line-height:1.6;margin:0">${escape(e.text)}</p>
+${button(p.pdfUrl, e.button)}
+<p style="font-size:13px;line-height:1.6;margin:0;color:${MUTED}">${escape(e.legal)}</p>
 <p style="font-size:12px;line-height:1.6;margin:16px 0 0;color:${MUTED}">${p.newsletter ? "You'll also get our weekly caregiving emails. " : ""}<a href="${escape(p.unsubscribeUrl)}" style="color:${MUTED}">Unsubscribe</a></p>`,
     }),
-    text: `Here's your free list
+    text: `${e.heading}
 
-Download your printable Medication List & Daily Medication Chart:
+${e.text}
 ${p.pdfUrl}
 
-${MEDICATION_LEGAL_LINE}
+${e.legal}
 
 ${p.newsletter ? "You'll also get our weekly caregiving emails. " : ""}Unsubscribe: ${p.unsubscribeUrl}
 

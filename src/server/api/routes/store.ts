@@ -7,9 +7,9 @@ import { orders } from "@/server/db/schema";
 import { getStripe } from "@/server/lib/stripe";
 import { issueDownloadLink } from "@/server/services/download-tokens";
 import { requestNewLinks, startDownload } from "@/server/services/downloads";
-import { SignupError, subscribeToFreeList, unsubscribe } from "@/server/services/subscribers";
+import { SignupError, subscribeToLeadMagnet, unsubscribe } from "@/server/services/subscribers";
 import { verifyUnsubscribe } from "@/server/lib/unsubscribe";
-import { FREE_LIST_PATH } from "@/lib/free-list";
+import { FREE_LIST, LEAD_MAGNETS } from "@/lib/lead-magnets";
 import { z } from "zod";
 import { CheckoutError, createCheckoutSession } from "@/server/services/checkout";
 import { handleStripeEvent } from "@/server/services/stripe-webhook";
@@ -88,17 +88,20 @@ export const storeRoutes = new Hono()
   .post("/subscribe", async (c) => {
     const isForm = (c.req.header("content-type") ?? "").includes("form");
     const body = (isForm ? await c.req.parseBody() : await c.req.json().catch(() => ({}))) as Record<string, unknown>;
+    // Which free download (an allow-listed source; the Medication List by default).
+    const magnet = LEAD_MAGNETS[String(body.source ?? "")] ?? FREE_LIST;
     const back = (error: string) =>
-      isForm ? c.redirect(`${FREE_LIST_PATH}?error=${encodeURIComponent(error)}#signup`, 303) : c.json({ error }, 400);
+      isForm ? c.redirect(`${magnet.path}?error=${encodeURIComponent(error)}#signup`, 303) : c.json({ error }, 400);
 
-    if (body.website) return isForm ? c.redirect(`${FREE_LIST_PATH}/thanks`, 303) : c.json({ ok: true }); // bot: pretend
+    if (body.website) return isForm ? c.redirect(`${magnet.path}/thanks`, 303) : c.json({ ok: true }); // bot: pretend
     const email = z.email().safeParse(String(body.email ?? "").trim());
     if (!email.success) return back("Enter a valid email address.");
 
     // Dev only: ?country=GB on the page is passed through to test the EU/UK box.
     const devCountry = process.env.NODE_ENV !== "production" ? String(body.country ?? "") : "";
     try {
-      await subscribeToFreeList({
+      await subscribeToLeadMagnet({
+        magnet,
         email: email.data,
         newsletterBox: body.newsletter === "on" || body.newsletter === true,
         country: (devCountry || c.req.header("x-vercel-ip-country")) ?? null,
@@ -111,7 +114,7 @@ export const storeRoutes = new Hono()
       console.error("Sign-up failed", err);
       return back("Something went wrong. Please try again.");
     }
-    return isForm ? c.redirect(`${FREE_LIST_PATH}/thanks`, 303) : c.json({ ok: true });
+    return isForm ? c.redirect(`${magnet.path}/thanks`, 303) : c.json({ ok: true });
   })
   /** Unsubscribe confirm button (the email link opens a page first, never a GET that acts). */
   .post("/unsubscribe", async (c) => {

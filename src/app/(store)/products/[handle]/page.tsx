@@ -8,17 +8,20 @@ import { FREE_LIST_PATH } from "@/lib/free-list";
 import { BUY_GUARANTEE_LINE } from "@/lib/legal";
 import { formatStorePrice } from "@/lib/money";
 import { guaranteeText, OFFER_PARTS, ONE_PRICE_BADGE } from "@/lib/offer";
-import { type CopySection, PRODUCT_COPY, type ProductCopy } from "@/lib/product-copy";
+import { PRODUCT_COPY, type ProductCopy } from "@/lib/product-copy";
 import { siteUrl } from "@/lib/site-url";
 import { formatStoreDay } from "@/lib/store-time";
 import { cn } from "@/lib/utils";
 import { getSettings } from "@/server/queries/settings";
 import { getStoreProduct, type StoreProduct } from "@/server/queries/storefront";
+import { CopyBlock } from "../../_components/copy-block";
+import { FaqList } from "../../_components/faq-list";
+import { InsideGrid } from "../../_components/inside-grid";
 import { DocMockup, type DocKind } from "../../_components/home/doc-mockup";
 import { ProductGallery } from "../../_components/product/gallery";
 import { ShareButton } from "../../_components/product/share-button";
 import { jsonLdHtml, productJsonLd, visitorCountry } from "../../_components/product-data";
-import { container, eyebrow, media, pillLight, section, sectionTitle } from "../../_components/ui";
+import { container, eyebrow, media, pillLight, sectionTitle } from "../../_components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -67,52 +70,6 @@ function Panel({ title, children, open = false }: { title: string; children: Rea
 			</summary>
 			<div className="text-body pb-5 text-[15px] leading-[1.714]">{children}</div>
 		</details>
-	);
-}
-
-/** One copy block under "What's inside" (Glozin's text-with-heading rows). */
-function CopyBlock({ block }: { block: CopySection }) {
-	return (
-		<div className="grid content-start gap-4">
-			<h2 className="text-foreground text-[22px] leading-tight font-semibold tracking-[-0.03em] md:text-[24px]">{block.title}</h2>
-			{block.steps && (
-				<ol className="grid gap-5">
-					{block.steps.map((step, i) => (
-						<li key={step.title} className="grid grid-cols-[auto_1fr] gap-x-4">
-							<span className="text-primary text-[28px] leading-none font-semibold tracking-[-0.04em]">0{i + 1}</span>
-							<div className="grid gap-1">
-								<h3 className="text-foreground text-[16px] font-semibold">{step.title}</h3>
-								<p className="text-body text-[15px] leading-[1.714]">{step.text}</p>
-							</div>
-						</li>
-					))}
-				</ol>
-			)}
-			{block.paragraphs?.map((p) => (
-				<p key={p} className="text-body text-[15px] leading-[1.714]">
-					{p}
-				</p>
-			))}
-			{block.bullets && (
-				<ul className="grid gap-3">
-					{block.bullets.map((b) => (
-						<li key={b.text} className="text-body flex gap-3 text-[15px] leading-[1.714]">
-							<span aria-hidden className="bg-primary mt-[0.7em] size-1.5 shrink-0 rounded-full" />
-							<span>
-								{b.lead && <strong className="text-foreground font-semibold">{b.lead} </strong>}
-								{b.text}
-							</span>
-						</li>
-					))}
-				</ul>
-			)}
-			{block.sample && (
-				<figure className="grid gap-2 rounded-[10px] bg-[#f5f5f5] p-5 md:p-6">
-					<figcaption className={`${eyebrow} text-body`}>{block.sample.label}</figcaption>
-					<blockquote className="text-foreground text-[16px] leading-[1.7] italic">{block.sample.text}</blockquote>
-				</figure>
-			)}
-		</div>
 	);
 }
 
@@ -337,20 +294,7 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 				</div>
 			</div>
 
-			{/* What's inside: Glozin's grey icon-box grid */}
-			<section className={`${container} ${section} border-t`}>
-				<h2 className={`${sectionTitle} mb-8 text-center md:mb-10`}>{copy.inside.title}</h2>
-				<ol className="grid gap-4 sm:grid-cols-2 md:gap-[30px] lg:grid-cols-3">
-					{copy.inside.items.map((item, i) => (
-						<li key={item.name} className="grid content-start gap-2 rounded-[10px] bg-[#f5f5f5] p-6">
-							<span className="text-primary text-[13px] font-semibold tabular-nums">{String(i + 1).padStart(2, "0")}</span>
-							<h3 className="text-foreground text-[18px] leading-snug font-semibold tracking-[-0.02em]">{item.name}</h3>
-							<p className="text-body text-[15px] leading-[1.714]">{item.text}</p>
-							{item.meta && <p className="text-foreground mt-1 text-[13px] font-medium">{item.meta}</p>}
-						</li>
-					))}
-				</ol>
-			</section>
+			<InsideGrid title={copy.inside.title} items={copy.inside.items} />
 
 			{copy.sections.length > 0 && (
 				<section className={`${container} pb-12 md:pb-[70px]`}>
@@ -366,27 +310,7 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 			<section className={`${container} pb-12 md:pb-[70px]`}>
 				<div className="mx-auto grid max-w-[860px] gap-8">
 					<h2 className={`${sectionTitle} text-center`}>Questions</h2>
-					<div className="border-t">
-						{copy.faq.map((item) => (
-							<details key={item.q} className="group border-b py-5">
-								<summary className="text-foreground flex cursor-pointer list-none items-center justify-between gap-4 text-[17px] font-semibold tracking-[-0.02em] [&::-webkit-details-marker]:hidden">
-									{item.q}
-									<Plus className="size-5 shrink-0 transition-transform group-open:rotate-45" />
-								</summary>
-								<p className="text-body mt-3 text-[15px] leading-[1.714]">
-									{item.a}
-									{item.link && (
-										<>
-											{" "}
-											<Link href={item.link.href} className="text-foreground hover:text-primary font-semibold underline underline-offset-2">
-												{item.link.label}
-											</Link>
-										</>
-									)}
-								</p>
-							</details>
-						))}
-					</div>
+					<FaqList items={copy.faq} />
 					<div className="text-body grid gap-2 text-xs leading-relaxed">
 						{copy.legal.map((line) => (
 							<p key={line.text}>
