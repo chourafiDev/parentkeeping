@@ -16,3 +16,8 @@ const usdRounded = new Intl.NumberFormat("en-US", {
 export function formatUsd(cents: number) {
   return usdRounded.format(Math.round(cents / 100));
 }
+
+/** Store pages: 3900 → "$39", 1950 → "$19.50" (no ".00" on whole dollars). */
+export function formatStorePrice(cents: number) {
+  return cents % 100 === 0 ? usdRounded.format(cents / 100) : formatPrice(cents);
+}

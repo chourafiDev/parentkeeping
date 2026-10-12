@@ -50,9 +50,6 @@ export default async function FreeMedicationListPage({ searchParams }: PageProps
 
 	return (
 		<main className="flex-1">
-			<header className="mx-auto flex max-w-5xl items-center px-4 py-5">
-				<span className="text-lg font-semibold tracking-tight">{SITE.name}</span>
-			</header>
 
 			<section id="signup" className="mx-auto grid max-w-5xl items-center gap-10 px-4 pt-6 pb-16 md:grid-cols-[1.1fr_1fr]">
 				<div className="grid gap-5">

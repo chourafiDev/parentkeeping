@@ -6,8 +6,7 @@ import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { PRODUCT_PATHS } from "@/lib/catalog";
 import { FREE_LIST_PDF } from "@/lib/free-list";
-import { formatPrice } from "@/lib/money";
-import { SITE } from "@/lib/site";
+import { formatStorePrice } from "@/lib/money";
 import { db } from "@/server/db";
 import { products } from "@/server/db/schema";
 import { getFoundingPrice } from "@/server/queries/settings";
@@ -27,9 +26,6 @@ export default async function FreeListThanksPage() {
 
 	return (
 		<main className="flex-1">
-			<header className="mx-auto flex max-w-3xl items-center px-4 py-5">
-				<span className="text-lg font-semibold tracking-tight">{SITE.name}</span>
-			</header>
 			<div className="mx-auto grid max-w-3xl gap-8 px-4 pt-6 pb-16">
 				<section className="bg-card grid gap-4 rounded-2xl border p-6 text-center sm:p-8">
 					<h1 className="text-3xl font-semibold tracking-tight">Here&apos;s your free list</h1>
@@ -63,11 +59,11 @@ export default async function FreeListThanksPage() {
 						</p>
 						<div className="flex flex-wrap items-center gap-3">
 							<Button asChild size="lg" className="h-11 px-6">
-								<a href={PRODUCT_PATHS[binder.slug]}>Get the Medical Binder · {formatPrice(binder.price)}</a>
+								<a href={PRODUCT_PATHS[binder.slug]}>Get the Medical Binder · {formatStorePrice(binder.price)}</a>
 							</Button>
 							{system?.status === "active" && systemPrice != null && (
 								<a href={PRODUCT_PATHS[system.slug]} className="text-primary text-sm font-medium underline-offset-2 hover:underline">
-									Or the whole Family Care System · {formatPrice(systemPrice)}
+									Or the whole Family Care System · {formatStorePrice(systemPrice)}
 								</a>
 							)}
 						</div>
