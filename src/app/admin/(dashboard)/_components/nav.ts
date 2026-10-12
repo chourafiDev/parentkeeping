@@ -4,9 +4,9 @@ import {
   HiCog6Tooth,
   HiCube,
   HiEnvelope,
-  HiIdentification,
   HiShoppingCart,
   HiSquares2X2,
+  HiUserCircle,
 } from "react-icons/hi2";
 import type { Permissions } from "@/server/auth/permissions";
 
@@ -47,10 +47,9 @@ export const navGroups: { label: string; items: NavItem[] }[] = [
     label: "Administration",
     items: [
       {
-        title: "Team",
-        href: "/admin/team",
-        icon: HiIdentification,
-        permission: { user: ["list"] },
+        title: "Account",
+        href: "/admin/account",
+        icon: HiUserCircle,
       },
       {
         title: "Settings",

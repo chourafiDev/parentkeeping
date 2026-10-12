@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE } from "@/lib/site";
 import { AuthCard } from "../_components/auth-card";
 import { ResetPasswordForm } from "./reset-password-form";
 
@@ -9,18 +8,13 @@ export const metadata: Metadata = { title: "Choose a password", robots: { index:
 export default async function ResetPasswordPage({ searchParams }: PageProps<"/admin/reset-password">) {
 	const params = await searchParams;
 	const token = typeof params.token === "string" ? params.token : null;
-	const isInvite = params.invite === "1";
 	// Better Auth redirects here with ?error=INVALID_TOKEN for expired/used links.
 	const invalid = !token || typeof params.error === "string";
 
 	return (
 		<AuthCard
-			title={isInvite ? "Welcome to the team" : "New password"}
-			description={
-				isInvite
-					? `Choose your password to access the ${SITE.name} admin.`
-					: "Choose a new password for your account."
-			}
+			title="New password"
+			description="Choose a new password for your account."
 		>
 			{invalid ? (
 				<div className="mt-10 grid gap-4 text-sm">

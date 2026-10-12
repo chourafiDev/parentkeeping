@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ExternalLink, LogOut, Settings, Users } from "lucide-react";
+import { ChevronDown, CircleUser, ExternalLink, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -14,7 +14,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
-import { hasPermission, isRole, ROLE_LABELS } from "@/server/auth/permissions";
+import { hasPermission } from "@/server/auth/permissions";
 
 export type SessionUser = { name: string; email: string; role?: string | null };
 
@@ -30,7 +30,6 @@ function initials(name: string) {
 /** Avatar + name in the header, with the account menu. */
 export function UserMenu({ user }: { user: SessionUser }) {
 	const router = useRouter();
-	const role = user.role?.split(",").find(isRole);
 
 	async function signOut() {
 		await authClient.signOut();
@@ -53,7 +52,7 @@ export function UserMenu({ user }: { user: SessionUser }) {
 					<span className="hidden text-start leading-tight md:grid">
 						<span className="max-w-36 truncate text-sm font-medium">{user.name}</span>
 						<span className="text-muted-foreground max-w-36 truncate text-xs">
-							{role ? ROLE_LABELS[role] : user.email}
+							{user.email}
 						</span>
 					</span>
 					<ChevronDown className="text-muted-foreground size-4" />
@@ -76,14 +75,12 @@ export function UserMenu({ user }: { user: SessionUser }) {
 							</Link>
 						</DropdownMenuItem>
 					)}
-					{hasPermission(user.role, { user: ["list"] }) && (
-						<DropdownMenuItem asChild>
-							<Link href="/admin/team">
-								<Users />
-								Team
-							</Link>
-						</DropdownMenuItem>
-					)}
+					<DropdownMenuItem asChild>
+						<Link href="/admin/account">
+							<CircleUser />
+							Account
+						</Link>
+					</DropdownMenuItem>
 					<DropdownMenuItem asChild>
 						<a href="/" target="_blank" rel="noreferrer">
 							<ExternalLink />

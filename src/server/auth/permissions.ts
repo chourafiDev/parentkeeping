@@ -14,7 +14,7 @@ export const statements = {
 
 export const ac = createAccessControl(statements);
 
-// Store owner: everything, including team accounts and settings.
+// Store owner: everything.
 export const owner = ac.newRole({
   ...adminAc.statements,
   product: ["create", "read", "update", "delete"],
@@ -24,29 +24,13 @@ export const owner = ac.newRole({
   finance: ["read"],
 });
 
-// Support: answers buyers (resends links, looks up orders), no money or settings.
-export const support = ac.newRole({
-  product: ["read"],
-  order: ["read", "update"],
-  subscriber: ["read"],
-});
-
-export const roles = { owner, support };
+// One account: the store owner. The permission checks stay in place (they
+// always pass for the owner) in case a second account is ever needed.
+export const roles = { owner };
 
 export type Role = keyof typeof roles;
 export type Permissions = {
   [K in keyof typeof statements]?: (typeof statements)[K][number][];
-};
-
-export const ROLE_LABELS: Record<Role, string> = {
-  owner: "Owner",
-  support: "Support",
-};
-
-/** What each role can do (shown when inviting / changing a member's role). */
-export const ROLE_DESCRIPTIONS: Record<Role, string> = {
-  owner: "Full access: products, orders, refunds, subscribers, settings and the team.",
-  support: "Looks up orders and subscribers, resends download links. No refunds, revenue or settings.",
 };
 
 export function isRole(value: unknown): value is Role {

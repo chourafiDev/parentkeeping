@@ -40,7 +40,7 @@ export const auth = betterAuth({
     admin({
       ac,
       roles,
-      defaultRole: "support", // least privilege
+      defaultRole: "owner", // single-owner store
       adminRoles: ["owner"],
     }),
   ],

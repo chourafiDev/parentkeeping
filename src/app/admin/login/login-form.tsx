@@ -96,12 +96,6 @@ export function LoginForm({ next }: { next: string }) {
 				{pending && <Loader className="size-4 animate-spin" />}
 				{pending ? "Signing in…" : "Sign in"}
 			</Button>
-			<p className="text-muted-foreground text-center text-sm">
-				No access yet?{" "}
-				<span className="text-foreground">
-					Ask the owner for an invite.
-				</span>
-			</p>
 		</form>
 	);
 }
