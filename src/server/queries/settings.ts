@@ -25,3 +25,10 @@ export async function getSettings<K extends keyof StoreSettings>(...keys: K[]): 
   }
   return out;
 }
+
+/** Founding price window: active until `endsAt` (end of a US Eastern day). */
+export async function getFoundingPrice() {
+  const { pricing } = await getSettings("pricing");
+  const endsAt = pricing.foundingEndsAt ? new Date(pricing.foundingEndsAt) : null;
+  return { endsAt, active: !!endsAt && endsAt.getTime() > Date.now() };
+}

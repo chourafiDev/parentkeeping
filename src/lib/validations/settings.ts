@@ -1,0 +1,27 @@
+import { z } from "zod";
+
+// Settings form ↔ API. Dates are store-local days ("yyyy-MM-dd", US Eastern).
+
+const optionalEmail = z
+  .string()
+  .trim()
+  .max(200)
+  .refine((v) => v === "" || z.email().safeParse(v).success, "Enter a valid email");
+
+export const settingsInputSchema = z.object({
+  pricing: z.object({
+    // Founding price runs until the end of this day; null = no founding price.
+    foundingEndsOn: z.iso.date().nullable(),
+  }),
+  checkout: z.object({
+    bumpEnabled: z.boolean(),
+  }),
+  contact: z.object({
+    legalName: z.string().trim().max(200),
+    supportEmail: optionalEmail,
+    privacyEmail: optionalEmail,
+    postalAddress: z.string().trim().max(400),
+  }),
+});
+
+export type SettingsInput = z.infer<typeof settingsInputSchema>;

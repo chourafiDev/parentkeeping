@@ -4,6 +4,7 @@ import { type AuthEnv, requireStaff } from "../middleware/auth";
 import { assetRoutes } from "./assets";
 import { orderRoutes } from "./orders";
 import { productRoutes } from "./products";
+import { settingsRoutes } from "./settings";
 import { subscriberRoutes } from "./subscribers";
 
 // Every route in here requires a signed-in team member.
@@ -22,4 +23,5 @@ export const adminRoutes = new Hono<AuthEnv>()
   .route("/products", productRoutes)
   .route("/assets", assetRoutes)
   .route("/orders", orderRoutes)
-  .route("/subscribers", subscriberRoutes);
+  .route("/subscribers", subscriberRoutes)
+  .route("/settings", settingsRoutes);
