@@ -6,10 +6,10 @@ import { db } from "@/server/db";
 import { files, productFiles, products, settings } from "@/server/db/schema";
 
 const PRODUCTS = [
-  { slug: "family-care-system", title: "Parentkeeping Family Care System", kind: "bundle", price: 3900, foundingPrice: 2900, sortOrder: 0 },
-  { slug: "medical-binder", title: "Parentkeeping Medical Binder for an Elderly Parent", kind: "single", price: 1900, foundingPrice: null, sortOrder: 1 },
-  { slug: "caregiver-agreement", title: "Parentkeeping Family Caregiver Agreement Template", kind: "single", price: 1900, foundingPrice: null, sortOrder: 2 },
-  { slug: "emergency-binder", title: "Emergency Binder for an Aging Parent", kind: "bump", price: 1500, foundingPrice: null, sortOrder: 3 },
+  { slug: "family-care-system", title: "Parentkeeping Family Care System", kind: "bundle", status: "active", price: 3900, foundingPrice: 2900, sortOrder: 0 },
+  { slug: "medical-binder", title: "Parentkeeping Medical Binder for an Elderly Parent", kind: "single", status: "active", price: 1900, foundingPrice: null, sortOrder: 1 },
+  { slug: "caregiver-agreement", title: "Parentkeeping Family Caregiver Agreement Template", kind: "single", status: "active", price: 1900, foundingPrice: null, sortOrder: 2 },
+  { slug: "emergency-binder", title: "Emergency Binder for an Aging Parent", kind: "bump", status: "active", price: 1500, foundingPrice: null, sortOrder: 3 },
 ] as const;
 
 // None are built yet: no upload, no "arrives by" date until the dates are decided.

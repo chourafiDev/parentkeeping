@@ -34,17 +34,21 @@ export function ListHeader({ icon, total, label, create, action }: ListHeaderPro
 							{total}
 						</span>
 					)}
-					{total > 1 ? label.plural : label.singular}
+					{total === 1 ? label.singular : label.plural}
 				</h1>
 			</div>
-			{action}
-			{create && (
-				<Button asChild className="md:w-auto w-full">
-					<Link href={create.href}>
-						<Plus className="size-4 mr-2" />
-						{create.label}
-					</Link>
-				</Button>
+			{(action || create) && (
+				<div className="flex md:flex-row flex-col md:items-center gap-2 md:w-auto w-full">
+					{action}
+					{create && (
+						<Button asChild className="md:w-auto w-full">
+							<Link href={create.href}>
+								<Plus className="size-4" />
+								{create.label}
+							</Link>
+						</Button>
+					)}
+				</div>
 			)}
 		</div>
 	);

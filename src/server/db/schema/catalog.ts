@@ -1,6 +1,5 @@
 import { sql } from "drizzle-orm";
 import {
-  boolean,
   check,
   index,
   integer,
@@ -18,6 +17,9 @@ import { id, timestamps } from "./_shared";
 // bump   = Emergency Binder (no page at launch, only the order bump on the System)
 export const productKind = pgEnum("product_kind", ["bundle", "single", "bump"]);
 
+// active = for sale · draft = hidden until ready · archived = retired, kept for past orders
+export const productStatus = pgEnum("product_status", ["active", "draft", "archived"]);
+
 export const products = pgTable(
   "products",
   {
@@ -34,7 +36,10 @@ export const products = pgTable(
     // always uses the Stripe price ids, never these numbers.
     price: integer().notNull(),
     foundingPrice: integer(),
-    active: boolean().default(true).notNull(),
+    status: productStatus().default("draft").notNull(),
+    // Cover image (public bucket), shown in the admin list and on the store.
+    imageKey: text(),
+    imageUrl: text(),
     sortOrder: integer().default(0).notNull(),
     ...timestamps,
   },
@@ -57,7 +62,9 @@ export const files = pgTable("files", {
   kind: fileKind().notNull(),
   storageKey: text(), // pdf: object key in private storage
   fileName: text(), // pdf: download name, e.g. Parentkeeping-Medical-Binder.pdf
+  contentType: text(), // pdf: e.g. application/pdf
   sizeBytes: integer(),
+  uploadedAt: timestamp({ withTimezone: true }), // last upload / replacement
   url: text(), // sheet_link: the .../copy URL
   // Pre-sale: "Arrives by [date]" until the file is uploaded and this is cleared.
   availableAt: timestamp({ withTimezone: true }),

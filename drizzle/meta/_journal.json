@@ -15,6 +15,20 @@
       "when": 1791756886236,
       "tag": "0001_slim_old_lace",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791815172723,
+      "tag": "0002_milky_tenebrous",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791815173312,
+      "tag": "0003_wild_thunderbolt_ross",
+      "breakpoints": true
     }
   ]
 }

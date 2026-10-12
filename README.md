@@ -19,3 +19,10 @@ pnpm dev                     # http://localhost:3001/admin
 ```
 
 The dev server runs on port 3001 so it can run next to the Noria store on 3000.
+
+## File storage
+
+Product files (PDFs) live in a private Cloudflare R2 bucket and are only reachable
+through short-lived signed links; cover images go to a public bucket. Set the `R2_*`
+variables from `.env.example`. Without them, development stores files in `./.storage`
+(signed local URLs via `/api/dev-storage`); production refuses uploads until R2 is set.
