@@ -9,6 +9,12 @@
   --color-green: var(--success);
   --color-gray: var(--gray);
   --color-deep: var(--deep);
+  /* Storefront: body copy is a soft ink (Glozin #444), headings stay --foreground */
+  --color-body: var(--body);
+  --animate-marquee: marquee var(--marquee-duration, 30s) linear infinite;
+  @keyframes marquee {
+    to { transform: translateX(-50%); }
+  }
   --shadow-dark: 0 20px 25px -5px rgb(0 0 0 / 0.5);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -69,6 +75,7 @@
 
   --background: #ffffff;
   --foreground: var(--ink);
+  --body: color-mix(in oklab, var(--ink) 80%, white);
   --card: #ffffff;
   --card-foreground: var(--ink);
   --popover: #ffffff;

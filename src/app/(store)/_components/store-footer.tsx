@@ -1,40 +1,112 @@
+import { headers } from "next/headers";
 import Link from "next/link";
-import { FOOTER_LEGAL_LINE } from "@/lib/legal";
+import { FREE_LIST_PATH } from "@/lib/free-list";
+import { EU_NEWSLETTER_CHECKBOX, FOOTER_LEGAL_LINE, SIGNUP_NOTICE } from "@/lib/legal";
 import { SITE } from "@/lib/site";
 import { getSettings } from "@/server/queries/settings";
+import { needsOptIn } from "@/server/services/subscribers";
+import { container } from "./ui";
 
-const LINKS = [
+const SHOP = [
+	{ href: "/products/family-care-system", label: "Family Care System" },
+	{ href: "/products/medical-binder", label: "Medical Binder" },
+	{ href: "/products/caregiver-agreement-template", label: "Caregiver Agreement" },
+	{ href: FREE_LIST_PATH, label: "Free Medication List" },
+];
+const POLICIES = [
 	{ href: "/policies/refund-policy", label: "Refund Policy" },
 	{ href: "/policies/privacy-policy", label: "Privacy Policy" },
 	{ href: "/policies/terms-of-service", label: "Terms of Service" },
 	{ href: "/pages/disclaimer", label: "Disclaimer" },
-	{ href: "/pages/contact", label: "Contact" },
 ];
 
+const heading = "text-foreground text-[17px] font-semibold tracking-[-0.02em]";
+const linkClass = "text-body hover:text-foreground transition-colors";
+
+/** Glozin footer: help, shop, policies, newsletter (= the free list sign-up). */
 export async function StoreFooter() {
-	const { contact } = await getSettings("contact");
+	const [{ contact }, country] = await Promise.all([getSettings("contact"), headers().then((h) => h.get("x-vercel-ip-country"))]);
+	const optIn = needsOptIn(country);
+
 	return (
-		<footer className="bg-muted/60 border-t">
-			<div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 text-sm">
-				<nav aria-label="Legal" className="flex flex-wrap gap-x-6 gap-y-2">
-					{LINKS.map((l) => (
-						<Link key={l.href} href={l.href} className="text-muted-foreground hover:text-foreground">
+		<footer className="mt-auto border-t">
+			<div className={`${container} grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1.4fr]`}>
+				<div className="grid content-start gap-4">
+					<h2 className={heading}>Help</h2>
+					<p className="text-body text-[15px] leading-[1.714]">
+						Questions about an order or a download? Write to us and a real person answers.
+					</p>
+					{contact.supportEmail && (
+						<a href={`mailto:${contact.supportEmail}`} className="text-foreground font-medium hover:underline">
+							{contact.supportEmail}
+						</a>
+					)}
+					<Link href="/pages/contact" className={linkClass}>
+						Contact us
+					</Link>
+				</div>
+				<nav aria-label="Shop" className="grid content-start gap-3 text-[15px]">
+					<h2 className={`${heading} mb-1`}>Shop</h2>
+					{SHOP.map((l) => (
+						<Link key={l.href} href={l.href} className={linkClass}>
 							{l.label}
 						</Link>
 					))}
 				</nav>
-				<p className="text-muted-foreground max-w-3xl text-xs">{FOOTER_LEGAL_LINE}</p>
-				<p className="text-muted-foreground text-xs">
-					© {new Date().getFullYear()} {contact.legalName ?? SITE.name}
-					{contact.supportEmail && (
-						<>
-							{" · "}
-							<a href={`mailto:${contact.supportEmail}`} className="hover:text-foreground">
-								{contact.supportEmail}
-							</a>
-						</>
-					)}
-				</p>
+				<nav aria-label="Policies" className="grid content-start gap-3 text-[15px]">
+					<h2 className={`${heading} mb-1`}>Policies</h2>
+					{POLICIES.map((l) => (
+						<Link key={l.href} href={l.href} className={linkClass}>
+							{l.label}
+						</Link>
+					))}
+				</nav>
+				<div className="grid content-start gap-4">
+					<h2 className={heading}>Get the free Medication List</h2>
+					<p className="text-body text-[15px] leading-[1.714]">
+						A printable medication list and daily chart for your parent, then our weekly caregiving emails.
+					</p>
+					<form action="/api/subscribe" method="post" className="grid gap-3">
+						<div className="flex gap-2">
+							<label htmlFor="footer-email" className="sr-only">
+								Email address
+							</label>
+							<input
+								id="footer-email"
+								name="email"
+								type="email"
+								required
+								autoComplete="email"
+								placeholder="Enter your email…"
+								className="border-input focus-visible:border-foreground h-[50px] min-w-0 flex-1 rounded-full border px-5 text-[15px] outline-none"
+							/>
+							<button type="submit" className="bg-foreground hover:bg-primary h-[50px] shrink-0 rounded-full px-6 text-[15px] font-semibold text-white transition-colors">
+								Sign Up
+							</button>
+						</div>
+						{optIn && (
+							<label className="flex items-start gap-2.5 text-sm">
+								<input type="checkbox" name="newsletter" className="accent-primary mt-0.5 size-4" />
+								<span>{EU_NEWSLETTER_CHECKBOX}</span>
+							</label>
+						)}
+						<input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
+						<p className="text-body text-xs">
+							{optIn ? "Weekly emails only if you tick the box." : SIGNUP_NOTICE}{" "}
+							<Link href="/policies/privacy-policy" className="text-foreground font-semibold">
+								Privacy Policy
+							</Link>
+						</p>
+					</form>
+				</div>
+			</div>
+			<div className="border-t">
+				<div className={`${container} grid gap-2 py-6 text-[13px] md:grid-cols-[1fr_auto] md:items-center`}>
+					<p className="text-body">
+						© {new Date().getFullYear()} {contact.legalName ?? SITE.name} · {FOOTER_LEGAL_LINE}
+					</p>
+					<p className="text-body">Secure checkout by Stripe · US customers</p>
+				</div>
 			</div>
 		</footer>
 	);
