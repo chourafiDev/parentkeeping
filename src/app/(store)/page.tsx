@@ -11,6 +11,7 @@ import { files, productFiles, products } from "@/server/db/schema";
 import { getFoundingPrice, getSettings } from "@/server/queries/settings";
 import { Bundle } from "./_components/home/bundle";
 import { ClosingBanner } from "./_components/home/closing-banner";
+import { BlogSection } from "./_components/blog/blog-section";
 import { ClosingStrips } from "./_components/home/closing-strips";
 import { Faq } from "./_components/home/faq";
 import { HomeHero } from "./_components/home/hero";
@@ -117,6 +118,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			<SoundFamiliar />
 			<PromoPair data={data} />
 			<Why />
+			<BlogSection />
 			<Faq data={data} />
 			<ClosingStrips data={data} />
 			<ClosingBanner data={data} />

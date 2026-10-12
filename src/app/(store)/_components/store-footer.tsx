@@ -14,6 +14,7 @@ const SHOP = [
 	{ href: FREE_LIST_PATH, label: "Free Medication List" },
 	{ href: "/pages/caregiver-checklists", label: "Free Caregiver Checklists" },
 	{ href: "/pages/caregiver-burnout-quiz", label: "Caregiver Burnout Quiz" },
+	{ href: "/blogs/guides", label: "Guides" },
 ];
 const POLICIES = [
 	{ href: "/policies/refund-policy", label: "Refund Policy" },

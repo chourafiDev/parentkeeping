@@ -182,6 +182,10 @@ export const CHECKLISTS: LeadMagnet = {
       paragraphs: [
         "Don't try to cover everything in one sitting. Pick one area per visit: health and doctors first, then money, then the home, then wishes. Ask open questions, listen more than you talk, and write down the answers while you have them.",
       ],
+      link: {
+        label: "Our post on 8 things not to say to your aging parents covers how to phrase the hard ones.",
+        href: "/blogs/guides/things-not-to-say-to-aging-parents",
+      },
     },
     {
       title: "A caring for aging parents checklist for siblings",

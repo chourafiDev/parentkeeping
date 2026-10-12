@@ -188,6 +188,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
             text: "If a parent pays a family member for care, Medicaid may later review those payments during its look-back period (five years in most states). Payments without a written agreement can be treated as gifts. An attorney can set the agreement up so it holds up for your family's situation.",
           },
         ],
+        link: { label: "What does care cost? See Cost of In-Home Care for Elderly Parents.", href: "/blogs/guides/cost-of-in-home-care" },
       },
       {
         title: "Formats",
