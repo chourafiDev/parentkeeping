@@ -1,0 +1,39 @@
+import "server-only";
+import { headers } from "next/headers";
+
+/** Visitor country from the edge; development can preview with ?country=GB. */
+export async function visitorCountry(devParam: unknown) {
+	if (process.env.NODE_ENV !== "production" && typeof devParam === "string") return devParam.toUpperCase();
+	return (await headers()).get("x-vercel-ip-country");
+}
+
+/** schema.org Product (name, price, USD, availability) for search engines. */
+export function productJsonLd(p: {
+	title: string;
+	description: string;
+	/** Price charged now, in cents. */
+	price: number;
+	url: string;
+	image?: string | null;
+	inStock: boolean;
+}) {
+	return {
+		"@context": "https://schema.org",
+		"@type": "Product",
+		name: p.title,
+		description: p.description,
+		...(p.image && { image: p.image }),
+		brand: { "@type": "Brand", name: "Parentkeeping" },
+		offers: {
+			"@type": "Offer",
+			url: p.url,
+			priceCurrency: "USD",
+			price: (p.price / 100).toFixed(2),
+			availability: p.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+			eligibleRegion: { "@type": "Country", name: "US" },
+		},
+	};
+}
+
+/** JSON for a <script type="application/ld+json">: "<" escaped so data can't close the tag. */
+export const jsonLdHtml = (data: unknown) => ({ __html: JSON.stringify(data).replace(/</g, "\\u003c") });

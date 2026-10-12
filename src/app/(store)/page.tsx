@@ -22,7 +22,7 @@ import { type ShopCard, ShopGrid } from "./_components/home/shop-grid";
 import { SoundFamiliar } from "./_components/home/sound-familiar";
 import type { HomeData, HomeProduct } from "./_components/home/types";
 import { Why } from "./_components/home/why";
-import { systemJsonLd, visitorCountry } from "./_components/system-sales-page";
+import { jsonLdHtml, productJsonLd, visitorCountry } from "./_components/product-data";
 
 export const metadata: Metadata = {
 	title: { absolute: `Parentkeeping · ${OFFER_HEADLINES.one_place}` },
@@ -88,20 +88,19 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			: []),
 		{ product: null, kind: "list", title: "Free Printable Medication List & Daily Medication Chart", href: FREE_LIST_PATH, tab: "free" },
 	];
-	const jsonLd = systemJsonLd({
+	const jsonLd = productJsonLd({
 		title: data.system.title,
-		price: data.system.compareAt ?? data.system.price,
-		foundingPrice: data.system.compareAt !== null ? data.system.price : null,
-		foundingActive: data.system.compareAt !== null,
+		description: OFFER_SUBHEAD,
+		price: data.system.price,
 		url: `${siteUrl()}/`,
+		inStock: data.system.sellable,
 	});
 
 	return (
 		<main className="flex-1">
 			<script
 				type="application/ld+json"
-				// JSON.stringify output; "<" escaped so the data can't close the tag.
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+				dangerouslySetInnerHTML={jsonLdHtml(jsonLd)}
 			/>
 			<HomeHero data={data} />
 			<Marquee messages={MARQUEE} />

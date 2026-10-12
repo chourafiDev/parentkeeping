@@ -5,6 +5,11 @@ export const PRODUCT_PATHS: Record<string, string> = {
   "caregiver-agreement": "/products/caregiver-agreement-template",
 };
 
+/** "/products/<handle>" → product slug (the handles come from the keyword tree). */
+export const SLUG_BY_HANDLE: Record<string, string> = Object.fromEntries(
+  Object.entries(PRODUCT_PATHS).map(([slug, path]) => [path.replace("/products/", ""), slug]),
+);
+
 /** The bundle that carries the order bump, and the bump itself. */
 export const BUNDLE_SLUG = "family-care-system";
 export const BUMP_SLUG = "emergency-binder";
