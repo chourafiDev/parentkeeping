@@ -1,7 +1,11 @@
 import { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import { PRODUCT_PATHS, VARIANT_COOKIE } from "@/lib/catalog";
+import { eq } from "drizzle-orm";
+import { db } from "@/server/db";
+import { orders } from "@/server/db/schema";
 import { getStripe } from "@/server/lib/stripe";
+import { issueDownloadLink } from "@/server/services/download-tokens";
 import { CheckoutError, createCheckoutSession } from "@/server/services/checkout";
 import { handleStripeEvent } from "@/server/services/stripe-webhook";
 
@@ -33,6 +37,22 @@ export const storeRoutes = new Hono()
       if (isForm) return c.redirect(`${PRODUCT_PATHS[slug] ?? "/"}?checkout_error=${encodeURIComponent(message)}`, 303);
       return c.json({ error: message }, status);
     }
+  })
+  /**
+   * "Go to my downloads" on the thank-you page: a download link is issued on
+   * click (not on every page view). The checkout session id only works for
+   * 48 hours after payment; after that, the order email's link is the way in.
+   */
+  .get("/thank-you/downloads", async (c) => {
+    const sessionId = c.req.query("session_id") ?? "";
+    const [order] = sessionId.startsWith("cs_")
+      ? await db.select().from(orders).where(eq(orders.stripeSessionId, sessionId))
+      : [];
+    if (!order || order.status !== "paid" || Date.now() - order.paidAt.getTime() > 48 * 60 * 60 * 1000) {
+      return c.redirect("/thank-you", 303);
+    }
+    const url = await issueDownloadLink(order.id);
+    return c.redirect(new URL(url).pathname, 303);
   })
   /** Stripe webhook: verified signature, then idempotent handling. */
   .post("/stripe/webhook", async (c) => {

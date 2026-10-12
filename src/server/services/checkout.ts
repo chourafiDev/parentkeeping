@@ -77,7 +77,10 @@ export async function createCheckoutSession({
   return stripe.checkout.sessions.create({
     mode: "payment",
     line_items: [{ price: priceId, quantity: 1 }],
-    ...(bump && { optional_items: [{ price: bump.stripePriceId!, quantity: 1 }] }),
+    // One Emergency Binder, quantity locked (spec: "quantity 1, not adjustable").
+    ...(bump && { optional_items: [{ price: bump.stripePriceId!, quantity: 1, adjustable_quantity: { enabled: false } }] }),
+    // US-only store priced in dollars: no conversion to the visitor's local currency.
+    adaptive_pricing: { enabled: false },
     customer_creation: "always",
     billing_address_collection: "required", // Stripe Tax needs it for state sales tax
     automatic_tax: { enabled: true },

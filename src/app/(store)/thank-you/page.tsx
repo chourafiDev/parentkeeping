@@ -1,6 +1,5 @@
 import { CircleCheck, FileText, Sheet } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import { assetStatus } from "@/lib/assets";
@@ -9,7 +8,6 @@ import { db } from "@/server/db";
 import { orders } from "@/server/db/schema";
 import { getStripe } from "@/server/lib/stripe";
 import { getOrderFiles } from "@/server/queries/orders";
-import { issueDownloadLink } from "@/server/services/download-tokens";
 import { Refresher } from "./refresher";
 
 export const metadata: Metadata = { title: "Thank you", robots: { index: false, follow: false } };
@@ -71,22 +69,27 @@ export default async function ThankYouPage({ searchParams }: PageProps<"/thank-y
 	if (order.status !== "paid") {
 		return (
 			<Shell>
-				<h1 className="text-2xl font-semibold tracking-tight">Your order was refunded</h1>
+				<h1 className="text-2xl font-semibold tracking-tight">
+					{order.refundedAt ? "Your order was refunded" : "Your order will be refunded"}
+				</h1>
 				<p className="text-muted-foreground mt-2">
-					Our paid products are only available to US customers for now, so we&apos;ve refunded the full amount. We sent
-					you an email with the details and a free list that works anywhere.
+					{order.refundedAt
+						? "Our paid products are only available to US customers for now, so we've refunded the full amount. We sent you an email with the details and a free list that works anywhere."
+						: "Our paid products are only available to US customers for now, so we're refunding the full amount. You'll get an email once it's done, with a free list that works anywhere."}
 				</p>
 			</Shell>
 		);
 	}
 
 	const files = await getOrderFiles(order.id);
-	const downloadsUrl = isFresh(order.paidAt) ? await issueDownloadLink(order.id) : null;
+	const fresh = isFresh(order.paidAt);
 
 	return (
 		<Shell>
 			<CircleCheck className="text-primary mx-auto mb-3 size-10" />
-			<h1 className="text-2xl font-semibold tracking-tight">Thank you, your files are ready</h1>
+			<h1 className="text-2xl font-semibold tracking-tight">
+				{files.some((f) => assetStatus(f) === "ready") ? "Thank you, your files are ready" : "Thank you for your order"}
+			</h1>
 			<p className="text-muted-foreground mt-2">
 				Order #{order.orderNumber}. We also emailed your download link to {order.email}.
 			</p>
@@ -109,9 +112,10 @@ export default async function ThankYouPage({ searchParams }: PageProps<"/thank-y
 					);
 				})}
 			</ul>
-			{downloadsUrl ? (
+			{fresh ? (
 				<Button asChild size="lg" className="mt-6 h-11 w-full">
-					<Link href={downloadsUrl.replace(/^https?:\/\/[^/]+/, "")}>Go to my downloads</Link>
+					{/* Plain link: the API issues the download link on click, then redirects. */}
+					<a href={`/api/thank-you/downloads?session_id=${encodeURIComponent(session.id)}`}>Go to my downloads</a>
 				</Button>
 			) : (
 				<p className="text-muted-foreground mt-6 text-sm">Use the link in your order email to download your files.</p>

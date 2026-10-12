@@ -104,9 +104,10 @@ async function recordPaidSession(sessionId: string) {
   });
 
   if (!created) {
-    // Already recorded: just make sure the order email went out.
+    // Already recorded (retry or duplicate): finish whatever a failed attempt left undone.
     const [existing] = await db.select().from(orders).where(eq(orders.stripeSessionId, session.id));
     if (existing?.status === "paid" && !existing.confirmationSentAt) await confirm(existing.id);
+    if (existing?.status === "flagged_non_us" && !existing.refundedAt) await refundNonUs(existing.id);
     return;
   }
 
@@ -115,32 +116,44 @@ async function recordPaidSession(sessionId: string) {
     return;
   }
 
-  // Non-US billing country: refund in full with a polite email.
-  await db.insert(orderEvents).values({
-    orderId: created.id,
-    type: "flagged_non_us",
-    message: `Billing country ${country ?? "unknown"}: paid products are US-only`,
-  });
-  if (!paymentIntentId) return;
+  await refundNonUs(created.id);
+}
+
+/**
+ * Non-US billing country: refund in full with a polite email. Runs again on
+ * Stripe's retry if it failed (the order exists by then, without refundedAt).
+ */
+async function refundNonUs(orderId: string) {
+  const stripe = getStripe()!;
+  const [order] = await db.select().from(orders).where(eq(orders.id, orderId));
+  if (!order || order.status !== "flagged_non_us" || order.refundedAt) return;
+
+  const [flaggedBefore] = await db
+    .select({ id: orderEvents.id })
+    .from(orderEvents)
+    .where(and(eq(orderEvents.orderId, orderId), eq(orderEvents.type, "flagged_non_us")));
+  if (!flaggedBefore) {
+    await db.insert(orderEvents).values({
+      orderId,
+      type: "flagged_non_us",
+      message: `Billing country ${order.billingCountry ?? "unknown"}: paid products are US-only`,
+    });
+  }
+  if (!order.stripePaymentIntentId) return;
+
+  // Throws if Stripe refuses: the webhook answers 500 and Stripe retries later.
   await stripe.refunds.create(
-    { payment_intent: paymentIntentId, reason: "requested_by_customer", metadata: { orderId: created.id, cause: "non_us" } },
-    { idempotencyKey: `refund-${created.id}` },
+    { payment_intent: order.stripePaymentIntentId, reason: "requested_by_customer", metadata: { orderId, cause: "non_us" } },
+    { idempotencyKey: `refund-${orderId}` },
   );
-  const amount = formatPrice(session.amount_total ?? 0);
-  await db
-    .update(orders)
-    .set({ amountRefunded: session.amount_total ?? 0, refundedAt: new Date() })
-    .where(eq(orders.id, created.id));
-  await db.insert(orderEvents).values({
-    orderId: created.id,
-    type: "refunded",
-    message: `Refunded ${amount} automatically (non-US)`,
-  });
+  const amount = formatPrice(order.amountTotal);
+  await db.update(orders).set({ amountRefunded: order.amountTotal, refundedAt: new Date() }).where(eq(orders.id, orderId));
+  await db.insert(orderEvents).values({ orderId, type: "refunded", message: `Refunded ${amount} automatically (non-US)` });
   try {
     await sendEmail({
-      to: { email: session.customer_details?.email ?? "", name: session.customer_details?.name ?? undefined },
+      to: { email: order.email, name: order.name ?? undefined },
       ...nonUsRefundEmail({
-        orderNumber: created.orderNumber,
+        orderNumber: order.orderNumber,
         amount,
         freeListUrl: `${siteUrl()}/pages/free-medication-list`,
         footer: await buyerFooter(),
