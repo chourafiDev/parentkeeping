@@ -1,4 +1,5 @@
 import "server-only";
+import { ORDER_CONSENT_LINE } from "@/lib/legal";
 import { SITE } from "@/lib/site";
 
 // Buyer-facing emails (order emails come with the Stripe webhook).
@@ -63,11 +64,6 @@ ${[SITE.name, p.footer.postalAddress].filter(Boolean).join("\n")}`,
   };
 }
 
-// TODO before launch: paste the exact wording from "Parentkeeping Legal Disclaimers"
-// (order email consent line). This placeholder only keeps the slot in place.
-export const ORDER_CONSENT_LINE =
-  "You asked for immediate access to your digital files and agreed that, once the download is available, you can't cancel the purchase under any cooling-off period. Our 14-day guarantee still applies.";
-
 /** Order confirmation: download link, parts with "arrives by" dates, consent line, guarantee. */
 export function orderConfirmationEmail(p: {
   orderNumber: number;
@@ -110,6 +106,30 @@ ${p.parts.map(partLine).join("\n")}
 ${ORDER_CONSENT_LINE}
 
 ${GUARANTEE} Refund policy: ${p.refundPolicyUrl}${p.footer.supportEmail ? `\nQuestions? Write to ${p.footer.supportEmail}.` : ""}
+
+${[SITE.name, p.footer.postalAddress].filter(Boolean).join("\n")}`,
+  };
+}
+
+/** Non-US billing country: polite refund (paid products are US-only for now). */
+export function nonUsRefundEmail(p: { orderNumber: number; amount: string; freeListUrl: string; footer: EmailFooter }) {
+  return {
+    subject: `Your Parentkeeping order #${p.orderNumber} has been refunded`,
+    html: layout({
+      footer: p.footer,
+      preheader: `We've refunded ${p.amount}: our paid products are US-only for now.`,
+      body: `<h1 style="font-size:20px;margin:20px 0 8px">We've refunded your order</h1>
+<p style="font-size:15px;line-height:1.6;margin:0 0 12px">Thank you for your order #${p.orderNumber}. Our paid products are only available to US customers for now (US-specific forms, laws and sales tax), so we've refunded the full ${escape(p.amount)} to your card. It usually shows within 5 to 10 business days.</p>
+<p style="font-size:15px;line-height:1.6;margin:0">Our free Medication List &amp; Daily Medication Chart works anywhere:</p>
+${button(p.freeListUrl, "Get the free list")}
+<p style="font-size:14px;line-height:1.6;margin:0">We're sorry for the trouble.${p.footer.supportEmail ? ` Questions? Write to ${escape(p.footer.supportEmail)}.` : ""}</p>`,
+    }),
+    text: `We've refunded your order #${p.orderNumber}
+
+Our paid products are only available to US customers for now, so we've refunded the full ${p.amount} to your card (5 to 10 business days).
+
+Our free Medication List works anywhere: ${p.freeListUrl}
+${p.footer.supportEmail ? `\nQuestions? Write to ${p.footer.supportEmail}.` : ""}
 
 ${[SITE.name, p.footer.postalAddress].filter(Boolean).join("\n")}`,
   };

@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { auth } from "@/server/auth";
 import { adminRoutes } from "./routes/admin";
 import { devStorageRoutes } from "./routes/dev-storage";
+import { storeRoutes } from "./routes/store";
 
 export const app = new Hono()
   .basePath("/api")
@@ -10,6 +11,7 @@ export const app = new Hono()
   .on(["GET", "POST"], "/auth/*", (c) => auth.handler(c.req.raw))
   .get("/health", (c) => c.json({ ok: true }))
   .route("/admin", adminRoutes)
-  .route("/dev-storage", devStorageRoutes);
+  .route("/dev-storage", devStorageRoutes)
+  .route("/", storeRoutes);
 
 export type AppType = typeof app;
