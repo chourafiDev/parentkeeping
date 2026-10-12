@@ -49,6 +49,8 @@ export const orders = pgTable(
     status: orderStatus().default("paid").notNull(),
     confirmationSentAt: timestamp({ withTimezone: true }), // order email sent
     refundedAt: timestamp({ withTimezone: true }),
+    // Support reset the download limits: only downloads after this count toward the cap.
+    downloadsResetAt: timestamp({ withTimezone: true }),
     paidAt: timestamp({ withTimezone: true }).notNull(),
     ...timestamps,
   },
@@ -89,6 +91,7 @@ export const orderEventType = pgEnum("order_event_type", [
   "file_ready_sent",
   "link_reissued",
   "email_resent",
+  "downloads_reset",
   "flagged_non_us",
   "refunded",
   "note",

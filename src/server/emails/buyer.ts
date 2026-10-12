@@ -62,3 +62,55 @@ ${GUARANTEE}${p.footer.supportEmail ? `\nQuestions? Write to ${p.footer.supportE
 ${[SITE.name, p.footer.postalAddress].filter(Boolean).join("\n")}`,
   };
 }
+
+// TODO before launch: paste the exact wording from "Parentkeeping Legal Disclaimers"
+// (order email consent line). This placeholder only keeps the slot in place.
+export const ORDER_CONSENT_LINE =
+  "You asked for immediate access to your digital files and agreed that, once the download is available, you can't cancel the purchase under any cooling-off period. Our 14-day guarantee still applies.";
+
+/** Order confirmation: download link, parts with "arrives by" dates, consent line, guarantee. */
+export function orderConfirmationEmail(p: {
+  orderNumber: number;
+  downloadsUrl: string;
+  parts: { label: string; availableAt: Date | null }[];
+  refundPolicyUrl: string;
+  footer: EmailFooter;
+  resent?: boolean;
+}) {
+  const fmt = (d: Date) => d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
+  const partLine = (part: (typeof p.parts)[number]) =>
+    part.availableAt ? `${part.label} — arrives by ${fmt(part.availableAt)}` : `${part.label} — ready to download`;
+  const rows = p.parts
+    .map(
+      (part) =>
+        `<tr><td style="padding:6px 0;font-size:14px;border-bottom:1px solid #ecebe6">${escape(part.label)}</td><td style="padding:6px 0;font-size:13px;text-align:right;white-space:nowrap;border-bottom:1px solid #ecebe6;color:${part.availableAt ? "#92400e" : SAGE}">${part.availableAt ? `Arrives by ${escape(fmt(part.availableAt))}` : "Ready"}</td></tr>`,
+    )
+    .join("");
+  const intro = p.resent
+    ? `Here's a fresh link to your downloads for order #${p.orderNumber}.`
+    : `Thank you for your order #${p.orderNumber}. Everything you bought is on your downloads page.`;
+  return {
+    subject: p.resent ? `Your Parentkeeping downloads (order #${p.orderNumber})` : `Your Parentkeeping order #${p.orderNumber}`,
+    html: layout({
+      footer: p.footer,
+      preheader: intro,
+      body: `<h1 style="font-size:20px;margin:20px 0 8px">${p.resent ? "Your downloads" : "Thank you, your files are ready"}</h1>
+<p style="font-size:15px;line-height:1.6;margin:0">${escape(intro)}</p>
+${button(p.downloadsUrl, "Go to my downloads")}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px">${rows}</table>
+<p style="font-size:13px;line-height:1.6;margin:0 0 12px;color:${MUTED}">${escape(ORDER_CONSENT_LINE)}</p>
+<p style="font-size:14px;line-height:1.6;margin:0">${escape(GUARANTEE)} <a href="${escape(p.refundPolicyUrl)}" style="color:${SAGE}">Refund policy</a>${p.footer.supportEmail ? ` · Questions? Write to ${escape(p.footer.supportEmail)}.` : ""}</p>`,
+    }),
+    text: `${intro}
+
+Your downloads: ${p.downloadsUrl}
+
+${p.parts.map(partLine).join("\n")}
+
+${ORDER_CONSENT_LINE}
+
+${GUARANTEE} Refund policy: ${p.refundPolicyUrl}${p.footer.supportEmail ? `\nQuestions? Write to ${p.footer.supportEmail}.` : ""}
+
+${[SITE.name, p.footer.postalAddress].filter(Boolean).join("\n")}`,
+  };
+}

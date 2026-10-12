@@ -29,6 +29,13 @@
       "when": 1791815173312,
       "tag": "0003_wild_thunderbolt_ross",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791817357287,
+      "tag": "0004_living_cerise",
+      "breakpoints": true
     }
   ]
 }
