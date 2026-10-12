@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
 import { Controller, useFormContext } from "react-hook-form";
 import { MoneyInput } from "@/components/money-input";
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
@@ -12,7 +13,7 @@ export function PricingCard() {
 	const { errors } = formState;
 
 	return (
-		<FormCard title="Pricing" contentClassName="grid gap-4">
+		<FormCard title="Price" contentClassName="grid gap-4">
 			<div className="grid gap-4 sm:grid-cols-2">
 				<Controller
 					control={control}
@@ -39,12 +40,16 @@ export function PricingCard() {
 				/>
 			</div>
 
-			<div className="bg-muted/70 grid gap-4 rounded-lg p-3">
-				<p className="text-muted-foreground text-xs">
-					Stripe is the source of truth for money: checkout charges these Stripe prices, the amounts above are only
-					shown on pages. Create them in Stripe test mode first, then live.
-				</p>
-				<div className="grid gap-4 sm:grid-cols-2">
+			{/* Stripe ids: secondary, folded away like Shopify's price chips. */}
+			<details className="group rounded-lg border" open={!!(errors.stripeProductId || errors.stripePriceId || errors.foundingPriceId)}>
+				<summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm [&::-webkit-details-marker]:hidden">
+					<span className="flex flex-wrap items-center gap-2">
+						<span className="font-medium">Stripe</span>
+						<span className="text-muted-foreground text-xs">Checkout charges these Stripe prices; the amounts above are what pages show.</span>
+					</span>
+					<ChevronDown className="text-muted-foreground size-4 shrink-0 transition-transform group-open:rotate-180" />
+				</summary>
+				<div className="grid gap-4 border-t p-3 sm:grid-cols-2">
 					<Field data-invalid={!!errors.stripeProductId} className="sm:col-span-2">
 						<FieldLabel htmlFor="stripeProductId">Stripe product ID</FieldLabel>
 						<Input id="stripeProductId" placeholder="prod_…" className="font-mono" {...register("stripeProductId")} />
@@ -60,8 +65,9 @@ export function PricingCard() {
 						<Input id="foundingPriceId" placeholder="price_…" className="font-mono" {...register("foundingPriceId")} />
 						<FieldError errors={[errors.foundingPriceId]} />
 					</Field>
+					<p className="text-muted-foreground text-xs sm:col-span-2">Run pnpm stripe:sync to create missing Stripe prices and fill these in.</p>
 				</div>
-			</div>
+			</details>
 		</FormCard>
 	);
 }

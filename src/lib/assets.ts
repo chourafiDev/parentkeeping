@@ -5,20 +5,25 @@
 
 export type AssetStatus = "ready" | "presale" | "missing";
 
+export type AssetKind = "file" | "pdf" | "sheet_link";
+
+/** Uploaded file (ZIP, PDF…) as opposed to the legacy Google Sheet link. */
+export const isUploadedFile = (kind: AssetKind) => kind !== "sheet_link";
+
 export function assetStatus(a: {
-  kind: "pdf" | "sheet_link";
+  kind: AssetKind;
   storageKey: string | null;
   url: string | null;
   availableAt: Date | string | null;
 }): AssetStatus {
   if (a.availableAt) return "presale";
-  const hasContent = a.kind === "pdf" ? !!a.storageKey : !!a.url;
+  const hasContent = isUploadedFile(a.kind) ? !!a.storageKey : !!a.url;
   return hasContent ? "ready" : "missing";
 }
 
 /** Uploaded/linked, whatever the status. */
-export const hasAssetContent = (a: { kind: "pdf" | "sheet_link"; storageKey: string | null; url: string | null }) =>
-  a.kind === "pdf" ? !!a.storageKey : !!a.url;
+export const hasAssetContent = (a: { kind: AssetKind; storageKey: string | null; url: string | null }) =>
+  isUploadedFile(a.kind) ? !!a.storageKey : !!a.url;
 
 /** 1536000 → "1.5 MB" */
 export function formatBytes(bytes: number | null | undefined) {

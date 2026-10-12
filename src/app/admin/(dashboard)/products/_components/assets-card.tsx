@@ -1,25 +1,37 @@
 "use client";
 
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import {
+	CalendarClock,
 	ChevronDown,
+	CloudDownload,
+	Download,
 	EllipsisVertical,
-	ExternalLink,
+	FileArchive,
 	FileText,
-	Library,
-	Link2Off,
-	Pencil,
-	Plus,
+	Loader,
+	PlusCircle,
+	RefreshCw,
 	Rocket,
 	Sheet,
 	Trash2,
-	Upload,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { Controller, useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -27,98 +39,122 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api-client";
 import { assetStatus, formatBytes, hasAssetContent } from "@/lib/assets";
+import { ASSET_ACCEPT, uploadAsset } from "@/lib/upload";
 import { cn } from "@/lib/utils";
-import type { LibraryAsset, ProductAsset, ProductOption } from "@/server/queries/products";
+import type { ProductInput } from "@/lib/validations/product";
+import type { ProductAsset } from "@/server/queries/products";
 import { ConfirmDialog } from "../../_components/shared/confirm-dialog";
-import { FormCard } from "../../_components/shared/form-card";
-import { AssetDialog, type EditedAsset } from "./asset-dialog";
-import { AttachAssetsDialog } from "./attach-assets-dialog";
+import { AddFilesDialog } from "./add-files-dialog";
 
-const toDateInput = (d: Date | string | null) => (d ? format(new Date(d), "yyyy-MM-dd") : null);
-
-function StatusBadge({ asset }: { asset: ProductAsset }) {
-	const status = assetStatus(asset);
-	if (status === "ready") {
-		return (
-			<Badge variant="outline" className="border-transparent bg-[color-mix(in_oklab,var(--success)_14%,white)] text-[color-mix(in_oklab,var(--success)_70%,black)]">
-				Ready
-			</Badge>
-		);
-	}
-	if (status === "presale") {
-		return (
-			<Badge variant="outline" className="border-transparent bg-amber-50 text-amber-800">
-				Arrives by {format(new Date(asset.availableAt!), "MMM d")}
-			</Badge>
-		);
-	}
-	return <Badge variant="destructive">Missing file</Badge>;
-}
+const fmtDay = (d: Date | string) => format(new Date(d), "MMM d, yyyy");
 
 type Pending =
 	| { type: "release"; asset: ProductAsset; owners: number | null }
-	| { type: "detach"; asset: ProductAsset }
 	| { type: "delete"; asset: ProductAsset };
 
+/** "Fulfilled · Access limit" chips + settings (Shopify), bound to the product form. */
+function DeliverySettings() {
+	const { control } = useFormContext<ProductInput>();
+	const [open, setOpen] = useState(false);
+	return (
+		<Controller
+			control={control}
+			name="downloadLimit"
+			render={({ field, fieldState }) => (
+				<div className="grid gap-3 border-t pt-3">
+					<button type="button" onClick={() => setOpen((o) => !o)} className="flex flex-wrap items-center gap-2 text-start" aria-expanded={open}>
+						<span className="bg-muted flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm whitespace-nowrap">
+							<span className="text-muted-foreground">Fulfilled</span>
+							<span className="bg-background rounded-md px-1.5 font-medium">Automatically</span>
+						</span>
+						<span className="bg-muted flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm whitespace-nowrap">
+							<span className="text-muted-foreground">Access limit</span>
+							<span className="bg-background rounded-md px-1.5 font-medium">
+								{field.value === null ? "Unlimited" : `${field.value} downloads`}
+							</span>
+						</span>
+						<ChevronDown className={cn("text-muted-foreground ms-auto size-4 transition-transform", open && "rotate-180")} />
+					</button>
+					{(open || fieldState.invalid) && (
+						<div className="bg-muted/60 grid gap-3 rounded-lg p-3 text-sm">
+							<p className="text-muted-foreground">
+								Files are delivered automatically after payment: on the thank-you page and in the order email. The access limit
+								is how many times a buyer can download each file.
+							</p>
+							<div className="flex flex-wrap items-center gap-4">
+								<label className="flex items-center gap-2">
+									<input
+										type="radio"
+										name="access-limit"
+										className="accent-primary size-4"
+										checked={field.value === null}
+										onChange={() => field.onChange(null)}
+									/>
+									Unlimited
+								</label>
+								<label className="flex items-center gap-2">
+									<input
+										type="radio"
+										name="access-limit"
+										className="accent-primary size-4"
+										checked={field.value !== null}
+										onChange={() => field.onChange(field.value ?? 20)}
+									/>
+									Limited to
+								</label>
+								<Input
+									type="number"
+									min={1}
+									max={1000}
+									aria-label="Downloads per file"
+									className="h-8 w-20"
+									disabled={field.value === null}
+									value={field.value ?? 20}
+									onChange={(e) => field.onChange(e.target.value === "" ? 1 : Number(e.target.value))}
+								/>
+								<span className="text-muted-foreground">downloads per file, per order</span>
+							</div>
+							{fieldState.error && <p className="text-destructive">{fieldState.error.message}</p>}
+						</div>
+					)}
+				</div>
+			)}
+		/>
+	);
+}
+
 /**
- * The product's deliverables, like Shopify Digital Products: each asset shows
- * its status (ready / pre-sale / missing) and downloads; add new files, attach
- * existing ones, release pre-sale parts to buyers.
+ * Shopify Digital Products card on the product page: the product's files
+ * (usually one ZIP), add / replace / delete, delivery settings. Pre-sale
+ * extra: an "arrives by" date per file, released with an email to buyers.
  */
 export function AssetsCard({
 	productId,
-	productTitle,
 	assets,
-	library,
-	products,
-	sales,
 	canUpdate,
 	canDelete,
 }: {
-	productId: string;
-	productTitle: string;
+	/** Undefined on a new product: files come after the first save. */
+	productId?: string;
 	assets: ProductAsset[];
-	library: LibraryAsset[];
-	products: ProductOption[];
-	sales: number;
 	canUpdate: boolean;
 	canDelete: boolean;
 }) {
 	const router = useRouter();
-	const [creating, setCreating] = useState(false);
-	const [attaching, setAttaching] = useState(false);
-	const [editing, setEditing] = useState<EditedAsset | undefined>();
+	const [adding, setAdding] = useState(false);
 	const [pending, setPending] = useState<Pending | null>(null);
+	const [dating, setDating] = useState<ProductAsset | null>(null);
+	const [replacing, setReplacing] = useState<{ asset: ProductAsset; progress: number } | null>(null);
+	const replaceInput = useRef<HTMLInputElement>(null);
+	const replaceTarget = useRef<ProductAsset | null>(null);
 
-	const attachable = library.filter((a) => !assets.some((x) => x.id === a.id));
-
-	const edit = (a: ProductAsset) =>
-		setEditing({
-			id: a.id,
-			label: a.label,
-			kind: a.kind,
-			file:
-				a.kind === "pdf" && a.storageKey
-					? { storageKey: a.storageKey, fileName: a.fileName ?? "file.pdf", contentType: "application/pdf", sizeBytes: a.sizeBytes ?? 1 }
-					: null,
-			url: a.url ?? "",
-			availableAt: toDateInput(a.availableAt),
-			productIds: library.find((l) => l.id === a.id)?.products.map((p) => p.id) ?? [productId],
-		});
-
-	async function askRelease(asset: ProductAsset) {
-		setPending({ type: "release", asset, owners: null });
-		const res = await api.api.admin.assets[":id"].owners.$get({ param: { id: asset.id } });
-		const owners = res.ok ? (await res.json()).count : null;
-		setPending((p) => (p?.type === "release" && p.asset.id === asset.id ? { ...p, owners } : p));
-	}
-
-	async function run(action: () => Promise<Response>, success: string) {
-		const res = await action();
-		const body = (await res.json().catch(() => null)) as { error?: string } | null;
-		if (!res.ok) {
+	async function call(res: Promise<Response>, success: string) {
+		const r = await res;
+		const body = (await r.json().catch(() => null)) as { error?: string } | null;
+		if (!r.ok) {
 			toast.error(body?.error ?? "Something went wrong");
 			return false;
 		}
@@ -127,71 +163,74 @@ export function AssetsCard({
 		return true;
 	}
 
-	const addMenu = canUpdate && (
-		<DropdownMenu modal={false}>
-			<DropdownMenuTrigger asChild>
-				<Button type="button" variant="outline" size="sm">
-					<Plus />
-					Add asset
-					<ChevronDown className="text-muted-foreground" />
-				</Button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end" className="w-56">
-				<DropdownMenuItem onSelect={() => setCreating(true)}>
-					<Upload />
-					Upload new file or link
-				</DropdownMenuItem>
-				<DropdownMenuItem disabled={attachable.length === 0} onSelect={() => setAttaching(true)}>
-					<Library />
-					Select existing ({attachable.length})
-				</DropdownMenuItem>
-			</DropdownMenuContent>
-		</DropdownMenu>
-	);
+	async function replace(file: File | undefined) {
+		const asset = replaceTarget.current;
+		if (!file || !asset) return;
+		setReplacing({ asset, progress: 0 });
+		try {
+			const uploaded = await uploadAsset(file, (progress) => setReplacing({ asset, progress }));
+			await call(api.api.admin.assets[":id"].$patch({ param: { id: asset.id }, json: { file: uploaded } }), "File replaced");
+		} catch (err) {
+			toast.error((err as Error).message);
+		} finally {
+			setReplacing(null);
+		}
+	}
+
+	async function askRelease(asset: ProductAsset) {
+		setPending({ type: "release", asset, owners: null });
+		const res = await api.api.admin.assets[":id"].owners.$get({ param: { id: asset.id } });
+		const owners = res.ok ? (await res.json()).count : null;
+		setPending((p) => (p?.type === "release" && p.asset.id === asset.id ? { ...p, owners } : p));
+	}
 
 	return (
-		<FormCard title={`Assets · ${assets.length}`} action={addMenu}>
-			{assets.length === 0 ? (
-				<div className="text-muted-foreground flex flex-col items-center gap-2 rounded-lg border border-dashed py-8 text-center text-sm">
-					<FileText className="size-5" />
-					<p>No files yet. Buyers of this product get nothing until you add one.</p>
-					{canUpdate && (
-						<Button type="button" size="sm" onClick={() => setCreating(true)}>
-							<Upload />
-							Add asset
-						</Button>
-					)}
-				</div>
-			) : (
+		<div className="bg-card grid gap-3 rounded-xl border p-3">
+			<div className="flex items-center gap-2">
+				<span className="bg-primary/10 text-primary flex size-6 items-center justify-center rounded-md">
+					<CloudDownload className="size-3.5" />
+				</span>
+				<span className="text-sm font-semibold">Digital Products</span>
+			</div>
+			<p className="text-sm font-medium">Assets ({assets.length})</p>
+
+			{!productId ? (
+				<p className="text-muted-foreground rounded-lg border border-dashed p-4 text-center text-sm">
+					Save the product first, then add its files (one ZIP folder per product).
+				</p>
+			) : assets.length > 0 ? (
 				<ul className="divide-y rounded-lg border">
 					{assets.map((a) => {
 						const status = assetStatus(a);
-						const Icon = a.kind === "pdf" ? FileText : Sheet;
-						const meta = [
-							a.kind === "pdf" ? (a.fileName ?? "No file uploaded") : a.url ? "Google Sheet copy link" : "No link yet",
-							a.kind === "pdf" ? formatBytes(a.sizeBytes) : null,
-							a.uploadedAt ? `updated ${format(new Date(a.uploadedAt), "MMM d, yyyy")}` : null,
-							status === "presale" && hasAssetContent(a) ? "uploaded, not released" : null,
-							`${a.downloads} download${a.downloads === 1 ? "" : "s"}`,
-						].filter(Boolean);
+						const Icon = a.kind === "sheet_link" ? Sheet : a.kind === "pdf" ? FileText : FileArchive;
+						const busy = replacing?.asset.id === a.id;
 						return (
-							<li key={a.id} className="flex items-center gap-3 p-3">
-								<span
-									className={cn(
-										"flex size-9 shrink-0 items-center justify-center rounded-md",
-										status === "missing" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary",
-									)}
-								>
-									<Icon className="size-4" />
-								</span>
+							<li key={a.id} className="flex items-start gap-3 p-3">
+								<Icon className={cn("mt-0.5 size-5 shrink-0", status === "missing" ? "text-destructive" : "text-muted-foreground")} />
 								<div className="grid min-w-0 flex-1 gap-0.5">
-									<div className="flex flex-wrap items-center gap-2">
-										<span className="truncate text-sm font-medium">{a.label}</span>
-										<StatusBadge asset={a} />
-									</div>
-									<span className="text-muted-foreground text-xs [overflow-wrap:anywhere]">{meta.join(" · ")}</span>
-									{a.alsoIn.length > 0 && (
-										<span className="text-muted-foreground truncate text-xs">Also in: {a.alsoIn.join(", ")}</span>
+									<span className="text-sm font-medium [overflow-wrap:anywhere]">{a.fileName ?? a.label}</span>
+									<span className="text-muted-foreground text-xs">
+										{busy
+											? `Uploading new version… ${replacing.progress}%`
+											: [
+													formatBytes(a.sizeBytes),
+													a.uploadedAt ? fmtDay(a.uploadedAt) : null,
+													`${a.downloads} download${a.downloads === 1 ? "" : "s"}`,
+													a.readyNotifiedAt ? "buyers notified" : null,
+												]
+													.filter(Boolean)
+													.join(" · ")}
+									</span>
+									{status === "presale" && (
+										<Badge variant="outline" className="mt-1 border-transparent bg-amber-50 text-amber-800">
+											<CalendarClock />
+											Pre-sale · arrives by {fmtDay(a.availableAt!)}
+										</Badge>
+									)}
+									{status === "missing" && (
+										<Badge variant="destructive" className="mt-1">
+											No file
+										</Badge>
 									)}
 								</div>
 								{status === "presale" && hasAssetContent(a) && canUpdate && (
@@ -200,64 +239,101 @@ export function AssetsCard({
 										Release
 									</Button>
 								)}
-								{/* Non-modal: a modal menu hands focus back to its trigger on close, which
-								    the dialog opened from it reads as "focus outside" and closes at once. */}
-								<DropdownMenu modal={false}>
-									<DropdownMenuTrigger asChild>
-										<Button type="button" variant="ghost" size="icon-sm" aria-label={`Actions: ${a.label}`}>
-											<EllipsisVertical className="size-4" />
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent align="end" className="w-56">
-										{hasAssetContent(a) && (
-											<DropdownMenuItem asChild>
-												<a href={`/api/admin/assets/${a.id}/preview`} target="_blank" rel="noreferrer">
-													<ExternalLink />
-													{a.kind === "pdf" ? "Download" : "Open sheet"}
-												</a>
-											</DropdownMenuItem>
-										)}
-										{canUpdate && (
-											<>
-												<DropdownMenuItem onSelect={() => edit(a)}>
-													<Pencil />
-													Edit or replace file
-												</DropdownMenuItem>
-												{status === "presale" && hasAssetContent(a) && (
-													<DropdownMenuItem onSelect={() => void askRelease(a)}>
-														<Rocket />
-														Release and notify buyers
+								{hasAssetContent(a) && (
+									<Button type="button" variant="ghost" size="icon-sm" asChild aria-label={`Download ${a.fileName ?? a.label}`}>
+										<a href={`/api/admin/assets/${a.id}/preview`}>
+											<Download className="size-4" />
+										</a>
+									</Button>
+								)}
+								{(canUpdate || canDelete) && (
+									// Non-modal: a modal menu hands focus back to its trigger on close, which
+									// the dialog opened from it reads as "focus outside" and closes at once.
+									<DropdownMenu modal={false}>
+										<DropdownMenuTrigger asChild>
+											<Button type="button" variant="ghost" size="icon-sm" aria-label={`Actions: ${a.fileName ?? a.label}`} disabled={busy}>
+												{busy ? <Loader className="size-4 animate-spin" /> : <EllipsisVertical className="size-4" />}
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="end" className="w-56">
+											{canUpdate && (
+												<>
+													<DropdownMenuItem
+														onSelect={() => {
+															replaceTarget.current = a;
+															replaceInput.current?.click();
+														}}
+													>
+														<RefreshCw />
+														Replace file
 													</DropdownMenuItem>
-												)}
-												<DropdownMenuSeparator />
-												<DropdownMenuItem onSelect={() => setPending({ type: "detach", asset: a })}>
-													<Link2Off />
-													Remove from this product
-												</DropdownMenuItem>
-											</>
-										)}
-										{canDelete && (
-											<DropdownMenuItem variant="destructive" onSelect={() => setPending({ type: "delete", asset: a })}>
-												<Trash2 />
-												Delete asset
-											</DropdownMenuItem>
-										)}
-									</DropdownMenuContent>
-								</DropdownMenu>
+													<DropdownMenuItem onSelect={() => setDating(a)}>
+														<CalendarClock />
+														{a.availableAt ? "Change arrival date" : "Set as pre-sale…"}
+													</DropdownMenuItem>
+													{status === "presale" && hasAssetContent(a) && (
+														<DropdownMenuItem onSelect={() => void askRelease(a)}>
+															<Rocket />
+															Release and notify buyers
+														</DropdownMenuItem>
+													)}
+												</>
+											)}
+											{canDelete && (
+												<>
+													<DropdownMenuSeparator />
+													<DropdownMenuItem variant="destructive" onSelect={() => setPending({ type: "delete", asset: a })}>
+														<Trash2 />
+														Delete
+													</DropdownMenuItem>
+												</>
+											)}
+										</DropdownMenuContent>
+									</DropdownMenu>
+								)}
 							</li>
 						);
 					})}
 				</ul>
+			) : null}
+
+			{productId && canUpdate && (
+				<button type="button" onClick={() => setAdding(true)} className="flex items-center gap-2 justify-self-start rounded-md px-1 py-1 text-sm font-medium hover:underline">
+					<PlusCircle className="size-4" />
+					Add asset
+				</button>
 			)}
 
-			<AssetDialog open={creating} onOpenChange={setCreating} products={products} defaultProductIds={[productId]} />
-			<AssetDialog open={!!editing} onOpenChange={(o) => !o && setEditing(undefined)} products={products} asset={editing} />
-			<AttachAssetsDialog open={attaching} onOpenChange={setAttaching} productId={productId} assets={attachable} />
+			<DeliverySettings />
+
+			<input
+				ref={replaceInput}
+				type="file"
+				accept={ASSET_ACCEPT}
+				hidden
+				onChange={(e) => {
+					void replace(e.target.files?.[0]);
+					e.target.value = "";
+				}}
+			/>
+			{productId && <AddFilesDialog open={adding} onOpenChange={setAdding} productId={productId} />}
+			<PresaleDialog
+				asset={dating}
+				onClose={() => setDating(null)}
+				onSave={(date) =>
+					dating
+						? call(
+								api.api.admin.assets[":id"].$patch({ param: { id: dating.id }, json: { availableAt: date } }),
+								date ? `Arrives by ${format(parseISO(date), "MMMM d")}` : "Pre-sale date removed",
+							)
+						: Promise.resolve(true)
+				}
+			/>
 
 			<ConfirmDialog
 				open={pending?.type === "release"}
 				onOpenChange={(o) => !o && setPending(null)}
-				title={`Release “${pending?.asset.label}”?`}
+				title={`Release “${pending?.asset.fileName ?? pending?.asset.label}”?`}
 				description={
 					pending?.type === "release" ? (
 						<p>
@@ -268,7 +344,7 @@ export function AssetsCard({
 									? "Counting buyers…"
 									: pending.owners === 0
 										? "Nobody has bought it yet, so no email goes out."
-										: `${pending.owners === 1 ? "1 buyer gets" : `${pending.owners} buyers get`} a “Your ${pending.asset.label} is ready” email with a link to their downloads.`}
+										: `${pending.owners === 1 ? "1 buyer gets" : `${pending.owners} buyers get`} a “your file is ready” email with a link to their downloads.`}
 						</p>
 					) : null
 				}
@@ -278,50 +354,95 @@ export function AssetsCard({
 					const res = await api.api.admin.assets[":id"].release.$post({ param: { id: pending.asset.id } });
 					const body = (await res.json().catch(() => null)) as { error?: string; notified?: number; failed?: number } | null;
 					if (!res.ok) {
-						toast.error(body?.error ?? "Couldn't release the asset");
+						toast.error(body?.error ?? "Couldn't release the file");
 						return false;
 					}
-					toast.success(
-						body?.notified ? `Released · ${body.notified} buyer${body.notified === 1 ? "" : "s"} emailed` : "Released",
-					);
+					toast.success(body?.notified ? `Released · ${body.notified} buyer${body.notified === 1 ? "" : "s"} emailed` : "Released");
 					if (body?.failed) toast.error(`${body.failed} email${body.failed === 1 ? "" : "s"} failed. See the orders' history.`);
 					router.refresh();
 					return true;
 				}}
 			/>
 			<ConfirmDialog
-				open={pending?.type === "detach"}
-				onOpenChange={(o) => !o && setPending(null)}
-				title={`Remove “${pending?.asset.label}” from ${productTitle}?`}
-				description={
-					sales > 0
-						? `It disappears from the downloads page of this product's ${sales} buyer${sales === 1 ? "" : "s"}. The asset stays in your library.`
-						: "The asset stays in your library; you can attach it again later."
-				}
-				confirmLabel="Remove"
-				destructive={sales > 0}
-				onConfirm={() =>
-					pending?.type === "detach"
-						? run(
-								() => api.api.admin.products[":id"].assets[":fileId"].$delete({ param: { id: productId, fileId: pending.asset.id } }),
-								"Asset removed from this product",
-							)
-						: Promise.resolve(true)
-				}
-			/>
-			<ConfirmDialog
 				open={pending?.type === "delete"}
 				onOpenChange={(o) => !o && setPending(null)}
-				title={`Delete “${pending?.asset.label}”?`}
-				description="The file is deleted from storage and removed from every product. This can't be undone. Assets that buyers already own can't be deleted: replace the file instead."
+				title={`Delete “${pending?.asset.fileName ?? pending?.asset.label}”?`}
+				description="The file is deleted from storage. This can't be undone. Files that buyers already own can't be deleted: use “Replace file” to give them a new version instead."
 				confirmLabel="Delete"
 				destructive
 				onConfirm={() =>
-					pending?.type === "delete"
-						? run(() => api.api.admin.assets[":id"].$delete({ param: { id: pending.asset.id } }), "Asset deleted")
-						: Promise.resolve(true)
+					pending?.type === "delete" ? call(api.api.admin.assets[":id"].$delete({ param: { id: pending.asset.id } }), "File deleted") : Promise.resolve(true)
 				}
 			/>
-		</FormCard>
+		</div>
+	);
+}
+
+/** Set, change or remove a file's pre-sale "arrives by" date. */
+function PresaleDialog({
+	asset,
+	onClose,
+	onSave,
+}: {
+	asset: ProductAsset | null;
+	onClose: () => void;
+	onSave: (date: string | null) => Promise<boolean>;
+}) {
+	const [date, setDate] = useState<string | null>(null);
+	const [saving, setSaving] = useState(false);
+	const [lastId, setLastId] = useState<string | null>(null);
+	// New asset opened: start from its current date.
+	if ((asset?.id ?? null) !== lastId) {
+		setLastId(asset?.id ?? null);
+		setDate(asset?.availableAt ? format(new Date(asset.availableAt), "yyyy-MM-dd") : null);
+	}
+
+	const submit = async (value: string | null) => {
+		setSaving(true);
+		const ok = await onSave(value);
+		setSaving(false);
+		if (ok) onClose();
+	};
+
+	return (
+		<Dialog open={!!asset} onOpenChange={(o) => !o && !saving && onClose()}>
+			<DialogContent className="sm:max-w-[420px]">
+				<DialogHeader>
+					<DialogTitle>Pre-sale date</DialogTitle>
+					<DialogDescription>
+						Until it&apos;s released, buyers see “Arrives by [date]” instead of a download button. Release it from the file&apos;s
+						menu when it&apos;s ready.
+					</DialogDescription>
+				</DialogHeader>
+				<div className="flex justify-center rounded-lg border">
+					<Calendar
+						mode="single"
+						selected={date ? parseISO(date) : undefined}
+						onSelect={(d) => d && setDate(format(d, "yyyy-MM-dd"))}
+						disabled={{ before: new Date() }}
+					/>
+				</div>
+				<DialogFooter className="sm:justify-between">
+					{asset?.availableAt ? (
+						<Button type="button" variant="ghost" disabled={saving} onClick={() => void submit(null)}>
+							Remove date
+						</Button>
+					) : (
+						<span />
+					)}
+					<div className="flex gap-2">
+						<DialogClose asChild>
+							<Button type="button" variant="outline" disabled={saving}>
+								Cancel
+							</Button>
+						</DialogClose>
+						<Button type="button" disabled={saving || !date} onClick={() => void submit(date)}>
+							{saving && <Loader className="size-4 animate-spin" />}
+							Save
+						</Button>
+					</div>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
 	);
 }

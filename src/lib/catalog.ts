@@ -12,3 +12,7 @@ export const BUMP_SLUG = "emergency-binder";
 /** Headline test cookie (set by middleware with the free-list page). */
 export const VARIANT_COOKIE = "pk_variant";
 export const VARIANTS = ["fairness", "one_place"] as const;
+
+/** "Parentkeeping-Medical-Binder.zip" contains "Medical Binder"? (case, dashes and punctuation ignored) */
+const squash = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+export const fileMatchesPart = (fileLabel: string, partLabel: string) => squash(fileLabel).includes(squash(partLabel));

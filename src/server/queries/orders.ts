@@ -87,15 +87,22 @@ export async function getOrderFiles(orderId: string, downloadsSince: Date | null
   const result = await db.execute<{
     id: string;
     label: string;
-    kind: "pdf" | "sheet_link";
+    kind: "file" | "pdf" | "sheet_link";
     storage_key: string | null;
+    file_name: string | null;
+    size_bytes: number | null;
+    download_limit: number | null;
     url: string | null;
     available_at: string | null;
     downloads: number;
     total_downloads: number;
     last_download_at: string | null;
   }>(sql`
-    select f.id, f.label, f.kind, f.storage_key, f.url, f.available_at,
+    select f.id, f.label, f.kind, f.storage_key, f.file_name, f.size_bytes, f.url, f.available_at,
+      -- Access limit from the order's products that include the file (null = unlimited).
+      (select case when bool_or(p.download_limit is null) then null else max(p.download_limit) end
+        from product_files pf join order_items oi on oi.product_id = pf.product_id join products p on p.id = pf.product_id
+        where oi.order_id = ${orderId} and pf.file_id = f.id) as download_limit,
       (select count(*)::int from downloads d join download_tokens t on t.id = d.token_id
         where t.order_id = ${orderId} and d.file_id = f.id
         and (${downloadsSince}::timestamptz is null or d.created_at > ${downloadsSince}::timestamptz)) as downloads,
@@ -121,6 +128,9 @@ export async function getOrderFiles(orderId: string, downloadsSince: Date | null
     label: r.label,
     kind: r.kind,
     storageKey: r.storage_key,
+    fileName: r.file_name,
+    sizeBytes: r.size_bytes === null ? null : Number(r.size_bytes),
+    downloadLimit: r.download_limit === null ? null : Number(r.download_limit),
     url: r.url,
     availableAt: r.available_at ? new Date(r.available_at) : null,
     downloads: Number(r.downloads),

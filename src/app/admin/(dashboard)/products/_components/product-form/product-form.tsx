@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader } from "lucide-react";
+import { ArrowLeft, ExternalLink, Loader } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -16,10 +16,13 @@ import { STATUS_STYLES } from "../products-list";
 import { MediaCard } from "./media-card";
 import { PricingCard } from "./pricing-card";
 import { StatusCard } from "./status-card";
-import { TitleCard } from "./title-card";
+import { SeoCard } from "./seo-card";
+import { TitleDescriptionCard } from "./title-description-card";
 
 export const emptyProduct: ProductInput = {
 	title: "",
+	description: "",
+	images: [],
 	slug: "",
 	kind: "single",
 	status: "draft",
@@ -28,17 +31,22 @@ export const emptyProduct: ProductInput = {
 	stripeProductId: "",
 	stripePriceId: "",
 	foundingPriceId: "",
-	image: null,
+	seoTitle: "",
+	seoDescription: "",
+	downloadLimit: 20,
 };
 
 /**
- * Product page. `assets`, `aside` and `after` are server-rendered cards placed
- * in the layout (assets and orders act immediately, outside the Save button).
+ * Shopify-style product page. `assets` (Digital Products card), `aside` and
+ * `after` are cards placed in the layout; file actions act immediately, the
+ * rest (incl. the access limit) saves with the Save button.
  */
 export function ProductForm({
 	productId,
 	defaultValues = emptyProduct,
 	readOnly = false,
+	host,
+	storePath,
 	assets,
 	aside,
 	after,
@@ -46,6 +54,10 @@ export function ProductForm({
 	productId?: string;
 	defaultValues?: ProductInput;
 	readOnly?: boolean;
+	/** Site host for the search preview, e.g. parentkeeping.com */
+	host: string;
+	/** Live store page for "View", when the product has one. */
+	storePath?: string | null;
 	assets?: React.ReactNode;
 	aside?: React.ReactNode;
 	after?: React.ReactNode;
@@ -110,15 +122,24 @@ export function ProductForm({
 							{PRODUCT_STATUS_LABELS[defaultValues.status]}
 						</Badge>
 					)}
+					{storePath && defaultValues.status === "active" && (
+						<Button asChild variant="outline" size="sm" className="ms-auto">
+							<a href={storePath} target="_blank" rel="noreferrer">
+								<ExternalLink />
+								View
+							</a>
+						</Button>
+					)}
 				</div>
 
 				<fieldset disabled={readOnly} className="contents">
 					<div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
 						<div className="flex min-w-0 flex-col gap-4">
-							<TitleCard />
+							<TitleDescriptionCard />
+							<MediaCard />
 							{assets}
 							<PricingCard />
-							<MediaCard />
+							<SeoCard host={host} pathPrefix="/products/" />
 							{after}
 						</div>
 						<div className="flex flex-col gap-4 lg:sticky lg:top-20">

@@ -1,14 +1,14 @@
 import { format } from "date-fns";
-import { ArrowLeft, ExternalLink, FileText, Sheet } from "lucide-react";
+import { ArrowLeft, ExternalLink, FileArchive, FileText, Sheet } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { assetStatus } from "@/lib/assets";
+import { assetStatus, isUploadedFile } from "@/lib/assets";
 import { formatPrice } from "@/lib/money";
-import { countryName, DOWNLOAD_LIMIT, formatOrderNumber, ORDER_STATUS_LABELS, ORDER_STATUS_TONES } from "@/lib/orders";
+import { countryName, formatOrderNumber, ORDER_STATUS_LABELS, ORDER_STATUS_TONES } from "@/lib/orders";
 import { cn } from "@/lib/utils";
 import { hasPermission } from "@/server/auth/permissions";
 import { requireStaffPage } from "@/server/auth/session";
@@ -118,8 +118,8 @@ export default async function OrderPage({ params }: PageProps<"/admin/orders/[id
 							<ul className="divide-y rounded-lg border">
 								{files.map((f) => {
 									const status = assetStatus(f);
-									const Icon = f.kind === "pdf" ? FileText : Sheet;
-									const atLimit = f.kind === "pdf" && f.downloads >= DOWNLOAD_LIMIT;
+									const Icon = f.kind === "sheet_link" ? Sheet : f.kind === "file" ? FileArchive : FileText;
+									const atLimit = isUploadedFile(f.kind) && f.downloadLimit !== null && f.downloads >= f.downloadLimit;
 									return (
 										<li key={f.id} className="flex items-center gap-3 p-3">
 											<span className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-md">
@@ -137,9 +137,9 @@ export default async function OrderPage({ params }: PageProps<"/admin/orders/[id
 																: "Not downloaded yet"}
 												</span>
 											</div>
-											{f.kind === "pdf" ? (
+											{isUploadedFile(f.kind) ? (
 												<span className={cn("text-sm tabular-nums", atLimit && "text-destructive font-medium")}>
-													{f.downloads} / {DOWNLOAD_LIMIT}
+													{f.downloadLimit === null ? `${f.downloads} downloads` : `${f.downloads} / ${f.downloadLimit}`}
 												</span>
 											) : (
 												<span className="text-muted-foreground text-sm tabular-nums">{f.totalDownloads} opened</span>

@@ -36,6 +36,20 @@
       "when": 1791817357287,
       "tag": "0004_living_cerise",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791834408673,
+      "tag": "0005_fantastic_warpath",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791834409470,
+      "tag": "0006_empty_sleepwalker",
+      "breakpoints": true
     }
   ]
 }

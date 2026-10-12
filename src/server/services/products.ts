@@ -1,8 +1,9 @@
 import "server-only";
-import { eq, sql } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import type { ProductInput } from "@/lib/validations/product";
 import { db } from "@/server/db";
-import { products } from "@/server/db/schema";
+import { productImages, products } from "@/server/db/schema";
+import { sanitizeDescription } from "@/server/lib/sanitize";
 import { deleteObjects } from "@/server/lib/storage";
 
 export class ProductError extends Error {
@@ -19,6 +20,7 @@ const cents = (dollars: number) => Math.round(dollars * 100);
 function toColumns(input: ProductInput) {
   return {
     title: input.title,
+    description: sanitizeDescription(input.description),
     slug: input.slug,
     kind: input.kind,
     status: input.status,
@@ -27,8 +29,9 @@ function toColumns(input: ProductInput) {
     stripeProductId: input.stripeProductId || null,
     stripePriceId: input.stripePriceId || null,
     foundingPriceId: input.foundingPriceId || null,
-    imageKey: input.image?.key ?? null,
-    imageUrl: input.image?.url ?? null,
+    seoTitle: input.seoTitle || null,
+    seoDescription: input.seoDescription || null,
+    downloadLimit: input.downloadLimit,
   };
 }
 
@@ -45,32 +48,56 @@ function rethrow(err: unknown): never {
   throw err;
 }
 
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+/** The gallery becomes exactly `images`, in order (first = main image). */
+async function saveImages(tx: Tx, productId: string, images: ProductInput["images"]) {
+  await tx.delete(productImages).where(eq(productImages.productId, productId));
+  if (images.length === 0) return;
+  await tx.insert(productImages).values(
+    images.map((img, i) => ({ productId, key: img.key, url: img.url, alt: img.alt, width: img.width, height: img.height, sortOrder: i })),
+  );
+}
+
 export async function createProduct(input: ProductInput) {
   try {
-    const [{ maxSort }] = await db
-      .select({ maxSort: sql<number>`coalesce(max(${products.sortOrder}), -1)::int` })
-      .from(products);
-    const [row] = await db
-      .insert(products)
-      .values({ ...toColumns(input), sortOrder: maxSort + 1 })
-      .returning({ id: products.id, slug: products.slug });
-    return row;
+    return await db.transaction(async (tx) => {
+      const [{ maxSort }] = await tx
+        .select({ maxSort: sql<number>`coalesce(max(${products.sortOrder}), -1)::int` })
+        .from(products);
+      const [row] = await tx
+        .insert(products)
+        .values({ ...toColumns(input), sortOrder: maxSort + 1 })
+        .returning({ id: products.id, slug: products.slug });
+      await saveImages(tx, row.id, input.images);
+      return row;
+    });
   } catch (err) {
     rethrow(err);
   }
 }
 
 export async function updateProduct(id: string, input: ProductInput) {
-  const [before] = await db.select({ imageKey: products.imageKey }).from(products).where(eq(products.id, id));
+  const [before] = await db.select({ id: products.id }).from(products).where(eq(products.id, id));
   if (!before) throw new ProductError("Product not found", 404);
+  const oldImages = await db
+    .select({ key: productImages.key })
+    .from(productImages)
+    .where(eq(productImages.productId, id))
+    .orderBy(asc(productImages.sortOrder));
   try {
-    const [row] = await db
-      .update(products)
-      .set(toColumns(input))
-      .where(eq(products.id, id))
-      .returning({ id: products.id, slug: products.slug });
-    // Replaced or removed cover image: drop the old object.
-    if (before.imageKey && before.imageKey !== input.image?.key) await deleteObjects("public", [before.imageKey]);
+    const row = await db.transaction(async (tx) => {
+      const [updated] = await tx
+        .update(products)
+        .set(toColumns(input))
+        .where(eq(products.id, id))
+        .returning({ id: products.id, slug: products.slug });
+      await saveImages(tx, id, input.images);
+      return updated;
+    });
+    // Images removed from the gallery: drop the objects from storage.
+    const kept = new Set(input.images.map((i) => i.key));
+    await deleteObjects("public", oldImages.map((i) => i.key).filter((k) => !kept.has(k)));
     return row;
   } catch (err) {
     rethrow(err);

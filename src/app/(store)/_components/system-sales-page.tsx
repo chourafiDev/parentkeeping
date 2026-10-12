@@ -2,7 +2,7 @@ import { and, eq, inArray, isNotNull } from "drizzle-orm";
 import { ArrowRight, CalendarClock, FileText, Handshake, MessagesSquare, Sheet, ShieldCheck } from "lucide-react";
 import { cookies, headers } from "next/headers";
 import Link from "next/link";
-import { BUNDLE_SLUG, PRODUCT_PATHS, VARIANT_COOKIE } from "@/lib/catalog";
+import { BUNDLE_SLUG, fileMatchesPart, PRODUCT_PATHS, VARIANT_COOKIE } from "@/lib/catalog";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { AGREEMENT_LEGAL_LINE, BINDER_LEGAL_LINE, SHEET_LEGAL_LINE } from "@/lib/legal";
 import { formatStorePrice } from "@/lib/money";
@@ -98,7 +98,7 @@ export async function SystemSalesPage({
 	const usVisitor = !country || country === "US";
 	const foundingActive = founding.active && system.foundingPrice !== null;
 	const error = typeof searchParams.checkout_error === "string" ? searchParams.checkout_error : null;
-	const dateFor = (fileLabel: string) => presale.find((f) => f.label.startsWith(fileLabel))?.availableAt ?? null;
+	const dateFor = (fileLabel: string) => presale.find((f) => fileMatchesPart(f.label, fileLabel))?.availableAt ?? null;
 
 	const separately = (binder?.price ?? 0) + (agreement?.price ?? 0);
 	const difference = system.price - separately;

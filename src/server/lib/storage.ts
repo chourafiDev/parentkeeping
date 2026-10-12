@@ -10,9 +10,13 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 // Without R2 credentials in development, objects are stored in ./.storage and
 // served by /api/dev-storage with the same kind of signed, expiring URLs.
 
-export const ASSET_TYPES = { "application/pdf": "pdf" } as const;
+export const ASSET_TYPES = {
+  "application/zip": "zip",
+  "application/x-zip-compressed": "zip", // Windows browsers
+  "application/pdf": "pdf",
+} as const;
 export type AssetType = keyof typeof ASSET_TYPES;
-export const MAX_ASSET_BYTES = 200 * 1024 * 1024; // 200 MB
+export const MAX_ASSET_BYTES = 500 * 1024 * 1024; // 500 MB
 
 export const IMAGE_TYPES = {
   "image/jpeg": "jpg",

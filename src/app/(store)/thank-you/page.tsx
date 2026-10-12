@@ -1,4 +1,4 @@
-import { CircleCheck, FileText, Sheet } from "lucide-react";
+import { CircleCheck, FileArchive, FileText, Sheet } from "lucide-react";
 import type { Metadata } from "next";
 import { eq } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
@@ -97,7 +97,7 @@ export default async function ThankYouPage({ searchParams }: PageProps<"/thank-y
 			</p>
 			<ul className="mt-6 divide-y rounded-lg border text-start">
 				{files.map((f) => {
-					const Icon = f.kind === "pdf" ? FileText : Sheet;
+					const Icon = f.kind === "sheet_link" ? Sheet : f.kind === "file" ? FileArchive : FileText;
 					const status = assetStatus(f);
 					return (
 						<li key={f.id} className="flex items-center gap-3 p-3 text-sm">

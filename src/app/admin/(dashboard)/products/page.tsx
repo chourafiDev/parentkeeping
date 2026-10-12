@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { HiCube } from "react-icons/hi2";
 import { hasPermission } from "@/server/auth/permissions";
 import { requireStaffPage } from "@/server/auth/session";
-import { getAssetLibrary, getProductOptions, getProductsList, getProductTabCounts } from "@/server/queries/products";
+import { getProductOptions, getProductsList, getProductTabCounts } from "@/server/queries/products";
 import { ListHeader } from "../_components/shared/list-header";
 import { ListTransitionProvider } from "../_components/shared/list-transition";
 import { AddAssetButton } from "./_components/add-asset-button";
@@ -16,11 +16,10 @@ export default async function ProductsPage({ searchParams }: PageProps<"/admin/p
 	const { status, q, sort } = productsSearchParamsCache.parse(await searchParams);
 	const canUpdate = hasPermission(user.role, { product: ["update"] });
 
-	const [rows, counts, productOptions, library] = await Promise.all([
+	const [rows, counts, productOptions] = await Promise.all([
 		getProductsList({ tab: status, q, sort }),
 		getProductTabCounts(),
 		getProductOptions(),
-		getAssetLibrary(),
 	]);
 
 	return (
@@ -30,7 +29,7 @@ export default async function ProductsPage({ searchParams }: PageProps<"/admin/p
 				total={counts.all}
 				label={{ singular: "Product", plural: "Products" }}
 				create={hasPermission(user.role, { product: ["create"] }) ? { href: "/admin/products/new", label: "New product" } : undefined}
-				action={canUpdate ? <AddAssetButton products={productOptions} assetCount={library.length} /> : undefined}
+				action={canUpdate ? <AddAssetButton products={productOptions} /> : undefined}
 			/>
 			<ProductsList rows={rows} counts={counts} />
 		</ListTransitionProvider>

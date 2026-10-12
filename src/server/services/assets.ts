@@ -1,17 +1,21 @@
 import "server-only";
-import { and, eq, inArray, notInArray, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { hasAssetContent } from "@/lib/assets";
-import type { AssetInput } from "@/lib/validations/asset";
+import type { UploadedFile, updateAssetSchema } from "@/lib/validations/asset";
+import type { z } from "zod";
 import { db } from "@/server/db";
-import { files, orderEvents, orderItems, orders, productFiles } from "@/server/db/schema";
+import { files, orderEvents, orderItems, orders, productFiles, products } from "@/server/db/schema";
 import { buyerFooter } from "@/server/emails/buyer-footer";
 import { fileReadyEmail } from "@/server/emails/buyer";
 import { sendEmail } from "@/server/lib/email";
 import { deleteObjects, signedDownloadUrl } from "@/server/lib/storage";
 import { issueDownloadLink } from "./download-tokens";
 
-// Assets work like Shopify Digital Products: one file, attached to any number
-// of products. Buyers of any of those products get it on their downloads page.
+// Assets work like Shopify Digital Products: files uploaded to a product
+// (usually one ZIP per product). Buyers of the product get them on their
+// downloads page. Pre-sale assets carry an "arrives by" date until released.
+
+type UpdateAssetInput = z.infer<typeof updateAssetSchema>;
 
 export class AssetError extends Error {
   constructor(
@@ -22,69 +26,62 @@ export class AssetError extends Error {
   }
 }
 
-function toColumns(input: AssetInput) {
-  const pdf = input.kind === "pdf" ? input.file : null;
-  return {
-    label: input.label,
-    kind: input.kind,
-    storageKey: pdf?.storageKey ?? null,
-    fileName: pdf?.fileName ?? null,
-    contentType: pdf?.contentType ?? null,
-    sizeBytes: pdf?.sizeBytes ?? null,
-    url: input.kind === "sheet_link" ? input.url || null : null,
-    availableAt: input.availableAt ? new Date(`${input.availableAt}T12:00:00Z`) : null,
-  };
-}
+const day = (d: string) => new Date(`${d}T12:00:00Z`); // noon UTC: same calendar day in US time zones
 
-type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
-
-/** Makes the asset attached to exactly `productIds` (new links go last). */
-async function syncProducts(tx: Tx, fileId: string, productIds: string[]) {
-  await tx
-    .delete(productFiles)
-    .where(
-      productIds.length
-        ? and(eq(productFiles.fileId, fileId), notInArray(productFiles.productId, productIds))
-        : eq(productFiles.fileId, fileId),
-    );
-  const linked = await tx
-    .select({ productId: productFiles.productId })
-    .from(productFiles)
-    .where(eq(productFiles.fileId, fileId));
-  for (const productId of productIds.filter((p) => !linked.some((l) => l.productId === p))) {
+/** "Add files": attach uploaded files to a product, in upload order, after its existing assets. */
+export async function addAssets(productId: string, uploads: UploadedFile[]) {
+  const [product] = await db.select({ id: products.id }).from(products).where(eq(products.id, productId));
+  if (!product) throw new AssetError("Product not found", 404);
+  return db.transaction(async (tx) => {
     const [{ next }] = await tx
       .select({ next: sql<number>`coalesce(max(${productFiles.sortOrder}) + 1, 0)::int` })
       .from(productFiles)
       .where(eq(productFiles.productId, productId));
-    await tx.insert(productFiles).values({ productId, fileId, sortOrder: next });
-  }
-}
-
-export async function createAsset(input: AssetInput) {
-  return db.transaction(async (tx) => {
-    const [row] = await tx
+    const rows = await tx
       .insert(files)
-      .values({ ...toColumns(input), uploadedAt: input.file ? new Date() : null })
+      .values(
+        uploads.map((u) => ({
+          label: u.fileName,
+          kind: "file" as const,
+          storageKey: u.storageKey,
+          fileName: u.fileName,
+          contentType: u.contentType,
+          sizeBytes: u.sizeBytes,
+          uploadedAt: new Date(),
+        })),
+      )
       .returning({ id: files.id });
-    await syncProducts(tx, row.id, input.productIds);
-    return row;
+    await tx.insert(productFiles).values(rows.map((r, i) => ({ productId, fileId: r.id, sortOrder: next + i })));
+    return { ids: rows.map((r) => r.id) };
   });
 }
 
-export async function updateAsset(id: string, input: AssetInput) {
+/**
+ * Replace an asset's file (buyers keep access, they get the new version) and/or
+ * set or clear its pre-sale "arrives by" date.
+ */
+export async function updateAsset(id: string, input: UpdateAssetInput) {
   const [before] = await db.select().from(files).where(eq(files.id, id));
   if (!before) throw new AssetError("Asset not found", 404);
-  const columns = toColumns(input);
-  const replaced = before.storageKey && before.storageKey !== columns.storageKey;
-
-  await db.transaction(async (tx) => {
-    await tx
-      .update(files)
-      .set({ ...columns, uploadedAt: columns.storageKey !== before.storageKey ? new Date() : before.uploadedAt })
-      .where(eq(files.id, id));
-    await syncProducts(tx, id, input.productIds);
-  });
-  if (replaced) await deleteObjects("private", [before.storageKey!]);
+  const set: Partial<typeof files.$inferInsert> = {};
+  if (input.file) {
+    Object.assign(set, {
+      kind: "file",
+      label: input.file.fileName,
+      storageKey: input.file.storageKey,
+      fileName: input.file.fileName,
+      contentType: input.file.contentType,
+      sizeBytes: input.file.sizeBytes,
+      url: null,
+      uploadedAt: new Date(),
+    });
+  }
+  if (input.availableAt !== undefined) set.availableAt = input.availableAt ? day(input.availableAt) : null;
+  if (Object.keys(set).length === 0) return { id };
+  await db.update(files).set(set).where(eq(files.id, id));
+  if (input.file && before.storageKey && before.storageKey !== input.file.storageKey) {
+    await deleteObjects("private", [before.storageKey]);
+  }
   return { id };
 }
 
@@ -98,28 +95,9 @@ async function ownerOrders(fileId: string) {
     .where(and(eq(productFiles.fileId, fileId), eq(orders.status, "paid")));
 }
 
-/** Detach from one product (the asset itself stays in the library). */
-export async function detachAsset(productId: string, fileId: string) {
-  await db.delete(productFiles).where(and(eq(productFiles.productId, productId), eq(productFiles.fileId, fileId)));
-}
 
-/** Attach library assets to a product. */
-export async function attachAssets(productId: string, fileIds: string[]) {
-  if (!fileIds.length) return;
-  const existing = await db.select({ id: files.id }).from(files).where(inArray(files.id, fileIds));
-  if (existing.length !== fileIds.length) throw new AssetError("Asset not found", 404);
-  await db.transaction(async (tx) => {
-    for (const fileId of fileIds) {
-      const [{ next }] = await tx
-        .select({ next: sql<number>`coalesce(max(${productFiles.sortOrder}) + 1, 0)::int` })
-        .from(productFiles)
-        .where(eq(productFiles.productId, productId));
-      await tx.insert(productFiles).values({ productId, fileId, sortOrder: next }).onConflictDoNothing();
-    }
-  });
-}
 
-/** Delete an asset nobody has bought (otherwise: replace the file instead). */
+/** Delete an asset nobody has bought (otherwise: replace its file instead, so buyers keep access). */
 export async function deleteAsset(id: string) {
   const [asset] = await db.select({ storageKey: files.storageKey }).from(files).where(eq(files.id, id));
   if (!asset) throw new AssetError("Asset not found", 404);
@@ -142,7 +120,7 @@ export async function releaseAsset(id: string, actorId: string) {
   const [asset] = await db.select().from(files).where(eq(files.id, id));
   if (!asset) throw new AssetError("Asset not found", 404);
   if (!hasAssetContent(asset)) {
-    throw new AssetError(asset.kind === "pdf" ? "Upload the PDF before releasing it" : "Add the sheet link before releasing it");
+    throw new AssetError(asset.kind === "sheet_link" ? "Add the sheet link before releasing it" : "Upload the file before releasing it");
   }
 
   await db.update(files).set({ availableAt: null }).where(eq(files.id, id));
@@ -192,7 +170,7 @@ export async function assetPreviewUrl(id: string) {
     return asset.url;
   }
   if (!asset.storageKey) throw new AssetError("No file uploaded yet", 404);
-  return signedDownloadUrl(asset.storageKey, asset.fileName ?? "file.pdf", 120);
+  return signedDownloadUrl(asset.storageKey, asset.fileName ?? "Parentkeeping-download", 120);
 }
 
 /** How many paid orders own the asset (shown before risky changes). */

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
+import { PRODUCT_PATHS } from "@/lib/catalog";
+import { siteUrl } from "@/lib/site-url";
 import { hasPermission } from "@/server/auth/permissions";
 import { requireStaffPage } from "@/server/auth/session";
-import { getAssetLibrary, getProductDetail, getProductOptions, toProductInput } from "@/server/queries/products";
+import { getProductDetail, toProductInput } from "@/server/queries/products";
 import { AssetsCard } from "../_components/assets-card";
-import { ProductStatsCard, RecentOrdersCard } from "../_components/product-insights";
+import { RecentOrdersCard, SalesCard } from "../_components/product-insights";
 import { ProductForm } from "../_components/product-form/product-form";
 
 const paramsSchema = z.object({ id: z.uuid() });
@@ -25,11 +27,8 @@ export async function generateMetadata({ params }: PageProps<"/admin/products/[i
 
 export default async function ProductPage({ params }: PageProps<"/admin/products/[id]">) {
 	const { user } = await requireStaffPage({ product: ["read"] });
-	const [{ product, assets, recentOrders }, library, products] = await Promise.all([
-		load(params),
-		getAssetLibrary(),
-		getProductOptions(),
-	]);
+	const detail = await load(params);
+	const { product, assets, recentOrders, last90 } = detail;
 	const canUpdate = hasPermission(user.role, { product: ["update"] });
 
 	return (
@@ -37,21 +36,19 @@ export default async function ProductPage({ params }: PageProps<"/admin/products
 			// Remount with fresh values when switching between products.
 			key={product.id}
 			productId={product.id}
-			defaultValues={toProductInput(product)}
+			defaultValues={toProductInput(detail)}
 			readOnly={!canUpdate}
+			host={new URL(siteUrl()).host}
+			storePath={PRODUCT_PATHS[product.slug] ?? null}
 			assets={
 				<AssetsCard
 					productId={product.id}
-					productTitle={product.title}
 					assets={assets}
-					library={library}
-					products={products}
-					sales={product.sales}
 					canUpdate={canUpdate}
 					canDelete={hasPermission(user.role, { product: ["delete"] })}
 				/>
 			}
-			aside={<ProductStatsCard product={product} canSeeRevenue={hasPermission(user.role, { finance: ["read"] })} />}
+			aside={<SalesCard last90={last90} canSeeRevenue={hasPermission(user.role, { finance: ["read"] })} />}
 			after={<RecentOrdersCard orders={recentOrders} />}
 		/>
 	);

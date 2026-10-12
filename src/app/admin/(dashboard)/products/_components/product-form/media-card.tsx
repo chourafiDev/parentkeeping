@@ -2,85 +2,117 @@
 
 import { ImagePlus, Loader, X } from "lucide-react";
 import { useRef, useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFieldArray, useFormContext } from "react-hook-form";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { IMAGE_ACCEPT, uploadImage } from "@/lib/upload";
 import { cn } from "@/lib/utils";
 import type { ProductInput } from "@/lib/validations/product";
 import { FormCard } from "../../../_components/shared/form-card";
 
-/** Single cover image (admin list + store). */
+const MAX_IMAGES = 20;
+
+/** Shopify "Media": gallery of images, first one is the main image. Drop to upload. */
 export function MediaCard() {
 	const { control } = useFormContext<ProductInput>();
-	const [uploading, setUploading] = useState(false);
+	const { fields, append, remove, move } = useFieldArray({ control, name: "images", keyName: "_id" });
+	const [uploading, setUploading] = useState(0);
+	const [dragging, setDragging] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 
+	const handleFiles = async (list: FileList | null) => {
+		const files = Array.from(list ?? []).slice(0, MAX_IMAGES - fields.length);
+		if (!files.length) return;
+		setUploading((n) => n + files.length);
+		await Promise.all(
+			files.map(async (file) => {
+				try {
+					append(await uploadImage(file));
+				} catch (err) {
+					toast.error(`${file.name}: ${(err as Error).message}`);
+				} finally {
+					setUploading((n) => n - 1);
+				}
+			}),
+		);
+	};
+
+	const dropzone = (
+		<button
+			type="button"
+			onClick={() => inputRef.current?.click()}
+			className={cn(
+				"border-input text-muted-foreground hover:border-primary hover:text-foreground flex size-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed p-6 text-sm transition-colors",
+				fields.length === 0 && "min-h-36",
+				dragging && "border-primary bg-accent text-foreground",
+			)}
+		>
+			{uploading > 0 ? <Loader className="size-5 animate-spin" /> : <ImagePlus className="size-5" />}
+			<span className="font-medium">{uploading > 0 ? `Uploading ${uploading}…` : fields.length ? "Add" : "Upload images"}</span>
+			{fields.length === 0 && <span className="text-xs">or drop them here · JPG, PNG, WEBP · 10 MB max</span>}
+		</button>
+	);
+
 	return (
-		<FormCard title="Cover image">
-			<Controller
-				control={control}
-				name="image"
-				render={({ field }) => {
-					const pick = async (file: File | undefined) => {
-						if (!file) return;
-						setUploading(true);
-						try {
-							field.onChange(await uploadImage(file));
-						} catch (err) {
-							toast.error((err as Error).message);
-						} finally {
-							setUploading(false);
-						}
-					};
-					return (
-						<div className="flex items-center gap-4">
-							<input
-								ref={inputRef}
-								type="file"
-								accept={IMAGE_ACCEPT}
-								hidden
-								onChange={(e) => {
-									void pick(e.target.files?.[0]);
-									e.target.value = "";
-								}}
-							/>
-							<button
-								type="button"
-								onClick={() => inputRef.current?.click()}
-								className={cn(
-									"border-input text-muted-foreground hover:border-primary hover:text-foreground relative flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-lg border transition-colors",
-									!field.value && "border-dashed",
-								)}
-								aria-label={field.value ? "Replace cover image" : "Add cover image"}
-							>
-								{uploading ? (
-									<Loader className="size-5 animate-spin" />
-								) : field.value ? (
-									// eslint-disable-next-line @next/next/no-img-element
-									<img src={field.value.url} alt="" className="size-full object-cover" />
-								) : (
-									<ImagePlus className="size-5" />
-								)}
-							</button>
-							<div className="grid gap-2 text-sm">
-								<p className="text-muted-foreground">JPG, PNG, WEBP or AVIF · up to 10 MB. Square works best.</p>
-								<div className="flex gap-2">
-									<Button type="button" variant="outline" size="sm" onClick={() => inputRef.current?.click()} disabled={uploading}>
-										{field.value ? "Replace" : "Upload image"}
-									</Button>
-									{field.value && (
-										<Button type="button" variant="ghost" size="sm" onClick={() => field.onChange(null)}>
-											<X />
-											Remove
-										</Button>
-									)}
-								</div>
-							</div>
-						</div>
-					);
+		<FormCard title="Media">
+			<div
+				onDragOver={(e) => {
+					e.preventDefault();
+					setDragging(true);
 				}}
-			/>
+				onDragLeave={() => setDragging(false)}
+				onDrop={(e) => {
+					e.preventDefault();
+					setDragging(false);
+					void handleFiles(e.dataTransfer.files);
+				}}
+			>
+				<input
+					ref={inputRef}
+					type="file"
+					accept={IMAGE_ACCEPT}
+					multiple
+					hidden
+					onChange={(e) => {
+						void handleFiles(e.target.files);
+						e.target.value = "";
+					}}
+				/>
+				{fields.length === 0 ? (
+					dropzone
+				) : (
+					<div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+						{fields.map((image, index) => (
+							<div
+								key={image._id}
+								className={cn("group bg-muted relative overflow-hidden rounded-lg border", index === 0 ? "col-span-2 row-span-2" : "aspect-square")}
+							>
+								{/* eslint-disable-next-line @next/next/no-img-element */}
+								<img src={image.url} alt="" className="size-full object-cover" />
+								<button
+									type="button"
+									aria-label="Remove image"
+									onClick={() => remove(index)}
+									className="bg-background/90 absolute end-1.5 top-1.5 rounded-md p-1 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+								>
+									<X className="size-3.5" />
+								</button>
+								{index === 0 ? (
+									<span className="bg-background/90 absolute start-1.5 bottom-1.5 rounded-md px-1.5 py-0.5 text-xs font-medium">Main</span>
+								) : (
+									<button
+										type="button"
+										onClick={() => move(index, 0)}
+										className="bg-background/90 absolute start-1.5 bottom-1.5 rounded-md px-1.5 py-0.5 text-xs font-medium opacity-0 shadow-sm transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+									>
+										Make main
+									</button>
+								)}
+							</div>
+						))}
+						{fields.length < MAX_IMAGES && <div className="aspect-square">{dropzone}</div>}
+					</div>
+				)}
+			</div>
 		</FormCard>
 	);
 }

@@ -37,9 +37,11 @@ export const products = pgTable(
     price: integer().notNull(),
     foundingPrice: integer(),
     status: productStatus().default("draft").notNull(),
-    // Cover image (public bucket), shown in the admin list and on the store.
-    imageKey: text(),
-    imageUrl: text(),
+    description: text().default("").notNull(), // sanitized HTML (rich-text editor)
+    seoTitle: text(),
+    seoDescription: text(),
+    // Downloads allowed per file per order (Shopify's "Access limit"). null = unlimited.
+    downloadLimit: integer().default(20),
     sortOrder: integer().default(0).notNull(),
     ...timestamps,
   },
@@ -49,9 +51,11 @@ export const products = pgTable(
   ],
 );
 
-// pdf        = file in private storage (R2/S3/Blob), served through a short-lived signed URL
-// sheet_link = Google Sheets "Make a copy" link, shown only on the downloads page
-export const fileKind = pgEnum("file_kind", ["pdf", "sheet_link"]);
+// file       = any uploaded file (usually the product's ZIP) in private storage,
+//              served through a short-lived signed URL
+// pdf        = same, kept for files uploaded before ZIPs (treated like "file")
+// sheet_link = Google Sheets "Make a copy" link (legacy; new assets are files)
+export const fileKind = pgEnum("file_kind", ["pdf", "sheet_link", "file"]);
 
 // One deliverable (e.g. the Medical Binder PDF). A file can belong to several
 // products — the Binder PDF is in both the Medical Binder and the System — so
@@ -85,4 +89,23 @@ export const productFiles = pgTable(
     sortOrder: integer().default(0).notNull(),
   },
   (t) => [primaryKey({ columns: [t.productId, t.fileId] }), index().on(t.fileId)],
+);
+
+// Product gallery (public bucket), first = main image (Shopify "Media").
+export const productImages = pgTable(
+  "product_images",
+  {
+    id: id(),
+    productId: uuid()
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    key: text().notNull(),
+    url: text().notNull(),
+    alt: text().default("").notNull(),
+    width: integer(),
+    height: integer(),
+    sortOrder: integer().default(0).notNull(),
+    createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index().on(t.productId, t.sortOrder)],
 );

@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api-client";
 import { formatPrice } from "@/lib/money";
-import { DOWNLOAD_LIMIT, type OrderStatus } from "@/lib/orders";
+import type { OrderStatus } from "@/lib/orders";
 import { ConfirmDialog } from "../../../_components/shared/confirm-dialog";
 
 type Action = "resend" | "reset" | "limits" | "refund";
@@ -91,7 +91,7 @@ export function OrderActions({
 		},
 		limits: {
 			title: "Reset download limits?",
-			description: `Each file allows ${DOWNLOAD_LIMIT} downloads per order. Resetting starts every count from zero; past downloads stay in the stats.`,
+			description: "Each file allows a set number of downloads per order (the product's access limit). Resetting starts every count from zero; past downloads stay in the stats.",
 			label: "Reset limits",
 		},
 		refund: {

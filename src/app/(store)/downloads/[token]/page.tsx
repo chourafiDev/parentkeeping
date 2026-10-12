@@ -1,8 +1,7 @@
-import { CalendarClock, Download, ExternalLink, FileText, Sheet } from "lucide-react";
+import { CalendarClock, Download, ExternalLink, FileArchive, FileText, Sheet } from "lucide-react";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
-import { assetStatus } from "@/lib/assets";
-import { DOWNLOAD_LIMIT } from "@/lib/orders";
+import { assetStatus, formatBytes, isUploadedFile } from "@/lib/assets";
 import { SITE } from "@/lib/site";
 import { getOrderFiles } from "@/server/queries/orders";
 import { getSettings } from "@/server/queries/settings";
@@ -21,7 +20,7 @@ export const dynamic = "force-dynamic";
 const ERRORS: Record<string, string> = {
 	not_in_order: "That file isn't part of this order.",
 	not_ready: "That part isn't ready yet. We'll email you as soon as it is.",
-	limit: `You've reached the ${DOWNLOAD_LIMIT}-download limit for that file. Write to us and we'll reset it.`,
+	limit: "You've reached the download limit for that file. Write to us and we'll reset it.",
 	link: "This link no longer works.",
 };
 
@@ -72,8 +71,7 @@ export default async function DownloadsPage({ params, searchParams }: PageProps<
 					<p className="text-muted-foreground text-sm">Order #{order.orderNumber}</p>
 					<h1 className="text-2xl font-semibold tracking-tight">Your downloads</h1>
 					<p className="text-muted-foreground mt-1 text-sm">
-						Bookmark this page: the link works for a year. PDFs open in any PDF reader; the fillable ones work best in
-						Adobe Acrobat Reader.
+						Bookmark this page: the link works for a year. ZIP files open with a double-click on Mac and Windows; the fillable PDFs inside work best in Adobe Acrobat Reader.
 					</p>
 				</div>
 
@@ -86,9 +84,10 @@ export default async function DownloadsPage({ params, searchParams }: PageProps<
 				<ul className="divide-y rounded-xl border">
 					{files.map((f) => {
 						const status = assetStatus(f);
-						const Icon = f.kind === "pdf" ? FileText : Sheet;
-						const left = DOWNLOAD_LIMIT - f.downloads;
-						const atLimit = f.kind === "pdf" && left <= 0;
+						const Icon = f.kind === "sheet_link" ? Sheet : f.kind === "file" ? FileArchive : FileText;
+						const file = isUploadedFile(f.kind);
+						const left = f.downloadLimit === null ? null : f.downloadLimit - f.downloads;
+						const atLimit = file && left !== null && left <= 0;
 						return (
 							<li key={f.id} className="flex flex-wrap items-center gap-3 p-3 sm:p-4">
 								<span className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-lg">
@@ -105,9 +104,9 @@ export default async function DownloadsPage({ params, searchParams }: PageProps<
 													? "Opens Google Sheets and makes your own copy. Share it with your family from there."
 													: atLimit
 														? "Download limit reached."
-														: left <= 5
+														: left !== null && left <= 5
 															? `${left} download${left === 1 ? "" : "s"} left`
-															: "PDF"}
+															: [f.fileName?.split(".").pop()?.toUpperCase(), formatBytes(f.sizeBytes)].filter(Boolean).join(" · ") || "File"}
 									</span>
 								</div>
 								{/* Phones: the action gets its own full-width row under the title. */}
@@ -118,13 +117,13 @@ export default async function DownloadsPage({ params, searchParams }: PageProps<
 											Limit reached
 										</Button>
 									) : (
-										<Button asChild variant={f.kind === "pdf" ? "default" : "outline"} className="w-full sm:w-auto">
+										<Button asChild variant={file ? "default" : "outline"} className="w-full sm:w-auto">
 											<a
 												href={`/api/download/${f.id}?t=${t}`}
 												{...(f.kind === "sheet_link" && { target: "_blank", rel: "noreferrer noopener" })}
 											>
-												{f.kind === "pdf" ? <Download /> : <ExternalLink />}
-												{f.kind === "pdf" ? "Download" : "Make a copy"}
+												{file ? <Download /> : <ExternalLink />}
+												{file ? "Download" : "Make a copy"}
 											</a>
 										</Button>
 									)

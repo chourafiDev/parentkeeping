@@ -1,11 +1,10 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { assetInputSchema } from "@/lib/validations/asset";
+import { updateAssetSchema } from "@/lib/validations/asset";
 import {
   AssetError,
   assetOwnerCount,
   assetPreviewUrl,
-  createAsset,
   deleteAsset,
   releaseAsset,
   updateAsset,
@@ -29,8 +28,8 @@ export const assetRoutes = new Hono<AuthEnv>()
     validate(
       "json",
       z.object({
-        contentType: z.enum(assetTypes, { error: "Upload a PDF" }),
-        size: z.number().int().positive().max(MAX_ASSET_BYTES, "File is too large (200 MB max)"),
+        contentType: z.enum(assetTypes, { error: "Upload a ZIP or PDF file" }),
+        size: z.number().int().positive().max(MAX_ASSET_BYTES, "File is too large (500 MB max)"),
       }),
     ),
     async (c) => {
@@ -39,10 +38,8 @@ export const assetRoutes = new Hono<AuthEnv>()
       return c.json(await presignAssetUpload(contentType, size));
     },
   )
-  .post("/", requirePermission({ product: ["update"] }), validate("json", assetInputSchema), async (c) => {
-    return c.json(await createAsset(c.req.valid("json")), 201);
-  })
-  .patch("/:id", requirePermission({ product: ["update"] }), idParam, validate("json", assetInputSchema), async (c) => {
+  // Replace the file and/or set or clear the pre-sale "arrives by" date.
+  .patch("/:id", requirePermission({ product: ["update"] }), idParam, validate("json", updateAssetSchema), async (c) => {
     try {
       return c.json(await updateAsset(c.req.valid("param").id, c.req.valid("json")));
     } catch (err) {

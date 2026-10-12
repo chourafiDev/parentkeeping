@@ -1,8 +1,9 @@
 import "server-only";
-import { and, asc, desc, eq, ilike, inArray, type SQL, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, type SQL, sql } from "drizzle-orm";
 import { db } from "@/server/db";
 import {
   files,
+  productImages,
   orderItems,
   orders,
   productFiles,
@@ -39,6 +40,10 @@ const revenueSum = sql<number>`(
   where oi.product_id = products.id and o.status = 'paid'
 )`;
 
+const mainImage = sql<string | null>`(
+  select pi.url from product_images pi where pi.product_id = products.id order by pi.sort_order limit 1
+)`;
+
 /** Products list (Shopify Digital Products style): status tab, search, sort. */
 export async function getProductsList({
   tab,
@@ -67,7 +72,7 @@ export async function getProductsList({
       slug: products.slug,
       kind: products.kind,
       status: products.status,
-      imageUrl: products.imageUrl,
+      imageUrl: mainImage,
       price: products.price,
       foundingPrice: products.foundingPrice,
       assets: assetsCount,
@@ -109,8 +114,10 @@ export async function getProductDetail(id: string) {
       stripeProductId: products.stripeProductId,
       stripePriceId: products.stripePriceId,
       foundingPriceId: products.foundingPriceId,
-      imageKey: products.imageKey,
-      imageUrl: products.imageUrl,
+      description: products.description,
+      seoTitle: products.seoTitle,
+      seoDescription: products.seoDescription,
+      downloadLimit: products.downloadLimit,
       sales: salesCount,
       downloads: downloadsCount,
       revenue: revenueSum,
@@ -145,14 +152,27 @@ export async function getProductDetail(id: string) {
     .where(eq(productFiles.productId, id))
     .orderBy(asc(productFiles.sortOrder), asc(files.label));
 
-  // Other products each asset is attached to ("Also in: …").
-  const links = assets.length
-    ? await db
-        .select({ fileId: productFiles.fileId, productId: products.id, title: products.title })
-        .from(productFiles)
-        .innerJoin(products, eq(products.id, productFiles.productId))
-        .where(inArray(productFiles.fileId, assets.map((a) => a.id)))
-    : [];
+  const [images, [last90]] = await Promise.all([
+    db
+      .select({
+        key: productImages.key,
+        url: productImages.url,
+        alt: productImages.alt,
+        width: productImages.width,
+        height: productImages.height,
+      })
+      .from(productImages)
+      .where(eq(productImages.productId, id))
+      .orderBy(asc(productImages.sortOrder)),
+    // Shopify's "Sales past 90 days": units, buyers, net sales (paid minus refunded).
+    db.execute<{ units: number; buyers: number; net: number }>(sql`
+      select count(*)::int as units,
+        count(distinct o.email)::int as buyers,
+        coalesce(sum(case when o.status = 'paid' then oi.amount else 0 end), 0)::int as net
+      from order_items oi join orders o on o.id = oi.order_id
+      where oi.product_id = ${id} and o.paid_at > now() - interval '90 days'
+    `).then((r) => r.rows),
+  ]);
 
   const recentOrders = await db
     .select({
@@ -172,11 +192,10 @@ export async function getProductDetail(id: string) {
 
   return {
     product,
-    assets: assets.map((a) => ({
-      ...a,
-      alsoIn: links.filter((l) => l.fileId === a.id && l.productId !== id).map((l) => l.title),
-    })),
+    images,
+    assets,
     recentOrders,
+    last90: { units: Number(last90?.units ?? 0), buyers: Number(last90?.buyers ?? 0), net: Number(last90?.net ?? 0) },
   };
 }
 
@@ -184,9 +203,11 @@ export type ProductDetail = NonNullable<Awaited<ReturnType<typeof getProductDeta
 export type ProductAsset = ProductDetail["assets"][number];
 
 /** Form values for the product page (prices in dollars). */
-export function toProductInput(p: ProductDetail["product"]): ProductInput {
+export function toProductInput({ product: p, images }: Pick<ProductDetail, "product" | "images">): ProductInput {
   return {
     title: p.title,
+    description: p.description,
+    images: images.map((i) => ({ ...i, alt: i.alt ?? "" })),
     slug: p.slug,
     kind: p.kind,
     status: p.status,
@@ -195,38 +216,13 @@ export function toProductInput(p: ProductDetail["product"]): ProductInput {
     stripeProductId: p.stripeProductId ?? "",
     stripePriceId: p.stripePriceId ?? "",
     foundingPriceId: p.foundingPriceId ?? "",
-    image: p.imageKey && p.imageUrl ? { key: p.imageKey, url: p.imageUrl } : null,
+    seoTitle: p.seoTitle ?? "",
+    seoDescription: p.seoDescription ?? "",
+    downloadLimit: p.downloadLimit,
   };
 }
 
-/** Every asset with the products it's attached to (asset picker, "Add asset"). */
-export async function getAssetLibrary() {
-  const rows = await db
-    .select({
-      id: files.id,
-      label: files.label,
-      kind: files.kind,
-      storageKey: files.storageKey,
-      fileName: files.fileName,
-      sizeBytes: files.sizeBytes,
-      url: files.url,
-      availableAt: files.availableAt,
-    })
-    .from(files)
-    .orderBy(asc(files.label));
-  const links = await db
-    .select({ fileId: productFiles.fileId, productId: products.id, title: products.title })
-    .from(productFiles)
-    .innerJoin(products, eq(products.id, productFiles.productId));
-  return rows.map((r) => ({
-    ...r,
-    products: links.filter((l) => l.fileId === r.id).map((l) => ({ id: l.productId, title: l.title })),
-  }));
-}
-
-export type LibraryAsset = Awaited<ReturnType<typeof getAssetLibrary>>[number];
-
-/** Products for the asset dialog's "Attach to" picker. */
+/** Products for the "Add files" dialog's product picker. */
 export function getProductOptions() {
   return db
     .select({ id: products.id, title: products.title, status: products.status })

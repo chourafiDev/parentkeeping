@@ -1,9 +1,8 @@
-// Seeds the catalog from the build spec: 4 products, the files they deliver,
-// and default settings. Run with: pnpm db:seed — safe to re-run (skips if seeded).
+// Seeds the catalog from the build spec: 4 products and default settings. Run with: pnpm db:seed — safe to re-run (skips if seeded).
 // Stripe ids stay empty until the Stripe catalog is created.
 import { sql } from "drizzle-orm";
 import { db } from "@/server/db";
-import { files, productFiles, products, settings } from "@/server/db/schema";
+import { products, settings } from "@/server/db/schema";
 
 const PRODUCTS = [
   { slug: "family-care-system", title: "Parentkeeping Family Care System", kind: "bundle", status: "active", price: 3900, foundingPrice: 2900, sortOrder: 0 },
@@ -11,22 +10,6 @@ const PRODUCTS = [
   { slug: "caregiver-agreement", title: "Parentkeeping Family Caregiver Agreement Template", kind: "single", status: "active", price: 1900, foundingPrice: null, sortOrder: 2 },
   { slug: "emergency-binder", title: "Emergency Binder for an Aging Parent", kind: "bump", status: "active", price: 1500, foundingPrice: null, sortOrder: 3 },
 ] as const;
-
-// None are built yet: no upload, no "arrives by" date until the dates are decided.
-const FILES = {
-  binder: { label: "Medical Binder (fillable PDF + printable)", kind: "pdf" },
-  sheet: { label: "Shared Family Care Sheet (Google Sheets)", kind: "sheet_link" },
-  agreement: { label: "Family Caregiver Agreement Template (PDF)", kind: "pdf" },
-  meetingKit: { label: "Family Meeting Kit (PDF)", kind: "pdf" },
-  emergency: { label: "Emergency Binder (PDF)", kind: "pdf" },
-} as const;
-
-const PRODUCT_FILES: Record<(typeof PRODUCTS)[number]["slug"], (keyof typeof FILES)[]> = {
-  "family-care-system": ["binder", "sheet", "agreement", "meetingKit"],
-  "medical-binder": ["binder"],
-  "caregiver-agreement": ["agreement"],
-  "emergency-binder": ["emergency"],
-};
 
 const SETTINGS = {
   pricing: { foundingEndsAt: null }, // ISO date; the System switches to $39 after it
@@ -42,18 +25,8 @@ async function main() {
   }
 
   await db.transaction(async (tx) => {
-    const insertedProducts = await tx.insert(products).values([...PRODUCTS]).returning({ id: products.id, slug: products.slug });
-    const insertedFiles = await tx
-      .insert(files)
-      .values(Object.values(FILES))
-      .returning({ id: files.id, label: files.label });
-
-    const fileId = (key: keyof typeof FILES) => insertedFiles.find((f) => f.label === FILES[key].label)!.id;
-    await tx.insert(productFiles).values(
-      insertedProducts.flatMap((p) =>
-        PRODUCT_FILES[p.slug as keyof typeof PRODUCT_FILES].map((key, i) => ({ productId: p.id, fileId: fileId(key), sortOrder: i })),
-      ),
-    );
+    // Files aren't seeded: each product's ZIP is uploaded from the admin.
+    await tx.insert(products).values([...PRODUCTS]);
 
     await tx
       .insert(settings)
@@ -61,7 +34,7 @@ async function main() {
       .onConflictDoNothing();
   });
 
-  console.log(`Seeded ${PRODUCTS.length} products, ${Object.keys(FILES).length} files and default settings.`);
+  console.log(`Seeded ${PRODUCTS.length} products and default settings.`);
 }
 
 main()

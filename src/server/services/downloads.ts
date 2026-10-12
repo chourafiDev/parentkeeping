@@ -1,7 +1,6 @@
 import "server-only";
 import { and, desc, eq, gt, inArray, sql } from "drizzle-orm";
-import { assetStatus } from "@/lib/assets";
-import { DOWNLOAD_LIMIT } from "@/lib/orders";
+import { assetStatus, isUploadedFile } from "@/lib/assets";
 import { db } from "@/server/db";
 import { downloadTokens, downloads, files, orderItems, orders, productFiles } from "@/server/db/schema";
 import { signedDownloadUrl } from "@/server/lib/storage";
@@ -53,12 +52,22 @@ export async function startDownload(token: string, fileId: string): Promise<Down
         order.downloadsResetAt ? gt(downloads.createdAt, order.downloadsResetAt) : undefined,
       ),
     );
-  // Sheets are a copy link, not a file transfer: no limit, just counted.
-  if (file.kind === "pdf" && used >= DOWNLOAD_LIMIT) return { ok: false, error: "limit" };
+  // Access limit of the order's products that include this file (null = unlimited).
+  // Sheet links are a copy link, not a file transfer: no limit, just counted.
+  const [{ limit }] = (
+    await db.execute<{ limit: number | null }>(sql`
+      select case when bool_or(p.download_limit is null) then null else max(p.download_limit) end as limit
+      from product_files pf
+      join order_items oi on oi.product_id = pf.product_id
+      join products p on p.id = pf.product_id
+      where oi.order_id = ${order.id} and pf.file_id = ${file.id}
+    `)
+  ).rows;
+  if (isUploadedFile(file.kind) && limit !== null && used >= Number(limit)) return { ok: false, error: "limit" };
 
   await db.insert(downloads).values({ tokenId, fileId: file.id });
   const url =
-    file.kind === "pdf" ? await signedDownloadUrl(file.storageKey!, file.fileName ?? "Parentkeeping.pdf") : file.url!;
+    isUploadedFile(file.kind) ? await signedDownloadUrl(file.storageKey!, file.fileName ?? "Parentkeeping-download") : file.url!;
   return { ok: true, url };
 }
 

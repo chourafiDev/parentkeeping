@@ -14,9 +14,6 @@ export const ORDER_STATUS_TONES: Record<OrderStatus, string> = {
   flagged_non_us: "border-transparent bg-amber-50 text-amber-800",
 };
 
-/** Downloads allowed per file per order (support can reset the count). */
-export const DOWNLOAD_LIMIT = 20;
-
 /** 1001 → "#1001" */
 export const formatOrderNumber = (n: number) => `#${n}`;
 

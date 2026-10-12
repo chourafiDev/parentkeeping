@@ -9,6 +9,7 @@ import { type Bucket, type DevOp, verifyDevUrl } from "@/server/lib/storage";
 
 const CONTENT_TYPES: Record<string, string> = {
   pdf: "application/pdf",
+  zip: "application/zip",
   jpg: "image/jpeg",
   png: "image/png",
   webp: "image/webp",

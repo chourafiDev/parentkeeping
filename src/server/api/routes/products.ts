@@ -1,7 +1,8 @@
 import { Hono } from "hono";
 import { z } from "zod";
+import { addAssetsSchema } from "@/lib/validations/asset";
 import { productInputSchema } from "@/lib/validations/product";
-import { attachAssets, AssetError, detachAsset } from "@/server/services/assets";
+import { addAssets, AssetError } from "@/server/services/assets";
 import { createProduct, ProductError, updateProduct } from "@/server/services/products";
 import { IMAGE_TYPES, type ImageType, isStorageConfigured, MAX_IMAGE_BYTES, presignImageUpload } from "@/server/lib/storage";
 import { validate } from "../lib/validate";
@@ -48,29 +49,18 @@ export const productRoutes = new Hono<AuthEnv>()
       return c.json(await presignImageUpload(contentType, size));
     },
   )
-  // Attach library assets / detach one asset (Shopify-style "Add asset" → "Select existing").
+  // "Add files": attach uploaded files to this product (Shopify Digital Products).
   .post(
     "/:id/assets",
     requirePermission({ product: ["update"] }),
     idParam,
-    validate("json", z.object({ fileIds: z.array(z.uuid()).min(1) })),
+    validate("json", addAssetsSchema),
     async (c) => {
       try {
-        await attachAssets(c.req.valid("param").id, c.req.valid("json").fileIds);
-        return c.json({ ok: true });
+        return c.json(await addAssets(c.req.valid("param").id, c.req.valid("json").files), 201);
       } catch (err) {
         const { error, status } = fail(err);
         return c.json({ error }, status);
       }
-    },
-  )
-  .delete(
-    "/:id/assets/:fileId",
-    requirePermission({ product: ["update"] }),
-    validate("param", z.object({ id: z.uuid(), fileId: z.uuid() })),
-    async (c) => {
-      const { id, fileId } = c.req.valid("param");
-      await detachAsset(id, fileId);
-      return c.json({ ok: true });
     },
   );

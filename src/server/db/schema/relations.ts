@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm";
 import { accounts, sessions, users } from "./auth";
-import { files, productFiles, products } from "./catalog";
+import { files, productFiles, productImages, products } from "./catalog";
 import { downloadTokens, downloads, orderEvents, orderItems, orders } from "./orders";
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -18,6 +18,7 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 
 export const productsRelations = relations(products, ({ many }) => ({
   files: many(productFiles),
+  images: many(productImages),
   orderItems: many(orderItems),
 }));
 
@@ -55,4 +56,8 @@ export const downloadTokensRelations = relations(downloadTokens, ({ one, many })
 export const downloadsRelations = relations(downloads, ({ one }) => ({
   token: one(downloadTokens, { fields: [downloads.tokenId], references: [downloadTokens.id] }),
   file: one(files, { fields: [downloads.fileId], references: [files.id] }),
+}));
+
+export const productImagesRelations = relations(productImages, ({ one }) => ({
+  product: one(products, { fields: [productImages.productId], references: [products.id] }),
 }));

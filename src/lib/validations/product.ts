@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-// Product form ↔ API. Prices are entered in dollars (29.00) and stored in cents.
+// Product form ↔ API (Shopify-style product page). Prices are entered in
+// dollars (29.00) and stored in cents.
 
 const dollars = z
   .number({ error: "Enter a price" })
@@ -16,8 +17,20 @@ const stripeId = (prefix: string) =>
 export const PRODUCT_KINDS = ["bundle", "single", "bump"] as const;
 export const PRODUCT_STATUSES = ["active", "draft", "archived"] as const;
 
+export const productImageSchema = z.object({
+  key: z.string().min(1).max(500).startsWith("products/"),
+  url: z.string().min(1),
+  alt: z.string().trim().max(255),
+  width: z.number().int().positive().nullable(),
+  height: z.number().int().positive().nullable(),
+});
+
+export type ProductImage = z.infer<typeof productImageSchema>;
+
 export const productInputSchema = z.object({
   title: z.string().trim().min(1, "Enter a title").max(200),
+  description: z.string().max(50_000, "Description is too long"),
+  images: z.array(productImageSchema).max(20, "20 images maximum"),
   slug: z
     .string()
     .trim()
@@ -31,7 +44,10 @@ export const productInputSchema = z.object({
   stripeProductId: stripeId("prod_"),
   stripePriceId: stripeId("price_"),
   foundingPriceId: stripeId("price_"),
-  image: z.object({ key: z.string().min(1), url: z.string().min(1) }).nullable(),
+  seoTitle: z.string().trim().max(70, "70 characters maximum"),
+  seoDescription: z.string().trim().max(320, "320 characters maximum"),
+  // Downloads per file per order. null = unlimited (Shopify "Access limit").
+  downloadLimit: z.number().int().min(1, "At least 1 download").max(1000).nullable(),
 });
 
 export type ProductInput = z.infer<typeof productInputSchema>;
