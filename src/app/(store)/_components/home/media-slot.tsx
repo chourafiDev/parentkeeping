@@ -5,10 +5,6 @@ import { cn } from "@/lib/utils";
 
 const EXTENSIONS = ["webp", "jpg", "png"];
 
-/**
- * A photo spot (Glozin is photo-led). Uses public/images/<dir>/<name>.webp|jpg|png
- * when it exists; until then, renders the designed fallback (children).
- */
 export function MediaSlot({
 	name,
 	dir = "home",
@@ -27,7 +23,9 @@ export function MediaSlot({
 	className?: string;
 	children: React.ReactNode;
 }) {
-	const ext = EXTENSIONS.find((e) => existsSync(path.join(process.cwd(), "public/images", dir, `${name}.${e}`)));
+	const ext = EXTENSIONS.find((e) =>
+		existsSync(path.join(process.cwd(), "public/images", dir, `${name}.${e}`)),
+	);
 	if (!ext) return <>{children}</>;
 	return (
 		<Image

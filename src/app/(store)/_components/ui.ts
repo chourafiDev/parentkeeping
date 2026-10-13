@@ -13,7 +13,7 @@ export const section = "py-12 md:py-[70px]";
 export const pillButton =
 	"inline-flex h-[50px] min-w-[180px] items-center justify-center gap-2 rounded-full px-8 text-[15px] font-semibold tracking-[-0.024em] transition-colors";
 export const pillDark = `${pillButton} bg-foreground text-background hover:bg-primary`;
-export const pillLight = `${pillButton} bg-white text-foreground hover:bg-foreground hover:text-white`;
+export const pillLight = `${pillButton} bg-white text-foreground hover:border hover:border-white hover:bg-foreground hover:text-white`;
 export const pillBrand = `${pillButton} bg-primary text-primary-foreground hover:bg-foreground`;
 
 /** Section title + subtitle ("Category Highlights" / one line under it). */

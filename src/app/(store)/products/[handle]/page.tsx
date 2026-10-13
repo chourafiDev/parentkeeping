@@ -8,6 +8,7 @@ import {
 	Users,
 } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { assetStatus } from "@/lib/assets";
@@ -43,6 +44,7 @@ import {
 } from "@/server/queries/storefront";
 import { CopyBlock } from "../../_components/copy-block";
 import { type DocKind, DocMockup } from "../../_components/home/doc-mockup";
+import { AskQuestionDialog } from "../../_components/product/ask-question-dialog";
 import { ProductClosingBanner } from "../../_components/product/closing-banner";
 import {
 	type CompareRow,
@@ -53,7 +55,6 @@ import { ProductFaqBand } from "../../_components/product/faq-band";
 import { ProductGallery } from "../../_components/product/gallery";
 import { ProductHighlights } from "../../_components/product/highlights";
 import { ProductReviews } from "../../_components/product/reviews";
-import { AskQuestionDialog } from "../../_components/product/ask-question-dialog";
 import { ShareDialog } from "../../_components/product/share-dialog";
 import { ProductSteps } from "../../_components/product/steps";
 import {
@@ -314,7 +315,7 @@ export default async function ProductPage({
 							<p className="flex flex-wrap items-baseline gap-x-2.5 tabular-nums">
 								<span
 									className={cn(
-										"text-[24px] font-semibold",
+										"text-[30px] font-bold text-primary",
 										data.compareAt && "text-[#dc3545]",
 									)}
 								>
@@ -374,16 +375,13 @@ export default async function ProductPage({
 						</ul>
 
 						<div className="flex flex-wrap items-center gap-5 border-y py-4">
-							{contact.supportEmail && <AskQuestionDialog productTitle={copy.h1} />}
+							{contact.supportEmail && (
+								<AskQuestionDialog productTitle={copy.h1} />
+							)}
 							<ShareDialog title={copy.h1} />
 						</div>
 
 						<div className="grid gap-3">
-							{copy.aboveButton && (
-								<p className="rounded-[10px] bg-amber-50 p-3 text-[13px] leading-relaxed text-amber-900">
-									{copy.aboveButton}
-								</p>
-							)}
 							{checkoutError && (
 								<p className="bg-destructive/10 text-destructive rounded-[10px] p-3 text-sm">
 									{checkoutError}
@@ -403,14 +401,21 @@ export default async function ProductPage({
 								className="flex flex-wrap justify-center gap-1.5"
 								aria-label="Accepted cards"
 							>
-								{["Visa", "Mastercard", "Amex", "Discover"].map((card) => (
-									<li
-										key={card}
-										className="rounded-[4px] border bg-white px-2 py-0.5 text-[11px] font-bold tracking-wide text-[#1a1f36]"
-									>
-										{card}
-									</li>
-								))}
+								{["visa", "mastercard", "amex", "discover", "paypal"].map(
+									(card) => (
+										<li
+											key={card}
+											className="rounded-[4px] border bg-white p-0.5 text-[11px] font-bold tracking-wide text-[#1a1f36]"
+										>
+											<Image
+												src={`/images/cards/${card}.png`}
+												alt={card}
+												width={35}
+												height={20}
+											/>
+										</li>
+									),
+								)}
 							</ul>
 							<p className="text-body text-xs">
 								Secure payment by Stripe. Sales tax is calculated at checkout.

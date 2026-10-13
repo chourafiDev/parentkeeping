@@ -44,7 +44,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         ...(id ? { id } : {}),
-        class: "rich-text min-h-36 px-3 py-2 text-sm outline-none",
+        class: "rich-text min-h-96 px-3 py-2 text-sm outline-none",
       },
     },
     onUpdate: ({ editor }) => onChange(editor.isEmpty ? "" : editor.getHTML()),

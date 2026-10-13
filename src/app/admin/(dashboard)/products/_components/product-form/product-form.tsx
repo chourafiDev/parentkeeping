@@ -36,11 +36,6 @@ export const emptyProduct: ProductInput = {
 	downloadLimit: 20,
 };
 
-/**
- * Shopify-style product page. `assets` (Digital Products card), `aside` and
- * `after` are cards placed in the layout; file actions act immediately, the
- * rest (incl. the access limit) saves with the Save button.
- */
 export function ProductForm({
 	productId,
 	defaultValues = emptyProduct,

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -36,10 +37,13 @@ export function AppSidebar({ role }: { role?: string | null }) {
 					<SidebarMenuItem>
 						<SidebarMenuButton size="lg" asChild>
 							<Link href="/admin" aria-label={`${SITE.name} — overview`}>
-								<div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary font-semibold text-sidebar-primary-foreground">
-									{SITE.name.charAt(0)}
-								</div>
-								<span className="truncate font-semibold">{SITE.name}</span>
+								<Image
+									src="/logo.svg"
+									alt={SITE.name}
+									width={100}
+									height={40}
+									className="object-cover"
+								/>
 							</Link>
 						</SidebarMenuButton>
 					</SidebarMenuItem>

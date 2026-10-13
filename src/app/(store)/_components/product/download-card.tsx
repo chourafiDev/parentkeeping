@@ -37,7 +37,7 @@ export function ProductDownloadCard({
 				<ul className="grid gap-5">
 					{inside.items.map((item, i) => (
 						<li key={item.name} className="flex gap-3.5">
-							<span className="bg-foreground mt-0.5 grid size-5 shrink-0 place-items-center rounded-full text-white">
+							<span className="bg-primary mt-0.5 grid size-5 shrink-0 place-items-center rounded-full text-white">
 								<Check className="size-3" strokeWidth={3} />
 							</span>
 							<div className="grid gap-0.5">

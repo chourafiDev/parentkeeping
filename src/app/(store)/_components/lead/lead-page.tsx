@@ -23,11 +23,6 @@ function Preview({ file, title, tilt }: { file: string; title: string; tilt: num
 	return <DocMockup kind="list" title={title} tilt={tilt} />;
 }
 
-/**
- * Free download page (Glozin layout): sign-up hero with page previews, what's
- * inside, the SEO text that answers the search even without signing up, FAQ,
- * and a closing banner with the second form.
- */
 export async function LeadMagnetPage({ magnet, searchParams }: { magnet: LeadMagnet; searchParams: Record<string, string | string[] | undefined> }) {
 	const variant = (await cookies()).get(VARIANT_COOKIE)?.value === "fairness" ? "fairness" : "one_place";
 	const country = await visitorCountry(searchParams.country);
@@ -39,7 +34,7 @@ export async function LeadMagnetPage({ magnet, searchParams }: { magnet: LeadMag
 
 	return (
 		<main className="flex-1">
-			<section id="signup" className={`${container} scroll-mt-28 pt-6 pb-12 md:pb-[70px]`}>
+			<section id="signup" className={`${container} scroll-mt-28 py-12 md:pb-[70px]`}>
 				<div className="grid items-center gap-8 md:grid-cols-2 lg:gap-[60px]">
 					<div className="grid gap-5">
 						<p className={`${eyebrow} text-primary`}>Free printable</p>
