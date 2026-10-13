@@ -1,3 +1,4 @@
+import { getSessionCookie } from "better-auth/cookies";
 import { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import { PRODUCT_PATHS, VARIANT_COOKIE } from "@/lib/catalog";
@@ -137,6 +138,8 @@ export const storeRoutes = new Hono()
     const body = (await c.req.json().catch(() => null)) as Record<string, unknown> | null;
     const parsed = trackSchema.safeParse(body);
     if (!parsed.success) return c.body(null, 204);
+    // The store owner's own browsing isn't counted (signed in to the admin).
+    if (getSessionCookie(c.req.raw)) return c.body(null, 204);
     const header = (name: string) => c.req.header(name) ?? null;
     const coord = (name: string) => {
       const n = Number.parseFloat(header(name) ?? "");

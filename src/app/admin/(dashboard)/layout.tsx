@@ -4,6 +4,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { SITE } from "@/lib/site";
 import { requireStaffPage } from "@/server/auth/session";
 import { AppSidebar } from "./_components/app-sidebar";
+import { ExcludeFromAnalytics } from "./_components/exclude-from-analytics";
 import { SiteFooter } from "./_components/site-footer";
 import { SiteHeader } from "./_components/site-header";
 
@@ -21,6 +22,7 @@ export default async function AdminLayout({
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
+      <ExcludeFromAnalytics />
       <AppSidebar role={user.role} />
       {/* min-w-0 lets wide content (tables) scroll inside instead of widening the page */}
       {/* Inset panel: fixed frame on desktop, the page scrolls inside it. */}

@@ -2,11 +2,14 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { EXCLUDE_KEY } from "@/lib/analytics";
 
 // First-party visit tracking for the admin's Live View: page views, Buy
 // clicks, and a ping every minute while the tab is visible. No cookies: the
 // visit id lives in this tab's sessionStorage. Visitors who send Global
-// Privacy Control or Do Not Track aren't tracked at all.
+// Privacy Control or Do Not Track aren't tracked at all, and neither are the
+// owner's browsers (marked when the admin is opened; signed-in visits are
+// also dropped on the server).
 
 /** Never tracked: the burnout quiz (legal: no pixels there), buyers' download pages, dev tools. */
 const EXCLUDED = ["/pages/caregiver-burnout-quiz", "/downloads", "/dev"];
@@ -14,7 +17,12 @@ const PING_MS = 60_000;
 
 function optedOut() {
 	const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
-	return nav.globalPrivacyControl === true || nav.doNotTrack === "1";
+	if (nav.globalPrivacyControl === true || nav.doNotTrack === "1") return true;
+	try {
+		return localStorage.getItem(EXCLUDE_KEY) === "1";
+	} catch {
+		return false;
+	}
 }
 
 let memoryId: string | null = null;
