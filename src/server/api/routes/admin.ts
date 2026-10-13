@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { revalidatePath } from "next/cache";
 import { type AuthEnv, requireStaff } from "../middleware/auth";
+import { analyticsRoutes } from "./analytics";
 import { assetRoutes } from "./assets";
 import { orderRoutes } from "./orders";
 import { productRoutes } from "./products";
@@ -24,4 +25,5 @@ export const adminRoutes = new Hono<AuthEnv>()
   .route("/assets", assetRoutes)
   .route("/orders", orderRoutes)
   .route("/subscribers", subscriberRoutes)
-  .route("/settings", settingsRoutes);
+  .route("/settings", settingsRoutes)
+  .route("/analytics", analyticsRoutes);

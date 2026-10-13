@@ -2,6 +2,7 @@ import type { IconType } from "react-icons";
 // Heroicons v2, solid style (react-icons "Hi*"; outline versions are "HiOutline*").
 import {
   HiCog6Tooth,
+  HiGlobeAmericas,
   HiCube,
   HiEnvelope,
   HiShoppingCart,
@@ -40,6 +41,17 @@ export const navGroups: { label: string; items: NavItem[] }[] = [
         href: "/admin/subscribers",
         icon: HiEnvelope,
         permission: { subscriber: ["read"] },
+      },
+    ],
+  },
+  {
+    label: "Analytics",
+    items: [
+      {
+        title: "Live View",
+        href: "/admin/analytics/live",
+        icon: HiGlobeAmericas,
+        permission: { analytics: ["read"] },
       },
     ],
   },

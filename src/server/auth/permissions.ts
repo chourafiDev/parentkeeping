@@ -10,6 +10,7 @@ export const statements = {
   subscriber: ["read", "export", "delete"], // delete = privacy erasure requests
   settings: ["read", "update"],
   finance: ["read"], // revenue figures
+  analytics: ["read"], // Live View, reports
 } as const;
 
 export const ac = createAccessControl(statements);
@@ -22,6 +23,7 @@ export const owner = ac.newRole({
   subscriber: ["read", "export", "delete"],
   settings: ["read", "update"],
   finance: ["read"],
+  analytics: ["read"],
 });
 
 // One account: the store owner. The permission checks stay in place (they

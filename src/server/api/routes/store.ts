@@ -7,6 +7,7 @@ import { orders } from "@/server/db/schema";
 import { getStripe } from "@/server/lib/stripe";
 import { issueDownloadLink } from "@/server/services/download-tokens";
 import { requestNewLinks, startDownload } from "@/server/services/downloads";
+import { recordVisit } from "@/server/services/analytics";
 import { ContactError, submitContactQuestion } from "@/server/services/contact";
 import { SignupError, subscribeToLeadMagnet, subscribeToQuizPlans, unsubscribe } from "@/server/services/subscribers";
 import { QUIZ_SOURCE } from "@/lib/burnout-quiz";
@@ -15,6 +16,14 @@ import { FREE_LIST, LEAD_MAGNETS } from "@/lib/lead-magnets";
 import { z } from "zod";
 import { CheckoutError, createCheckoutSession } from "@/server/services/checkout";
 import { handleStripeEvent } from "@/server/services/stripe-webhook";
+
+const trackSchema = z.object({
+  sessionId: z.uuid(),
+  type: z.enum(["page_view", "checkout", "ping"]),
+  path: z.string().startsWith("/").max(300),
+  referrer: z.string().max(500).nullable().default(null),
+  productSlug: z.string().max(80).nullable().default(null),
+});
 
 // Public store endpoints (no admin session).
 export const storeRoutes = new Hono()
@@ -119,6 +128,37 @@ export const storeRoutes = new Hono()
       return back("Something went wrong. Please try again.");
     }
     return isForm ? c.redirect(`${magnet.path}/thanks`, 303) : c.json({ ok: true });
+  })
+  /**
+   * Visit tracking beacon from store pages (Live View). Always answers 204:
+   * a lost page view must never surface as an error to a visitor.
+   */
+  .post("/track", async (c) => {
+    const body = (await c.req.json().catch(() => null)) as Record<string, unknown> | null;
+    const parsed = trackSchema.safeParse(body);
+    if (!parsed.success) return c.body(null, 204);
+    const header = (name: string) => c.req.header(name) ?? null;
+    const coord = (name: string) => {
+      const n = Number.parseFloat(header(name) ?? "");
+      return Number.isFinite(n) ? n : null;
+    };
+    const city = header("x-vercel-ip-city");
+    try {
+      await recordVisit(parsed.data, {
+        host: header("host"),
+        userAgent: header("user-agent"),
+        geo: {
+          country: header("x-vercel-ip-country"),
+          region: header("x-vercel-ip-country-region"),
+          city: city ? decodeURIComponent(city) : null,
+          latitude: coord("x-vercel-ip-latitude"),
+          longitude: coord("x-vercel-ip-longitude"),
+        },
+      });
+    } catch (err) {
+      console.error("Visit tracking failed", err);
+    }
+    return c.body(null, 204);
   })
   /** "Ask a question" on a product page: one email to support, reply-to the visitor. */
   .post("/contact", async (c) => {

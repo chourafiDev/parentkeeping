@@ -36,3 +36,11 @@ export function storeDate(date: Date): string {
 
 /** "October 31" in the store's time zone (founding and "arrives by" dates in copy). */
 export const formatStoreDay = (date: Date) => date.toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: STORE_TIME_ZONE });
+
+/** Midnight (00:00:00) at the start of `dateStr` in the store's time zone. */
+export function startOfStoreDay(dateStr: string): Date {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const prev = new Date(Date.UTC(y, m - 1, d - 1));
+  const prevStr = `${prev.getUTCFullYear()}-${String(prev.getUTCMonth() + 1).padStart(2, "0")}-${String(prev.getUTCDate()).padStart(2, "0")}`;
+  return new Date(endOfStoreDay(prevStr).getTime() + 1000);
+}
