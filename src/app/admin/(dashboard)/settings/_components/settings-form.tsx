@@ -183,17 +183,11 @@ export function SettingsForm({
 				</FormCard>
 
 				<FormCard title="Business details" contentClassName="grid gap-4">
-					<Field data-invalid={!!errors.contact?.legalName}>
-						<FieldLabel htmlFor="legalName">LLC legal name</FieldLabel>
-						<Input id="legalName" placeholder="Parentkeeping LLC" {...register("contact.legalName")} />
-						<FieldDescription>Used in the disclaimer, the policies and the footer.</FieldDescription>
-						<FieldError errors={[errors.contact?.legalName]} />
-					</Field>
 					<div className="grid gap-4 sm:grid-cols-2">
 						<Field data-invalid={!!errors.contact?.supportEmail}>
 							<FieldLabel htmlFor="supportEmail">Support email</FieldLabel>
 							<Input id="supportEmail" type="email" placeholder="hello@parentkeeping.com" {...register("contact.supportEmail")} />
-							<FieldDescription>In every buyer email and on the Contact page.</FieldDescription>
+							<FieldDescription>In every buyer email, on the Contact page and in the store footer.</FieldDescription>
 							<FieldError errors={[errors.contact?.supportEmail]} />
 						</Field>
 						<Field data-invalid={!!errors.contact?.privacyEmail}>
@@ -203,16 +197,22 @@ export function SettingsForm({
 							<FieldError errors={[errors.contact?.privacyEmail]} />
 						</Field>
 					</div>
+					<Field data-invalid={!!errors.contact?.phone}>
+						<FieldLabel htmlFor="phone">Phone number</FieldLabel>
+						<Input id="phone" type="tel" placeholder="(307) 555-0142" {...register("contact.phone")} />
+						<FieldDescription>Shown in the store footer, next to the email and address.</FieldDescription>
+						<FieldError errors={[errors.contact?.phone]} />
+					</Field>
 					<Field data-invalid={!!errors.contact?.postalAddress}>
 						<FieldLabel htmlFor="postalAddress">Postal address</FieldLabel>
 						<Textarea
 							id="postalAddress"
 							rows={3}
-							placeholder={"Parentkeeping LLC\n123 Main St, Suite 100\nCheyenne, WY 82001"}
+							placeholder={"123 Main St, Suite 100\nCheyenne, WY 82001"}
 							{...register("contact.postalAddress")}
 						/>
 						<FieldDescription>
-							Required in marketing emails. A virtual mailbox or registered agent address works.
+							Required in marketing emails, and shown in the store footer. A virtual mailbox or registered agent address works.
 						</FieldDescription>
 						<FieldError errors={[errors.contact?.postalAddress]} />
 					</Field>

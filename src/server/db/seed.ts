@@ -14,7 +14,7 @@ const PRODUCTS = [
 const SETTINGS = {
   pricing: { foundingEndsAt: null }, // ISO date; the System switches to $39 after it
   checkout: { bumpEnabled: false }, // Emergency Binder order bump
-  contact: { legalName: null, supportEmail: null, privacyEmail: null, postalAddress: null },
+  contact: { supportEmail: null, privacyEmail: null, postalAddress: null, phone: null },
 };
 
 async function main() {

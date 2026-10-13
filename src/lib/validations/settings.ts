@@ -17,10 +17,10 @@ export const settingsInputSchema = z.object({
     bumpEnabled: z.boolean(),
   }),
   contact: z.object({
-    legalName: z.string().trim().max(200),
     supportEmail: optionalEmail,
     privacyEmail: optionalEmail,
     postalAddress: z.string().trim().max(400),
+    phone: z.string().trim().max(30),
   }),
 });
 

@@ -7,13 +7,13 @@ import { settings } from "@/server/db/schema";
 export type StoreSettings = {
   pricing: { foundingEndsAt: string | null };
   checkout: { bumpEnabled: boolean };
-  contact: { legalName: string | null; supportEmail: string | null; privacyEmail: string | null; postalAddress: string | null };
+  contact: { supportEmail: string | null; privacyEmail: string | null; postalAddress: string | null; phone: string | null };
 };
 
 const DEFAULTS: StoreSettings = {
   pricing: { foundingEndsAt: null },
   checkout: { bumpEnabled: false },
-  contact: { legalName: null, supportEmail: null, privacyEmail: null, postalAddress: null },
+  contact: { supportEmail: null, privacyEmail: null, postalAddress: null, phone: null },
 };
 
 export async function getSettings<K extends keyof StoreSettings>(...keys: K[]): Promise<Pick<StoreSettings, K>> {

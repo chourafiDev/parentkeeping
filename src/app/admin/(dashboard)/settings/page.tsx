@@ -56,10 +56,10 @@ export default async function SettingsPage() {
 					pricing: { foundingEndsOn: pricing.foundingEndsAt ? storeDate(new Date(pricing.foundingEndsAt)) : null },
 					checkout: { bumpEnabled: checkout.bumpEnabled },
 					contact: {
-						legalName: contact.legalName ?? "",
 						supportEmail: contact.supportEmail ?? "",
 						privacyEmail: contact.privacyEmail ?? "",
 						postalAddress: contact.postalAddress ?? "",
+						phone: contact.phone ?? "",
 					},
 				}}
 				bump={bump && { ...bump, availableAt: bump.availableAt?.toISOString() ?? null }}

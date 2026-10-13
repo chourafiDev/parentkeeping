@@ -41,13 +41,13 @@ export function LaunchChecklist({
 			state: services.email ? "done" : "todo",
 			detail: services.email ? `Sending as ${services.emailFrom}` : "Add BREVO_API_KEY and EMAIL_FROM_ADDRESS",
 		},
-		{ label: "LLC legal name", state: contact.legalName ? "done" : "todo", detail: contact.legalName ?? "Used in the disclaimer and policies" },
 		{ label: "Support email", state: contact.supportEmail ? "done" : "todo", detail: contact.supportEmail ?? "Shown in every buyer email" },
 		{
 			label: "Postal address",
 			state: contact.postalAddress ? "done" : "todo",
-			detail: contact.postalAddress ? "In email footers and Contact" : "Required in marketing emails",
+			detail: contact.postalAddress ? "In email footers, Contact and the store footer" : "Required in marketing emails",
 		},
+		{ label: "Phone number", state: contact.phone ? "done" : "todo", detail: contact.phone ?? "Shown in the store footer" },
 		{
 			label: "Founding price date",
 			state: !foundingEndsAt ? "todo" : new Date(foundingEndsAt) > new Date() ? "done" : "warn",

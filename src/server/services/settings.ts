@@ -14,10 +14,10 @@ export async function saveSettings(input: SettingsInput) {
     pricing: { foundingEndsAt: input.pricing.foundingEndsOn ? endOfStoreDay(input.pricing.foundingEndsOn).toISOString() : null },
     checkout: { bumpEnabled: input.checkout.bumpEnabled },
     contact: {
-      legalName: orNull(input.contact.legalName),
       supportEmail: orNull(input.contact.supportEmail.toLowerCase()),
       privacyEmail: orNull(input.contact.privacyEmail.toLowerCase()),
       postalAddress: orNull(input.contact.postalAddress),
+      phone: orNull(input.contact.phone),
     },
   };
   await db
