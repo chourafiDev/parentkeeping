@@ -25,7 +25,8 @@ export async function getStoreProduct(slug: string) {
 		.where(and(eq(products.slug, slug), eq(products.status, "active")));
 	if (!product || (product.kind === "bump" && !(await hasFiles(product.id)))) return null;
 
-	const [images, assets, founding, [system]] = await Promise.all([
+	const isBundle = product.slug === BUNDLE_SLUG;
+	const [images, assets, founding, [system], pieceRows] = await Promise.all([
 		db
 			.select({ url: productImages.url, alt: productImages.alt, width: productImages.width, height: productImages.height })
 			.from(productImages)
@@ -47,9 +48,11 @@ export async function getStoreProduct(slug: string) {
 			.where(eq(productFiles.productId, product.id))
 			.orderBy(asc(productFiles.sortOrder)),
 		getFoundingPrice(),
-		product.slug === BUNDLE_SLUG
-			? Promise.resolve([])
-			: db.select().from(products).where(and(inArray(products.slug, [BUNDLE_SLUG]), eq(products.status, "active"))),
+		isBundle ? Promise.resolve([]) : db.select().from(products).where(and(inArray(products.slug, [BUNDLE_SLUG]), eq(products.status, "active"))),
+		// The System page compares itself with buying the pieces.
+		isBundle
+			? db.select().from(products).where(and(inArray(products.slug, ["medical-binder", "caregiver-agreement"]), eq(products.status, "active")))
+			: Promise.resolve([]),
 	]);
 
 	const priceNow = (p: typeof product) => {
@@ -68,6 +71,8 @@ export async function getStoreProduct(slug: string) {
 		images,
 		assets,
 		system: system ? { title: system.title, ...priceNow(system) } : null,
+		/** Regular prices of the parts sold on their own (System page only). */
+		pieces: Object.fromEntries(pieceRows.map((p) => [p.slug, p.price])) as Record<string, number>,
 	};
 }
 

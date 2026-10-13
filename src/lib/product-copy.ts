@@ -5,7 +5,7 @@
 
 import { AGREEMENT_ABOVE_BUTTON, AGREEMENT_DISCLAIMER_SHORT, AGREEMENT_LEGAL_LINE, BINDER_LEGAL_LINE, EMERGENCY_LEGAL_LINE, PRODUCT_DISCLAIMER_SHORT, SHEET_LEGAL_LINE } from "./legal";
 import { FREE_LIST_PATH } from "./free-list";
-import { type FaqItem, OFFER_FAQ, OFFER_PARTS, OFFER_SUBHEAD, ONLY_CHILD_NOTE, PARTS_TITLE, SHARING_STEPS, SHARING_TITLE } from "./offer";
+import { type FaqItem, OFFER_FAQ, OFFER_MOMENT, OFFER_PARTS, OFFER_SUBHEAD, ONLY_CHILD_NOTE, PARTS_TITLE, SHARING_STEPS, SHARING_TITLE } from "./offer";
 
 export type CopySection = {
   title: string;
@@ -20,6 +20,11 @@ export type CopySection = {
   sample?: { label: string; text: string };
 };
 
+export type FactIcon = "download" | "format" | "family" | "guarantee" | "print" | "attorney";
+
+/** "What it does" row: a two-tone title (second part in the brand color). */
+export type Highlight = { tag: string; title: [string, string?]; text: string; meta?: string };
+
 export type ProductCopy = {
   seo: { title: string; description: string };
   /** Product structured data name, when it differs from the H1. */
@@ -30,9 +35,19 @@ export type ProductCopy = {
   aboveButton?: string;
   /** First line under the Buy button (then BUY_GUARANTEE_LINE). */
   underButton: string;
+  /** Story paragraphs under the hook (the subhead). */
   intro?: string[];
+  /** Buy box: icon facts (format, delivery, who it covers). */
+  facts: { icon: FactIcon; text: string }[];
+  /** "How it works": three steps. */
+  steps: { title: string; items: readonly { title: string; text: string }[]; note?: string };
+  /** "What it does": zig-zag rows, the strongest parts of "What's inside". */
+  highlights: { title: string; items: Highlight[] };
+  /** "Everything in the download": the full list. */
   inside: { title: string; items: { name: string; text: string; meta?: string }[] };
-  /** Full-width sections after "What's inside", in page order. */
+  /** The System parts this product is (comparison table); the System has all four. */
+  parts: string[];
+  /** Story sections that don't fit the blocks above (the Agreement's "Why families write one"). */
   sections: CopySection[];
   faq: FaqItem[];
   /** Small-print legal lines (each with an optional label). */
@@ -42,6 +57,14 @@ export type ProductCopy = {
 };
 
 const SYSTEM_PATH = "/products/family-care-system";
+
+/** The System's part names, split for the two-tone titles (same order as OFFER_PARTS). */
+const SYSTEM_PART_TITLES: [string, string][] = [
+  ["Medical Binder", "for an Elderly Parent"],
+  ["Shared Family", "Care Sheet"],
+  ["Family Caregiver", "Agreement Template"],
+  ["Family", "Meeting Kit"],
+];
 
 export const PRODUCT_COPY: Record<string, ProductCopy> = {
   "family-care-system": {
@@ -54,10 +77,29 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
     subhead: OFFER_SUBHEAD,
     underButton: PRODUCT_DISCLAIMER_SHORT,
     inside: {
-      title: PARTS_TITLE,
+      // DRAFT heading (the zig-zag above already uses "Four parts that work together").
+      title: "Everything in the download",
       items: OFFER_PARTS.map((p) => ({ name: p.name, text: p.what, meta: p.format })),
     },
-    sections: [{ title: SHARING_TITLE, steps: SHARING_STEPS, paragraphs: [ONLY_CHILD_NOTE] }],
+    intro: OFFER_MOMENT.paragraphs,
+    facts: [
+      { icon: "download", text: "Instant download after checkout" },
+      { icon: "format", text: "A printable binder and a Google Sheet. Nothing to install." },
+      { icon: "family", text: "Covers relatives who help care for the same parent" },
+      { icon: "guarantee", text: "14-day “if it doesn't help” guarantee" },
+    ],
+    steps: { title: SHARING_TITLE, items: SHARING_STEPS, note: ONLY_CHILD_NOTE },
+    highlights: {
+      title: PARTS_TITLE,
+      items: OFFER_PARTS.map((p, i) => ({
+        tag: p.pillar,
+        title: SYSTEM_PART_TITLES[i],
+        text: p.what,
+        meta: p.format,
+      })),
+    },
+    parts: OFFER_PARTS.map((p) => p.fileLabel),
+    sections: [],
     faq: OFFER_FAQ,
     legal: [
       { label: "Medical Binder", text: BINDER_LEGAL_LINE },
@@ -100,22 +142,49 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
         { name: "Sunday check-in page", text: "A 10-minute weekly review: what changed, what's coming up, what needs a hand." },
       ],
     },
-    sections: [
-      {
-        title: "Format and delivery",
-        bullets: [
-          { lead: "Fillable PDF:", text: "type in it, save it, print it. Also prints blank for handwriting." },
-          { text: "US Letter, prints on A4." },
-          { text: "Instant download after checkout. Print as many copies as your family needs." },
-        ],
-      },
-      {
-        title: "How sharing works",
-        paragraphs: [
-          "Print a copy for each sibling, or keep one at Mom's house by the phone. The “Who does what” page turns “let me know if you need anything” into a named job with a date.",
-        ],
-      },
+    facts: [
+      { icon: "format", text: "Fillable PDF: type in it, save it, print it" },
+      { icon: "print", text: "US Letter, prints on A4. Print as many copies as your family needs." },
+      { icon: "download", text: "Instant download after checkout" },
+      { icon: "family", text: "Covers relatives caring for the same parent" },
     ],
+    steps: {
+      title: "How sharing works",
+      items: [
+        // DRAFT step titles; the texts are the doc's own sentences.
+        { title: "Fill it in once", text: "Fill it in once on your computer, print it, and the answers live in the binder instead of in your head." },
+        { title: "Print a copy for each sibling", text: "Print a copy for each sibling, or keep one at Mom's house by the phone." },
+        { title: "Give every job a name", text: "The “Who does what” page turns “let me know if you need anything” into a named job with a date." },
+      ],
+    },
+    highlights: {
+      // DRAFT heading (from the System's binder line).
+      title: "Anyone can pick it up and find the answer",
+      items: [
+        {
+          tag: "Medications",
+          title: ["One medication list", "the pharmacist can review"],
+          text: "Prescriptions, over-the-counter medicines and supplements, plus a medication changes log. A medication binder the pharmacist can review in two minutes.",
+        },
+        {
+          tag: "Appointments",
+          title: ["Every visit,", "written down"],
+          text: "Upcoming visits, questions to ask, and notes from each visit, so the next sibling knows what the cardiologist said.",
+        },
+        {
+          tag: "Who does what",
+          title: ["Jobs stop", "defaulting to you"],
+          text: "One page that names who handles refills, rides, bills and calls, so jobs stop defaulting to you.",
+        },
+        {
+          tag: "Sunday check-in",
+          title: ["Ten minutes", "every Sunday"],
+          text: "A 10-minute weekly review: what changed, what's coming up, what needs a hand.",
+        },
+      ],
+    },
+    parts: ["Medical Binder"],
+    sections: [],
     faq: [
       {
         q: "What's the difference between a medical binder and a caregiver binder?",
@@ -157,6 +226,45 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       "Write down who cares for Mom or Dad, what's paid and how, so nobody has to guess and nobody keeps score in silence. A template to start the conversation and take to your attorney.",
     aboveButton: AGREEMENT_ABOVE_BUTTON,
     underButton: AGREEMENT_DISCLAIMER_SHORT,
+    intro: [
+      "Most care arrangements start with “I'll just help out.” A year later one sibling is there four days a week, another sends money now and then, and nobody has said out loud what's fair.",
+    ],
+    facts: [
+      { icon: "format", text: "Fillable PDF plus an editable document your attorney can mark up" },
+      { icon: "print", text: "US Letter" },
+      { icon: "download", text: "Instant download after checkout" },
+      { icon: "attorney", text: "Signature page with space for the attorney's review" },
+    ],
+    steps: {
+      // DRAFT heading and step titles; texts follow the doc's wording.
+      title: "From the kitchen table to a signed agreement",
+      items: [
+        {
+          title: "Talk it through as a family",
+          text: "Use the plain-words guide to settle the questions as a family before your attorney meeting, so the billed hour goes further.",
+        },
+        { title: "Fill in the template", text: "Who's involved, the care to be provided, the schedule and hours, and whether it's paid, the rate and how payments are made." },
+        {
+          title: "Have an attorney review it",
+          text: "Have an elder-law attorney in your parent's state review and adjust it before anyone signs or any payment is made.",
+        },
+      ],
+    },
+    highlights: {
+      // DRAFT heading (from the subhead).
+      title: "So nobody has to guess",
+      items: [
+        { tag: "The care", title: ["The care", "to be provided"], text: "From rides and meals to medication pickups and bill paying, with the schedule and expected hours, including live-in arrangements." },
+        { tag: "Payments", title: ["Paid", "or unpaid"], text: "The rate, and how and when payments are made." },
+        { tag: "Time log", title: ["A time and", "task log"], text: "A simple time and task log to keep with the agreement." },
+        {
+          tag: "Family guide",
+          title: ["A plain-words", "guide"],
+          text: "Questions to settle as a family before your attorney meeting, so the billed hour goes further.",
+        },
+      ],
+    },
+    parts: ["Family Caregiver Agreement"],
     inside: {
       title: "What's inside the template",
       items: [
@@ -178,7 +286,6 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       {
         title: "Why families write one",
         paragraphs: [
-          "Most care arrangements start with “I'll just help out.” A year later one sibling is there four days a week, another sends money now and then, and nobody has said out loud what's fair.",
           "A caregiver agreement, sometimes called a personal care agreement or caregiver contract, puts the arrangement on paper: what care is given, how often, and whether it's paid. It helps families in two ways.",
         ],
         bullets: [
@@ -266,15 +373,41 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
         { name: "Emergency binder checklist", text: "How to set it up in an afternoon and when to update it." },
       ],
     },
-    sections: [
-      { title: "Format", paragraphs: ["Printable PDF, fillable on screen. US Letter. Instant download."] },
-      {
-        title: "Where to keep it",
-        paragraphs: [
-          "Keep the binder by the front door or with the fridge sheet, and give each sibling a copy or a photo of the summary page. Update it whenever a medication or doctor changes.",
-        ],
-      },
+    facts: [
+      { icon: "format", text: "Printable PDF, fillable on screen" },
+      { icon: "print", text: "US Letter" },
+      { icon: "download", text: "Instant download" },
+      { icon: "family", text: "Give each sibling a copy or a photo of the summary page" },
     ],
+    steps: {
+      title: "Where to keep it",
+      items: [
+        // DRAFT step titles; the texts are the doc's own sentences.
+        { title: "Fill in the summary page", text: "Name, date of birth, conditions, allergies and medications, ready to hand to a paramedic." },
+        { title: "Keep it by the front door", text: "Keep the binder by the front door or with the fridge sheet, and give each sibling a copy or a photo of the summary page." },
+        { title: "Keep it current", text: "Update it whenever a medication or doctor changes." },
+      ],
+    },
+    highlights: {
+      // Heading from the doc's FAQ ("built to be handed to a stranger").
+      title: "Built to be handed to a stranger",
+      items: [
+        {
+          tag: "Summary",
+          title: ["One page", "for the paramedic"],
+          text: "Name, date of birth, conditions, allergies and medications, ready to hand to a paramedic.",
+        },
+        {
+          tag: "Documents",
+          title: ["Where the", "originals are"],
+          text: "Where the originals of the advance directive, POLST or DNR form and power of attorney are kept, and who has copies.",
+        },
+        { tag: "Grab and go", title: ["For the person", "who arrives first"], text: "What to take to the hospital, for the person who arrives first." },
+        { tag: "Fridge sheet", title: ["The key facts,", "on the fridge"], text: "A single page for the refrigerator door, so the key facts are easy to find." },
+      ],
+    },
+    parts: [],
+    sections: [],
     faq: [
       {
         q: "What's the difference between this and the Medical Binder?",
