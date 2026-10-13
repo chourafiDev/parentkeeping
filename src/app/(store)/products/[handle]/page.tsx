@@ -1,38 +1,75 @@
-import { ArrowRight, CircleHelp, Download, FileText, Printer, Scale, ShieldCheck, Users } from "lucide-react";
+import {
+	ArrowRight,
+	Download,
+	FileText,
+	Printer,
+	Scale,
+	ShieldCheck,
+	Users,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { assetStatus } from "@/lib/assets";
-import { BUNDLE_SLUG, BUY_LABELS, fileMatchesPart, PRODUCT_PATHS, SLUG_BY_HANDLE } from "@/lib/catalog";
+import {
+	BUNDLE_SLUG,
+	BUY_LABELS,
+	fileMatchesPart,
+	PRODUCT_PATHS,
+	SLUG_BY_HANDLE,
+} from "@/lib/catalog";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { BUY_GUARANTEE_LINE } from "@/lib/legal";
 import { formatStorePrice } from "@/lib/money";
-import { OFFER_HEADLINES, OFFER_PARTS, ONE_PRICE_BADGE, PRICE_ANCHOR_TITLE } from "@/lib/offer";
-import { type FactIcon, PRODUCT_COPY, type ProductCopy } from "@/lib/product-copy";
+import {
+	OFFER_HEADLINES,
+	OFFER_PARTS,
+	ONE_PRICE_BADGE,
+	PRICE_ANCHOR_TITLE,
+} from "@/lib/offer";
+import {
+	type FactIcon,
+	PRODUCT_COPY,
+	type ProductCopy,
+} from "@/lib/product-copy";
 import { reviewsFor } from "@/lib/reviews";
 import { siteUrl } from "@/lib/site-url";
 import { formatStoreDay } from "@/lib/store-time";
 import { cn } from "@/lib/utils";
 import { getSettings } from "@/server/queries/settings";
-import { getStoreProduct, type StoreProduct } from "@/server/queries/storefront";
+import {
+	getStoreProduct,
+	type StoreProduct,
+} from "@/server/queries/storefront";
 import { CopyBlock } from "../../_components/copy-block";
-import { DocMockup, type DocKind } from "../../_components/home/doc-mockup";
+import { type DocKind, DocMockup } from "../../_components/home/doc-mockup";
 import { ProductClosingBanner } from "../../_components/product/closing-banner";
-import { type CompareRow, ProductCompare } from "../../_components/product/compare";
+import {
+	type CompareRow,
+	ProductCompare,
+} from "../../_components/product/compare";
 import { ProductDownloadCard } from "../../_components/product/download-card";
 import { ProductFaqBand } from "../../_components/product/faq-band";
 import { ProductGallery } from "../../_components/product/gallery";
-import { ProductGuarantee } from "../../_components/product/guarantee";
 import { ProductHighlights } from "../../_components/product/highlights";
 import { ProductReviews } from "../../_components/product/reviews";
-import { ShareButton } from "../../_components/product/share-button";
+import { AskQuestionDialog } from "../../_components/product/ask-question-dialog";
+import { ShareDialog } from "../../_components/product/share-dialog";
 import { ProductSteps } from "../../_components/product/steps";
-import { jsonLdHtml, productJsonLd, visitorCountry } from "../../_components/product-data";
+import {
+	jsonLdHtml,
+	productJsonLd,
+	visitorCountry,
+} from "../../_components/product-data";
 import { container, pillDark, pillLight, section } from "../../_components/ui";
 
 export const dynamic = "force-dynamic";
 
-const textOf = (html: string) => html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+const textOf = (html: string) =>
+	html
+		.replace(/<[^>]*>/g, " ")
+		.replace(/\s+/g, " ")
+		.trim();
 
 const DOC_KIND: Record<string, DocKind> = {
 	"family-care-system": "bundle",
@@ -48,7 +85,10 @@ const HIGHLIGHT_KINDS: Record<string, DocKind[]> = {
 	"emergency-binder": ["binder", "agreement", "list", "binder"],
 };
 /** Short names for the comparison table's column. */
-const SHORT_NAME: Record<string, string> = { "medical-binder": "Medical Binder", "caregiver-agreement": "Agreement Template" };
+const SHORT_NAME: Record<string, string> = {
+	"medical-binder": "Medical Binder",
+	"caregiver-agreement": "Agreement Template",
+};
 
 const FACT_ICONS: Record<FactIcon, typeof Download> = {
 	download: Download,
@@ -69,39 +109,56 @@ async function load(params: Promise<{ handle: string }>) {
 
 /** Admin SEO fields win; the page copy is the default. */
 function seoOf({ product, copy }: StoreProduct & { copy: ProductCopy }) {
-	return { title: product.seoTitle || copy.seo.title, description: product.seoDescription || copy.seo.description };
+	return {
+		title: product.seoTitle || copy.seo.title,
+		description: product.seoDescription || copy.seo.description,
+	};
 }
 
-export async function generateMetadata({ params }: PageProps<"/products/[handle]">): Promise<Metadata> {
+export async function generateMetadata({
+	params,
+}: PageProps<"/products/[handle]">): Promise<Metadata> {
 	const data = await load(params);
 	const seo = seoOf(data);
 	// The System's page repeats the home page: canonical to "/" so they don't compete.
-	const canonical = data.product.slug === BUNDLE_SLUG ? "/" : PRODUCT_PATHS[data.product.slug];
+	const canonical =
+		data.product.slug === BUNDLE_SLUG ? "/" : PRODUCT_PATHS[data.product.slug];
 	return {
 		title: { absolute: seo.title },
 		description: seo.description,
 		alternates: { canonical },
-		openGraph: { title: seo.title, description: seo.description, url: canonical, images: data.images[0] ? [{ url: data.images[0].url }] : undefined },
+		openGraph: {
+			title: seo.title,
+			description: seo.description,
+			url: canonical,
+			images: data.images[0] ? [{ url: data.images[0].url }] : undefined,
+		},
 	};
 }
 
-/**
- * Product page, laid out like the Slate reference in Glozin's design system:
- * buy box (hook, story, facts), how it works, what it does (zig-zag),
- * guarantee, everything in the download, comparison, FAQ band, and the
- * closing block (singles end with the upgrade to the System, per the copy rules).
- */
-export default async function ProductPage({ params, searchParams }: PageProps<"/products/[handle]">) {
+export default async function ProductPage({
+	params,
+	searchParams,
+}: PageProps<"/products/[handle]">) {
 	const [data, query] = await Promise.all([load(params), searchParams]);
-	const [country, { contact }] = await Promise.all([visitorCountry(query.country), getSettings("contact")]);
+	const [country, { contact }] = await Promise.all([
+		visitorCountry(query.country),
+		getSettings("contact"),
+	]);
 	const { product, images, assets, system, copy, pieces } = data;
 	const usVisitor = !country || country === "US";
 	const isBundle = product.slug === BUNDLE_SLUG;
-	const discount = data.compareAt ? Math.round((1 - data.price / data.compareAt) * 100) : 0;
+	const discount = data.compareAt
+		? Math.round((1 - data.price / data.compareAt) * 100)
+		: 0;
 	const presale = assets.some((a) => assetStatus(a) === "presale");
-	const checkoutError = typeof query.checkout_error === "string" ? query.checkout_error : null;
+	const checkoutError =
+		typeof query.checkout_error === "string" ? query.checkout_error : null;
 	const url = `${siteUrl()}${isBundle ? "/" : PRODUCT_PATHS[product.slug]}`;
-	const description = product.description && textOf(product.description) ? product.description : null;
+	const description =
+		product.description && textOf(product.description)
+			? product.description
+			: null;
 	const reviews = reviewsFor(product.slug);
 	const facts = [
 		...copy.facts,
@@ -117,8 +174,13 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 	const buyButton = (className: string) =>
 		!usVisitor ? (
 			<div className="bg-muted/70 grid gap-1 rounded-[10px] p-4 text-left text-sm">
-				<p className="text-foreground font-medium">Available to US customers only for now.</p>
-				<Link href={FREE_LIST_PATH} className="text-primary font-semibold underline-offset-2 hover:underline">
+				<p className="text-foreground font-medium">
+					Available to US customers only for now.
+				</p>
+				<Link
+					href={FREE_LIST_PATH}
+					className="text-primary font-semibold underline-offset-2 hover:underline"
+				>
 					Join the list for the UK edition (and get the free Medication List)
 				</Link>
 			</div>
@@ -131,7 +193,11 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 				</button>
 			</form>
 		) : (
-			<button type="button" disabled className={cn(className, "cursor-not-allowed opacity-50")}>
+			<button
+				type="button"
+				disabled
+				className={cn(className, "cursor-not-allowed opacity-50")}
+			>
 				Coming soon
 			</button>
 		);
@@ -149,7 +215,13 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 
 	// "Everything in the download": pre-sale dates per item (System parts only).
 	const arrivesBy = copy.inside.items.map((_, i) =>
-		isBundle ? (assets.find((a) => fileMatchesPart(a.label, OFFER_PARTS[i]?.fileLabel ?? "") && a.availableAt)?.availableAt ?? null) : null,
+		isBundle
+			? (assets.find(
+					(a) =>
+						fileMatchesPart(a.label, OFFER_PARTS[i]?.fileLabel ?? "") &&
+						a.availableAt,
+				)?.availableAt ?? null)
+			: null,
 	);
 
 	// Comparison rows.
@@ -157,17 +229,26 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 	const singleRows: CompareRow[] = OFFER_PARTS.map((part) => ({
 		label: part.name,
 		ours: { yes: true, text: "Included" },
-		theirs: copy.parts.includes(part.fileLabel) ? { yes: true, text: "Included" } : { yes: false, text: "Not included" },
+		theirs: copy.parts.includes(part.fileLabel)
+			? { yes: true, text: "Included" }
+			: { yes: false, text: "Not included" },
 	}));
-	const separately = (pieces["medical-binder"] ?? 0) + (pieces["caregiver-agreement"] ?? 0);
+	const separately =
+		(pieces["medical-binder"] ?? 0) + (pieces["caregiver-agreement"] ?? 0);
 	const pieceText: Record<string, string | undefined> = {
-		"Medical Binder": pieces["medical-binder"] ? `${formatStorePrice(pieces["medical-binder"])} on its own` : undefined,
-		"Family Caregiver Agreement": pieces["caregiver-agreement"] ? `${formatStorePrice(pieces["caregiver-agreement"])} on its own` : undefined,
+		"Medical Binder": pieces["medical-binder"]
+			? `${formatStorePrice(pieces["medical-binder"])} on its own`
+			: undefined,
+		"Family Caregiver Agreement": pieces["caregiver-agreement"]
+			? `${formatStorePrice(pieces["caregiver-agreement"])} on its own`
+			: undefined,
 	};
 	const bundleRows: CompareRow[] = OFFER_PARTS.map((part) => ({
 		label: part.name,
 		ours: { yes: true, text: "Included" },
-		theirs: pieceText[part.fileLabel] ? { yes: true, text: pieceText[part.fileLabel]! } : { yes: false, text: "Only in the System" },
+		theirs: pieceText[part.fileLabel]
+			? { yes: true, text: pieceText[part.fileLabel]! }
+			: { yes: false, text: "Only in the System" },
 	}));
 
 	return (
@@ -175,7 +256,14 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 			<script
 				type="application/ld+json"
 				dangerouslySetInnerHTML={jsonLdHtml(
-					productJsonLd({ title: copy.schemaName ?? copy.h1, description: copy.seo.description, price: data.price, url, image: images[0]?.url, inStock: data.sellable }),
+					productJsonLd({
+						title: copy.schemaName ?? copy.h1,
+						description: copy.seo.description,
+						price: data.price,
+						url,
+						image: images[0]?.url,
+						inStock: data.sellable,
+					}),
 				)}
 			/>
 
@@ -191,30 +279,73 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 
 				<div className="grid items-start gap-8 md:grid-cols-2 lg:gap-[60px]">
 					<div className="md:sticky md:top-[130px]">
-						<ProductGallery images={images} title={copy.h1} fallback={<DocMockup kind={DOC_KIND[product.slug] ?? "binder"} title={product.title} />} />
+						<ProductGallery
+							images={images}
+							title={copy.h1}
+							fallback={
+								<DocMockup
+									kind={DOC_KIND[product.slug] ?? "binder"}
+									title={product.title}
+								/>
+							}
+						/>
 					</div>
 
 					<div className="grid gap-6">
 						<div className="grid gap-3">
 							<div className="flex flex-wrap gap-1.5">
-								<span className="text-foreground rounded-full border px-3 py-0.5 text-xs font-medium">Parentkeeping</span>
-								{discount > 0 && <span className="rounded-full bg-[#dc3545] px-2.5 py-0.5 text-xs font-semibold text-white">-{discount}%</span>}
-								{presale && <span className="rounded-full bg-[#6c4cf1] px-2.5 py-0.5 text-xs font-semibold text-white">Pre-order</span>}
+								<span className="text-foreground rounded-full border px-3 py-0.5 text-xs font-medium">
+									Parentkeeping
+								</span>
+								{discount > 0 && (
+									<span className="rounded-full bg-[#dc3545] px-2.5 py-0.5 text-xs font-semibold text-white">
+										-{discount}%
+									</span>
+								)}
+								{presale && (
+									<span className="rounded-full bg-[#6c4cf1] px-2.5 py-0.5 text-xs font-semibold text-white">
+										Pre-order
+									</span>
+								)}
 							</div>
-							<h1 className="text-foreground text-[28px] leading-tight font-semibold tracking-[-0.034em] md:text-[34px]">{copy.h1}</h1>
+							<h1 className="text-foreground text-[28px] leading-tight font-semibold tracking-[-0.034em] md:text-[34px]">
+								{copy.h1}
+							</h1>
 							<p className="flex flex-wrap items-baseline gap-x-2.5 tabular-nums">
-								<span className={cn("text-[24px] font-semibold", data.compareAt && "text-[#dc3545]")}>{formatStorePrice(data.price)}</span>
-								{data.compareAt && <span className="text-body text-[17px] line-through">{formatStorePrice(data.compareAt)}</span>}
-								{data.foundingEndsAt && <span className="text-foreground text-[14px] font-medium">founding price until {formatStoreDay(data.foundingEndsAt)}</span>}
+								<span
+									className={cn(
+										"text-[24px] font-semibold",
+										data.compareAt && "text-[#dc3545]",
+									)}
+								>
+									{formatStorePrice(data.price)}
+								</span>
+								{data.compareAt && (
+									<span className="text-body text-[17px] line-through">
+										{formatStorePrice(data.compareAt)}
+									</span>
+								)}
+								{data.foundingEndsAt && (
+									<span className="text-foreground text-[14px] font-medium">
+										founding price until {formatStoreDay(data.foundingEndsAt)}
+									</span>
+								)}
 							</p>
-							<p className="text-primary text-[13px] font-medium">{ONE_PRICE_BADGE}</p>
+							<p className="text-primary text-[13px] font-medium">
+								{ONE_PRICE_BADGE}
+							</p>
 						</div>
 
 						{/* Hook + story (Slate's bold headline and short problem-led paragraphs) */}
 						<div className="grid gap-3">
-							<p className="text-foreground text-[18px] leading-snug font-semibold tracking-[-0.02em]">{copy.subhead}</p>
+							<p className="text-foreground text-[18px] leading-snug font-semibold tracking-[-0.02em]">
+								{copy.subhead}
+							</p>
 							{description ? (
-								<div className="rich-text text-body text-[15px] leading-[1.714]" dangerouslySetInnerHTML={{ __html: description }} />
+								<div
+									className="rich-text text-body text-[15px] leading-[1.714]"
+									dangerouslySetInnerHTML={{ __html: description }}
+								/>
 							) : (
 								copy.intro?.map((p) => (
 									<p key={p} className="text-body text-[15px] leading-[1.714]">
@@ -228,8 +359,14 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 							{facts.map((f) => {
 								const Icon = FACT_ICONS[f.icon];
 								return (
-									<li key={f.text} className="text-foreground flex items-start gap-3 text-[14px]">
-										<Icon className="text-primary mt-0.5 size-4 shrink-0" strokeWidth={1.75} />
+									<li
+										key={f.text}
+										className="text-foreground flex items-start gap-3 text-[14px]"
+									>
+										<Icon
+											className="text-primary mt-0.5 size-4 shrink-0"
+											strokeWidth={1.75}
+										/>
 										{f.text}
 									</li>
 								);
@@ -237,35 +374,47 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 						</ul>
 
 						<div className="flex flex-wrap items-center gap-5 border-y py-4">
-							{contact.supportEmail && (
-								<a
-									href={`mailto:${contact.supportEmail}?subject=${encodeURIComponent(`Question about ${copy.h1}`)}`}
-									className="text-foreground hover:text-primary flex items-center gap-2 text-sm transition-colors"
-								>
-									<CircleHelp className="size-4" />
-									Ask a question
-								</a>
-							)}
-							<ShareButton title={copy.h1} />
+							{contact.supportEmail && <AskQuestionDialog productTitle={copy.h1} />}
+							<ShareDialog title={copy.h1} />
 						</div>
 
 						<div className="grid gap-3">
-							{copy.aboveButton && <p className="rounded-[10px] bg-amber-50 p-3 text-[13px] leading-relaxed text-amber-900">{copy.aboveButton}</p>}
-							{checkoutError && <p className="bg-destructive/10 text-destructive rounded-[10px] p-3 text-sm">{checkoutError}</p>}
+							{copy.aboveButton && (
+								<p className="rounded-[10px] bg-amber-50 p-3 text-[13px] leading-relaxed text-amber-900">
+									{copy.aboveButton}
+								</p>
+							)}
+							{checkoutError && (
+								<p className="bg-destructive/10 text-destructive rounded-[10px] p-3 text-sm">
+									{checkoutError}
+								</p>
+							)}
 							{buyButton(fullWidthDark)}
-							<div className="text-body grid gap-1 text-[13px] [&>p]:justify-start">{underButton}</div>
+							<div className="text-body grid gap-1 text-[13px] [&>p]:justify-start">
+								{underButton}
+							</div>
 						</div>
 
 						<div className="grid justify-items-center gap-3 rounded-[10px] bg-[#f5f5f5] p-5">
-							<p className="text-foreground text-[15px] font-semibold">Guaranteed safe checkout</p>
-							<ul className="flex flex-wrap justify-center gap-1.5" aria-label="Accepted cards">
+							<p className="text-foreground text-[15px] font-semibold">
+								Guaranteed safe checkout
+							</p>
+							<ul
+								className="flex flex-wrap justify-center gap-1.5"
+								aria-label="Accepted cards"
+							>
 								{["Visa", "Mastercard", "Amex", "Discover"].map((card) => (
-									<li key={card} className="rounded-[4px] border bg-white px-2 py-0.5 text-[11px] font-bold tracking-wide text-[#1a1f36]">
+									<li
+										key={card}
+										className="rounded-[4px] border bg-white px-2 py-0.5 text-[11px] font-bold tracking-wide text-[#1a1f36]"
+									>
 										{card}
 									</li>
 								))}
 							</ul>
-							<p className="text-body text-xs">Secure payment by Stripe. Sales tax is calculated at checkout.</p>
+							<p className="text-body text-xs">
+								Secure payment by Stripe. Sales tax is calculated at checkout.
+							</p>
 						</div>
 					</div>
 				</div>
@@ -273,19 +422,26 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 
 			{reviews.length > 0 && <ProductReviews reviews={reviews} />}
 			<ProductSteps steps={copy.steps} />
-			<ProductHighlights slug={product.slug} highlights={copy.highlights} kinds={HIGHLIGHT_KINDS[product.slug] ?? []} />
+			<ProductHighlights
+				slug={product.slug}
+				highlights={copy.highlights}
+				kinds={HIGHLIGHT_KINDS[product.slug] ?? []}
+			/>
 
 			{copy.sections.length > 0 && (
 				<section className={`${container} ${section} border-t`}>
-					<div className={cn("grid gap-10 md:gap-[60px]", copy.sections.length > 1 && "md:grid-cols-2")}>
+					<div
+						className={cn(
+							"grid gap-10 md:gap-[60px]",
+							copy.sections.length > 1 && "md:grid-cols-2",
+						)}
+					>
 						{copy.sections.map((block) => (
 							<CopyBlock key={block.title} block={block} />
 						))}
 					</div>
 				</section>
 			)}
-
-			<ProductGuarantee supportEmail={contact.supportEmail} />
 
 			<ProductDownloadCard
 				inside={copy.inside}
@@ -307,14 +463,24 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 						...bundleRows,
 						{
 							label: "Price",
-							ours: { yes: true, text: `${formatStorePrice(data.price)} for all four` },
-							theirs: { yes: false, text: `${formatStorePrice(separately)}, without the Sheet or the Meeting Kit` },
+							ours: {
+								yes: true,
+								text: `${formatStorePrice(data.price)} for all four`,
+							},
+							theirs: {
+								yes: false,
+								text: `${formatStorePrice(separately)}, without the Sheet or the Meeting Kit`,
+							},
 						},
 					]}
 				/>
 			)}
 
-			<ProductFaqBand items={copy.faq} supportEmail={contact.supportEmail} legal={copy.legal} />
+			<ProductFaqBand
+				items={copy.faq}
+				supportEmail={contact.supportEmail}
+				legal={copy.legal}
+			/>
 
 			{/* Closing block. Singles: the upgrade to the System (always last, per the copy rules). */}
 			{copy.upgrade?.priceLine && system && upgradeBy > 0 && (
@@ -327,7 +493,10 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 						...singleRows,
 						{
 							label: "Price",
-							ours: { yes: true, text: `${formatStorePrice(system.price)}${system.compareAt ? " founding price" : ""}` },
+							ours: {
+								yes: true,
+								text: `${formatStorePrice(system.price)}${system.compareAt ? " founding price" : ""}`,
+							},
 							theirs: { yes: true, text: formatStorePrice(data.price) },
 						},
 					]}
@@ -349,7 +518,11 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 
 			{/* The Emergency Binder's cross-sell. */}
 			{copy.upgrade && !copy.upgrade.priceLine && (
-				<ProductClosingBanner eyebrowText="The Family Care System" title={copy.upgrade.title} text={copy.upgrade.text}>
+				<ProductClosingBanner
+					eyebrowText="The Family Care System"
+					title={copy.upgrade.title}
+					text={copy.upgrade.text}
+				>
 					<Link href={copy.upgrade.href} className={`${pillLight} gap-2`}>
 						{copy.upgrade.cta}
 						<ArrowRight className="size-4" />
@@ -359,9 +532,15 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 
 			{/* The System: one last Buy. */}
 			{isBundle && (
-				<ProductClosingBanner eyebrowText="The Parentkeeping Family Care System" title={OFFER_HEADLINES.fairness} text={ONE_PRICE_BADGE}>
+				<ProductClosingBanner
+					eyebrowText="The Parentkeeping Family Care System"
+					title={OFFER_HEADLINES.fairness}
+					text={ONE_PRICE_BADGE}
+				>
 					{buyButton(pillLight)}
-					<div className="grid gap-1 text-xs text-white/75 [&_svg]:text-white">{underButton}</div>
+					<div className="grid gap-1 text-xs text-white/75 [&_svg]:text-white">
+						{underButton}
+					</div>
 				</ProductClosingBanner>
 			)}
 		</main>

@@ -7,6 +7,7 @@ import { orders } from "@/server/db/schema";
 import { getStripe } from "@/server/lib/stripe";
 import { issueDownloadLink } from "@/server/services/download-tokens";
 import { requestNewLinks, startDownload } from "@/server/services/downloads";
+import { ContactError, submitContactQuestion } from "@/server/services/contact";
 import { SignupError, subscribeToLeadMagnet, subscribeToQuizPlans, unsubscribe } from "@/server/services/subscribers";
 import { QUIZ_SOURCE } from "@/lib/burnout-quiz";
 import { verifyUnsubscribe } from "@/server/lib/unsubscribe";
@@ -118,6 +119,33 @@ export const storeRoutes = new Hono()
       return back("Something went wrong. Please try again.");
     }
     return isForm ? c.redirect(`${magnet.path}/thanks`, 303) : c.json({ ok: true });
+  })
+  /** "Ask a question" on a product page: one email to support, reply-to the visitor. */
+  .post("/contact", async (c) => {
+    const body = (await c.req.json().catch(() => ({}))) as Record<string, unknown>;
+    if (body.website) return c.json({ ok: true }); // honeypot: pretend
+
+    const name = String(body.name ?? "").trim();
+    const email = z.email().safeParse(String(body.email ?? "").trim());
+    const message = String(body.message ?? "").trim();
+    const phone = String(body.phone ?? "").trim();
+    if (!name || !email.success || !message) return c.json({ error: "Fill in your name, email and message." }, 400);
+
+    try {
+      await submitContactQuestion({
+        name: name.slice(0, 200),
+        email: email.data,
+        phone: phone ? phone.slice(0, 40) : null,
+        message: message.slice(0, 4000),
+        productTitle: typeof body.productTitle === "string" ? body.productTitle.slice(0, 200) : null,
+        ip: c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+      });
+    } catch (err) {
+      if (err instanceof ContactError) return c.json({ error: err.message }, err.status);
+      console.error("Contact message failed", err);
+      return c.json({ error: "Something went wrong. Please try again." }, 500);
+    }
+    return c.json({ ok: true });
   })
   /** Unsubscribe confirm button (the email link opens a page first, never a GET that acts). */
   .post("/unsubscribe", async (c) => {

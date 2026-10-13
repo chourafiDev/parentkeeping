@@ -52,3 +52,27 @@ ${p.url}
 If you didn't ask for it, ignore this email.`,
   };
 }
+
+/** "Ask a question" on a product page → the store owner, reply-to the visitor. */
+export function contactQuestionEmail(p: { name: string; email: string; phone: string | null; productTitle: string | null; message: string }) {
+  const subject = p.productTitle ? `Question about ${p.productTitle}` : `New message from ${p.name}`;
+  return {
+    subject,
+    html: layout({
+      preheader: `${p.name} asked a question${p.productTitle ? ` about ${p.productTitle}` : ""}.`,
+      body: `<h1 style="font-size:20px;margin:20px 0 8px">${escape(subject)}</h1>
+<p style="font-size:15px;line-height:1.6;margin:0 0 16px">
+<strong>${escape(p.name)}</strong> · <a href="mailto:${escape(p.email)}" style="color:${SAGE}">${escape(p.email)}</a>${p.phone ? ` · ${escape(p.phone)}` : ""}
+</p>
+<p style="font-size:15px;line-height:1.6;margin:0;white-space:pre-wrap">${escape(p.message)}</p>
+<p style="font-size:13px;line-height:1.6;margin:20px 0 0;color:#6b726e">Reply to this email to answer ${escape(p.name)} directly.</p>`,
+    }),
+    text: `${subject}
+
+${p.name} · ${p.email}${p.phone ? ` · ${p.phone}` : ""}
+
+${p.message}
+
+Reply to this email to answer ${p.name} directly.`,
+  };
+}

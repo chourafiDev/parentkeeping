@@ -8,6 +8,8 @@ export interface EmailMessage {
   subject: string;
   html: string;
   text: string;
+  /** So the store owner can hit "reply" and answer the visitor directly. */
+  replyTo?: { email: string; name?: string };
 }
 
 export async function sendEmail(message: EmailMessage) {
@@ -20,7 +22,7 @@ export async function sendEmail(message: EmailMessage) {
       throw new Error("Email is not configured (BREVO_API_KEY / EMAIL_FROM_ADDRESS).");
     }
     console.info(
-      `\n📧 [email not configured — printed instead]\nTo: ${message.to.email}\nSubject: ${message.subject}\n\n${message.text}\n`,
+      `\n📧 [email not configured — printed instead]\nTo: ${message.to.email}${message.replyTo ? `\nReply-To: ${message.replyTo.email}` : ""}\nSubject: ${message.subject}\n\n${message.text}\n`,
     );
     return;
   }
@@ -34,6 +36,7 @@ export async function sendEmail(message: EmailMessage) {
       subject: message.subject,
       htmlContent: message.html,
       textContent: message.text,
+      ...(message.replyTo && { replyTo: message.replyTo }),
     }),
   });
   if (!res.ok) {
