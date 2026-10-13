@@ -23,7 +23,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 			return PRODUCT_PATHS[p.slug];
 		}),
 	);
-	const pages = ["/", ...live.filter((p): p is string => !!p), ...Object.values(LEAD_MAGNETS).map((m) => m.path), QUIZ_PATH, BLOG_PATH];
+	const pages = [
+		"/",
+		...live.filter((p): p is string => !!p),
+		...Object.values(LEAD_MAGNETS).map((m) => m.path),
+		QUIZ_PATH,
+		BLOG_PATH,
+		"/pages/contact",
+		"/pages/disclaimer",
+		"/policies/terms-of-service",
+		"/policies/privacy-policy",
+		"/policies/refund-policy",
+	];
 	return [
 		...pages.map((path) => ({ url: `${base}${path}`, changeFrequency: "weekly" as const, priority: path === "/" ? 1 : 0.8 })),
 		...POSTS.map((post) => ({ url: `${base}${postPath(post.slug)}`, lastModified: post.updatedAt ?? post.publishedAt, priority: 0.6 })),

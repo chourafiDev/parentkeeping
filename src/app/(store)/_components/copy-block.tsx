@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CopySection } from "@/lib/product-copy";
+import { Inline } from "./blog/inline";
 import { eyebrow } from "./ui";
 
 const body = "text-body text-[15px] leading-[1.714]";
@@ -24,7 +25,7 @@ export function CopyBlock({ block }: { block: CopySection }) {
 			)}
 			{block.paragraphs?.map((p) => (
 				<p key={p} className={body}>
-					{p}
+					<Inline text={p} />
 				</p>
 			))}
 			{block.numbered && (
@@ -32,7 +33,7 @@ export function CopyBlock({ block }: { block: CopySection }) {
 					{block.numbered.map((item, i) => (
 						<li key={item} className={`${body} flex gap-3`}>
 							<span className="text-primary w-5 shrink-0 font-semibold tabular-nums">{i + 1}.</span>
-							{item}
+							<Inline text={item} />
 						</li>
 					))}
 				</ol>
@@ -44,7 +45,7 @@ export function CopyBlock({ block }: { block: CopySection }) {
 							<span aria-hidden className="bg-primary mt-[0.7em] size-1.5 shrink-0 rounded-full" />
 							<span>
 								{b.lead && <strong className="text-foreground font-semibold">{b.lead} </strong>}
-								{b.text}
+								<Inline text={b.text} />
 							</span>
 						</li>
 					))}
@@ -52,7 +53,7 @@ export function CopyBlock({ block }: { block: CopySection }) {
 			)}
 			{block.after?.map((p) => (
 				<p key={p} className={body}>
-					{p}
+					<Inline text={p} />
 				</p>
 			))}
 			{block.sample && (
