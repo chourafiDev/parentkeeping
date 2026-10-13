@@ -39,7 +39,7 @@ export function LaunchChecklist({
 		{
 			label: "Email sending",
 			state: services.email ? "done" : "todo",
-			detail: services.email ? `Sending as ${services.emailFrom}` : "Add BREVO_API_KEY and EMAIL_FROM_ADDRESS",
+			detail: services.email ? `Sending as ${services.emailFrom}` : "Add RESEND_API_KEY and EMAIL_FROM_ADDRESS",
 		},
 		{ label: "Support email", state: contact.supportEmail ? "done" : "todo", detail: contact.supportEmail ?? "Shown in every buyer email" },
 		{

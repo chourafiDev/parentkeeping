@@ -44,7 +44,7 @@ export default async function SettingsPage() {
 	const services = {
 		stripe: env.STRIPE_SECRET_KEY ? (env.STRIPE_SECRET_KEY.startsWith("sk_live_") ? "live" : "test") : null,
 		storage: !!(env.R2_ACCOUNT_ID && env.R2_ACCESS_KEY_ID && env.R2_SECRET_ACCESS_KEY && env.R2_PRIVATE_BUCKET && env.R2_PUBLIC_BUCKET && env.R2_PUBLIC_URL),
-		email: !!(env.BREVO_API_KEY && env.EMAIL_FROM_ADDRESS),
+		email: !!(env.RESEND_API_KEY && env.EMAIL_FROM_ADDRESS),
 		emailFrom: env.EMAIL_FROM_ADDRESS ?? null,
 	} as const;
 
