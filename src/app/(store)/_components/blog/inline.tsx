@@ -17,8 +17,14 @@ export function Inline({ text }: { text: string }) {
 				}
 				const link = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
 				if (link) {
+					const external = /^https?:\/\//.test(link[2]);
 					return (
-						<Link key={i} href={link[2]} className="text-foreground hover:text-primary font-medium underline underline-offset-4">
+						<Link
+							key={i}
+							href={link[2]}
+							className="text-foreground hover:text-primary font-medium underline underline-offset-4"
+							{...(external && { target: "_blank", rel: "noopener noreferrer" })}
+						>
 							{link[1]}
 						</Link>
 					);

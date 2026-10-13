@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { EXCLUDE_KEY } from "@/lib/analytics";
+import { isExcludedPath, isTrackingOptedOut } from "@/lib/analytics";
 
 // First-party visit tracking for the admin's Live View: page views, Buy
 // clicks, and a ping every minute while the tab is visible. No cookies: the
@@ -11,19 +11,7 @@ import { EXCLUDE_KEY } from "@/lib/analytics";
 // owner's browsers (marked when the admin is opened; signed-in visits are
 // also dropped on the server).
 
-/** Never tracked: the burnout quiz (legal: no pixels there), buyers' download pages, dev tools. */
-const EXCLUDED = ["/pages/caregiver-burnout-quiz", "/downloads", "/dev"];
 const PING_MS = 60_000;
-
-function optedOut() {
-	const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
-	if (nav.globalPrivacyControl === true || nav.doNotTrack === "1") return true;
-	try {
-		return localStorage.getItem(EXCLUDE_KEY) === "1";
-	} catch {
-		return false;
-	}
-}
 
 let memoryId: string | null = null;
 function visitId() {
@@ -56,17 +44,17 @@ function send(type: "page_view" | "checkout" | "ping", path: string, productSlug
 
 export function AnalyticsTracker() {
 	const pathname = usePathname();
-	const excluded = EXCLUDED.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+	const excluded = isExcludedPath(pathname);
 
 	// One page view per route change.
 	useEffect(() => {
-		if (excluded || optedOut()) return;
+		if (excluded || isTrackingOptedOut()) return;
 		send("page_view", pathname);
 	}, [pathname, excluded]);
 
 	// "Right now": a ping each minute while the tab is in front.
 	useEffect(() => {
-		if (excluded || optedOut()) return;
+		if (excluded || isTrackingOptedOut()) return;
 		const timer = setInterval(() => {
 			if (document.visibilityState === "visible") send("ping", pathname);
 		}, PING_MS);
@@ -75,7 +63,7 @@ export function AnalyticsTracker() {
 
 	// Buy buttons are plain forms posting to /api/checkout.
 	useEffect(() => {
-		if (excluded || optedOut()) return;
+		if (excluded || isTrackingOptedOut()) return;
 		const onSubmit = (e: SubmitEvent) => {
 			const form = e.target as HTMLFormElement | null;
 			if (!form?.action?.endsWith("/api/checkout")) return;

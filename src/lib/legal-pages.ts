@@ -160,7 +160,8 @@ export const PRIVACY_SECTIONS: CopySection[] = [
     title: "Analytics, in plain terms",
     paragraphs: [
       "We use our own, first-party analytics to see what's working: page views, whether a visit led to a sale, and a rough location (country, region and city, from your network connection, never GPS). We don't use cookies for this, and we don't store your IP address.",
-      "If your browser sends Global Privacy Control or Do Not Track, none of this runs for you. It also never runs on the Caregiver Burnout Quiz page, under any circumstance.",
+      "We also use Google Analytics, which does use cookies. We only run it for US visitors, never for visitors in the EU, UK or EEA.",
+      "If your browser sends Global Privacy Control or Do Not Track, neither of these run for you. Neither ever runs on the Caregiver Burnout Quiz page, under any circumstance.",
     ],
   },
   {
@@ -179,6 +180,10 @@ export const PRIVACY_SECTIONS: CopySection[] = [
       { lead: "Resend", text: "sends our emails (order confirmations, download links, free downloads, newsletter)." },
       { lead: "Cloudflare", text: "stores your purchased files and serves product images." },
       { lead: "Neon and Vercel", text: "host our database and the site itself." },
+      {
+        lead: "Google Analytics",
+        text: "measures site traffic, for US visitors only. See [Google's Privacy Policy](https://policies.google.com/privacy) for how Google itself handles that information.",
+      },
     ],
   },
   {
