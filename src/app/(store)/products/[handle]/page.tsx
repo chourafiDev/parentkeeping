@@ -9,6 +9,7 @@ import { BUY_GUARANTEE_LINE } from "@/lib/legal";
 import { formatStorePrice } from "@/lib/money";
 import { OFFER_HEADLINES, OFFER_PARTS, ONE_PRICE_BADGE, PRICE_ANCHOR_TITLE } from "@/lib/offer";
 import { type FactIcon, PRODUCT_COPY, type ProductCopy } from "@/lib/product-copy";
+import { reviewsFor } from "@/lib/reviews";
 import { siteUrl } from "@/lib/site-url";
 import { formatStoreDay } from "@/lib/store-time";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ import { ProductFaqBand } from "../../_components/product/faq-band";
 import { ProductGallery } from "../../_components/product/gallery";
 import { ProductGuarantee } from "../../_components/product/guarantee";
 import { ProductHighlights } from "../../_components/product/highlights";
+import { ProductReviews } from "../../_components/product/reviews";
 import { ShareButton } from "../../_components/product/share-button";
 import { ProductSteps } from "../../_components/product/steps";
 import { jsonLdHtml, productJsonLd, visitorCountry } from "../../_components/product-data";
@@ -100,6 +102,7 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 	const checkoutError = typeof query.checkout_error === "string" ? query.checkout_error : null;
 	const url = `${siteUrl()}${isBundle ? "/" : PRODUCT_PATHS[product.slug]}`;
 	const description = product.description && textOf(product.description) ? product.description : null;
+	const reviews = reviewsFor(product.slug);
 	const facts = [
 		...copy.facts,
 		{
@@ -268,6 +271,7 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
 				</div>
 			</div>
 
+			{reviews.length > 0 && <ProductReviews reviews={reviews} />}
 			<ProductSteps steps={copy.steps} />
 			<ProductHighlights slug={product.slug} highlights={copy.highlights} kinds={HIGHLIGHT_KINDS[product.slug] ?? []} />
 
