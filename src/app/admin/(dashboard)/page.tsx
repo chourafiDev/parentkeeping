@@ -7,7 +7,7 @@ import {
 import { formatUsd } from "@/lib/money";
 import { hasPermission } from "@/server/auth/permissions";
 import { requireStaffPage } from "@/server/auth/session";
-import { getLiveView } from "@/server/queries/analytics";
+import { getOverview } from "@/server/queries/analytics";
 import { KpiCard } from "./_components/shared/kpi-card";
 import { TodayStrip } from "./_components/today-strip";
 import { WelcomeHeader } from "./_components/welcome-header";
@@ -19,7 +19,7 @@ const PERIOD = "Last 30 days";
 export default async function OverviewPage() {
 	const { user } = await requireStaffPage();
 	const canSeeRevenue = hasPermission(user.role, { finance: ["read"] });
-	const today = hasPermission(user.role, { analytics: ["read"] }) ? await getLiveView({ withSales: canSeeRevenue }) : null;
+	const today = hasPermission(user.role, { analytics: ["read"] }) ? await getOverview({ range: "today", withSales: canSeeRevenue }) : null;
 
 	return (
 		<>
