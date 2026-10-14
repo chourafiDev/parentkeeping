@@ -1,16 +1,14 @@
 "use client";
 
-import { CalendarIcon, Check, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { RANGES, type RangeId, rangeById } from "@/lib/analytics-ranges";
+import type { RangeId } from "@/lib/analytics-ranges";
 import { api } from "@/lib/api-client";
 import { formatUsd } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import type { OverviewStats } from "@/server/queries/analytics";
 import { LiveGlobe } from "../analytics/live/_components/live-globe";
+import { RangePicker } from "../analytics/live/_components/range-picker";
 import { Sparkline } from "../analytics/live/_components/sparkline";
 
 const POLL_MS = 15_000;
@@ -79,30 +77,13 @@ export function TodayStrip({ initial }: { initial: OverviewStats }) {
 
 			<div className="flex flex-wrap items-start gap-x-10 gap-y-5 md:pe-[260px]">
 				<div className="w-full lg:w-auto lg:min-w-40">
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant="outline" size="sm" className="gap-1.5">
-								<CalendarIcon className="text-muted-foreground" />
-								{rangeById(range).label}
-								<ChevronDown className="text-muted-foreground" />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="start" className="w-44">
-							{RANGES.map((r) => (
-								<DropdownMenuItem
-									key={r.id}
-									onSelect={() => {
-										if (r.id === range) return;
-										setLoading(true);
-										setRange(r.id);
-									}}
-								>
-									<Check className={cn("size-4", r.id === range ? "opacity-100" : "opacity-0")} />
-									{r.label}
-								</DropdownMenuItem>
-							))}
-						</DropdownMenuContent>
-					</DropdownMenu>
+					<RangePicker
+						value={range}
+						onChange={(next) => {
+							setLoading(true);
+							setRange(next);
+						}}
+					/>
 				</div>
 
 				<div className={cn("grid grid-cols-2 gap-x-10 gap-y-5 transition-opacity sm:flex sm:flex-wrap", loading && "opacity-50")} aria-busy={loading}>
