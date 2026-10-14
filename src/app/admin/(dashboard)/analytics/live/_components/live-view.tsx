@@ -2,15 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { LuInfo } from "react-icons/lu";
-import { Area, AreaChart, ResponsiveContainer } from "recharts";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { api } from "@/lib/api-client";
 import { formatUsd } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import type { LiveView as LiveData } from "@/server/queries/analytics";
 import { LiveGlobe } from "./live-globe";
-
-const POLL_MS = 10_000;
+import { Sparkline } from "./sparkline";
+import { useLiveData } from "./use-live-data";
 
 function Hint({ text }: { text: string }) {
 	return (
@@ -31,26 +29,6 @@ function Title({ children, hint }: { children: React.ReactNode; hint?: string })
 		<div className="flex items-center justify-between gap-2">
 			<h2 className="decoration-muted-foreground/60 text-sm font-semibold underline decoration-dotted underline-offset-4">{children}</h2>
 			{hint && <Hint text={hint} />}
-		</div>
-	);
-}
-
-/** Today so far, hour by hour (stops at the current hour). */
-function Sparkline({ values, currentHour }: { values: number[]; currentHour: number }) {
-	const data = values.slice(0, currentHour + 1).map((v, h) => ({ h, v }));
-	return (
-		<div className="h-9 w-24 shrink-0" aria-hidden>
-			<ResponsiveContainer width="100%" height="100%">
-				<AreaChart data={data} margin={{ top: 2, right: 0, bottom: 2, left: 0 }}>
-					<defs>
-						<linearGradient id="spark" x1="0" y1="0" x2="0" y2="1">
-							<stop offset="0%" stopColor="var(--primary)" stopOpacity={0.25} />
-							<stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
-						</linearGradient>
-					</defs>
-					<Area type="monotone" dataKey="v" stroke="var(--primary)" strokeWidth={1.5} fill="url(#spark)" isAnimationActive={false} />
-				</AreaChart>
-			</ResponsiveContainer>
 		</div>
 	);
 }
@@ -115,29 +93,8 @@ function useAgo(iso: string) {
  * today (US Eastern), refreshed every 10 seconds while the tab is open.
  */
 export function LiveView({ initial }: { initial: LiveData }) {
-	const [data, setData] = useState(initial);
-	const [stale, setStale] = useState(false);
+	const { data, stale } = useLiveData(initial);
 	const ago = useAgo(data.at);
-
-	useEffect(() => {
-		let cancelled = false;
-		async function poll() {
-			if (document.visibilityState !== "visible") return;
-			const res = await api.api.admin.analytics.live.$get().catch(() => null);
-			if (cancelled) return;
-			if (res?.ok) {
-				setData(await res.json());
-				setStale(false);
-			} else setStale(true);
-		}
-		const timer = setInterval(poll, POLL_MS);
-		document.addEventListener("visibilitychange", poll);
-		return () => {
-			cancelled = true;
-			clearInterval(timer);
-			document.removeEventListener("visibilitychange", poll);
-		};
-	}, []);
 
 	const { behavior, customers, currentHour } = data;
 	const visitors = data.markers.filter((m) => m.kind === "visitor").length;

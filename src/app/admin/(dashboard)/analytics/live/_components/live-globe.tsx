@@ -22,7 +22,7 @@ const toCobe = (markers: LiveMarker[]) =>
 		color: m.kind === "order" ? ORDER : VISITOR,
 	}));
 
-export function LiveGlobe({ markers }: { markers: LiveMarker[] }) {
+export function LiveGlobe({ markers, decorative = false }: { markers: LiveMarker[]; /** Background use: no dragging, hidden from screen readers. */ decorative?: boolean }) {
 	// cobe wraps its canvas in a div of its own, so React only owns an empty
 	// host and the canvas is created by hand inside it.
 	const host = useRef<HTMLDivElement>(null);
@@ -91,6 +91,9 @@ export function LiveGlobe({ markers }: { markers: LiveMarker[] }) {
 		};
 	}, []);
 
+	if (decorative) {
+		return <div ref={host} aria-hidden className="pointer-events-none aspect-square w-full opacity-0 transition-opacity duration-700" />;
+	}
 	return (
 		<div
 			ref={host}
