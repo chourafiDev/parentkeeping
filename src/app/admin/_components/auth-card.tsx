@@ -18,7 +18,7 @@ export function AuthCard({
 					</span>
 				</div>
 
-				<div className="flex flex-1 py-10">
+				<div className="w-md flex flex-1 py-10">
 					<div className="w-full">
 						<h1 className="text-2xl text-center font-semibold tracking-tight">{title}</h1>
 						<p className="text-muted-foreground text-center mt-1 text-base">

@@ -118,8 +118,8 @@ export function PartsHighlights({ data }: { data: HomeData }) {
 										"pointer-events-none",
 										"absolute inset-0 z-10",
 										"bg-gradient-to-t",
-										"from-black/65",
-										"via-black/10",
+										"from-deep",
+										"via-deep/15",
 										"to-transparent",
 									)}
 								/>

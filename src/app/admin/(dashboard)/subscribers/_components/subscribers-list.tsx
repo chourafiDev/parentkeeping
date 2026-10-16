@@ -1,17 +1,47 @@
 "use client";
 
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Download, Loader, Search, Trash2 } from "lucide-react";
+import {
+	ChevronLeft,
+	ChevronRight,
+	Download,
+	Loader,
+	Search,
+	Trash2,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQueryStates } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupInput,
+} from "@/components/ui/input-group";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import {
+	Sheet,
+	SheetContent,
+	SheetDescription,
+	SheetHeader,
+	SheetTitle,
+} from "@/components/ui/sheet";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { api } from "@/lib/api-client";
@@ -21,7 +51,10 @@ import { cn } from "@/lib/utils";
 import type { SubscriberRow } from "@/server/queries/subscribers";
 import { ConfirmDialog } from "../../_components/shared/confirm-dialog";
 import { useListTransition } from "../../_components/shared/list-transition";
-import { SUBSCRIBER_TABS, subscribersSearchParams } from "../_lib/search-params";
+import {
+	SUBSCRIBER_TABS,
+	subscribersSearchParams,
+} from "../_lib/search-params";
 import { VARIANT_LABELS } from "../_lib/variants";
 
 const TAB_LABELS: Record<(typeof SUBSCRIBER_TABS)[number], string> = {
@@ -34,12 +67,21 @@ const TAB_LABELS: Record<(typeof SUBSCRIBER_TABS)[number], string> = {
 const ANY = "__any"; // Radix Select can't use "" as a value
 
 /** "free-medication-list" → "Free medication list" */
-const sourceLabel = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, " ");
+const sourceLabel = (s: string) =>
+	s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, " ");
 
 function ConsentBadge({ row }: { row: SubscriberRow }) {
-	if (row.unsubscribedAt) return <Badge variant="outline" className="text-muted-foreground">Unsubscribed</Badge>;
+	if (row.unsubscribedAt)
+		return (
+			<Badge variant="outline" className="text-muted-foreground">
+				Unsubscribed
+			</Badge>
+		);
 	return row.marketingConsent ? (
-		<Badge variant="outline" className="border-transparent bg-[color-mix(in_oklab,var(--success)_14%,white)] text-[color-mix(in_oklab,var(--success)_70%,black)]">
+		<Badge
+			variant="outline"
+			className="border-transparent bg-[color-mix(in_oklab,var(--success)_14%,white)] text-[color-mix(in_oklab,var(--success)_70%,black)]"
+		>
 			Newsletter
 		</Badge>
 	) : (
@@ -67,13 +109,19 @@ export function SubscribersList({
 }) {
 	const router = useRouter();
 	const { isPending, startTransition } = useListTransition();
-	const [params, setParams] = useQueryStates(subscribersSearchParams, { shallow: false, startTransition });
+	const [params, setParams] = useQueryStates(subscribersSearchParams, {
+		shallow: false,
+		startTransition,
+	});
 	const [search, setSearch] = useState(params.q);
 	const [lastQ, setLastQ] = useState(params.q);
 	const [selected, setSelected] = useState<SubscriberRow | null>(null);
 	const [toDelete, setToDelete] = useState<SubscriberRow | null>(null);
 	const [exporting, setExporting] = useState(false);
-	const debouncedSearch = useDebouncedCallback((q: string) => setParams({ q: q || null, page: null }), 300);
+	const debouncedSearch = useDebouncedCallback(
+		(q: string) => setParams({ q: q || null, page: null }),
+		300,
+	);
 
 	// Back/forward navigation changes the URL: keep the box in sync.
 	if (params.q !== lastQ) {
@@ -87,7 +135,12 @@ export function SubscribersList({
 	async function exportCsv() {
 		setExporting(true);
 		const res = await api.api.admin.subscribers.export.$get({
-			query: { status: params.status, q: params.q, source: params.source, country: params.country },
+			query: {
+				status: params.status,
+				q: params.q,
+				source: params.source,
+				country: params.country,
+			},
 		});
 		setExporting(false);
 		if (!res.ok) {
@@ -100,18 +153,29 @@ export function SubscribersList({
 	return (
 		<div className="bg-card rounded-xl border p-3">
 			<div className="flex flex-wrap items-center justify-between gap-2">
-				<Tabs value={params.status} onValueChange={(v) => setParams({ status: v as typeof params.status, page: null })}>
+				<Tabs
+					value={params.status}
+					onValueChange={(v) =>
+						setParams({ status: v as typeof params.status, page: null })
+					}
+				>
 					<TabsList className="max-w-full overflow-x-auto">
 						{SUBSCRIBER_TABS.map((t) => (
 							<TabsTrigger key={t} value={t}>
 								{TAB_LABELS[t]}
-								<span className="text-muted-foreground tabular-nums">{counts[t]}</span>
+								<span className="text-muted-foreground tabular-nums">
+									{counts[t]}
+								</span>
 							</TabsTrigger>
 						))}
 					</TabsList>
 				</Tabs>
 				{canExport && (
-					<Button variant="outline" onClick={exportCsv} disabled={exporting || total === 0}>
+					<Button
+						variant="outline"
+						onClick={exportCsv}
+						disabled={exporting || total === 0}
+					>
 						{exporting ? <Loader className="animate-spin" /> : <Download />}
 						Export {total > 0 ? `${total} ` : ""}CSV
 					</Button>
@@ -135,7 +199,9 @@ export function SubscribersList({
 				</InputGroup>
 				<Select
 					value={params.source || ANY}
-					onValueChange={(v) => setParams({ source: v === ANY ? null : v, page: null })}
+					onValueChange={(v) =>
+						setParams({ source: v === ANY ? null : v, page: null })
+					}
 				>
 					<SelectTrigger aria-label="Source" className="w-auto min-w-36">
 						<SelectValue />
@@ -151,7 +217,9 @@ export function SubscribersList({
 				</Select>
 				<Select
 					value={params.country || ANY}
-					onValueChange={(v) => setParams({ country: v === ANY ? null : v, page: null })}
+					onValueChange={(v) =>
+						setParams({ country: v === ANY ? null : v, page: null })
+					}
 				>
 					<SelectTrigger aria-label="Country" className="w-auto min-w-36">
 						<SelectValue />
@@ -167,7 +235,12 @@ export function SubscribersList({
 				</Select>
 			</div>
 
-			<div className={cn("mt-3 overflow-x-auto rounded-lg border", isPending && "opacity-60 transition-opacity")}>
+			<div
+				className={cn(
+					"mt-3 overflow-x-auto rounded-lg border",
+					isPending && "opacity-60 transition-opacity",
+				)}
+			>
 				<Table>
 					<TableHeader className="bg-muted/70">
 						<TableRow>
@@ -182,7 +255,10 @@ export function SubscribersList({
 					<TableBody>
 						{rows.length === 0 ? (
 							<TableRow>
-								<TableCell colSpan={6} className="text-muted-foreground h-28 text-center">
+								<TableCell
+									colSpan={6}
+									className="text-muted-foreground h-28 text-center"
+								>
 									{filtered
 										? "No subscribers match these filters."
 										: counts.all === 0
@@ -212,10 +288,16 @@ export function SubscribersList({
 									<TableCell>
 										<ConsentBadge row={row} />
 									</TableCell>
-									<TableCell className="hidden md:table-cell">{row.country ?? "—"}</TableCell>
-									<TableCell className="text-muted-foreground hidden xl:table-cell">{sourceLabel(row.source)}</TableCell>
+									<TableCell className="hidden md:table-cell">
+										{row.country ?? "—"}
+									</TableCell>
+									<TableCell className="text-muted-foreground hidden xl:table-cell">
+										{sourceLabel(row.source)}
+									</TableCell>
 									<TableCell className="text-muted-foreground hidden lg:table-cell">
-										{row.testVariant ? (VARIANT_LABELS[row.testVariant] ?? row.testVariant) : "—"}
+										{row.testVariant
+											? (VARIANT_LABELS[row.testVariant] ?? row.testVariant)
+											: "—"}
 									</TableCell>
 									<TableCell className="text-muted-foreground pe-3 text-end whitespace-nowrap">
 										{format(new Date(row.createdAt), "MMM d, yyyy")}
@@ -230,7 +312,8 @@ export function SubscribersList({
 			{pageCount > 1 && (
 				<div className="mt-3 flex items-center justify-between gap-2 text-sm">
 					<span className="text-muted-foreground">
-						Page {page} of {pageCount} · {total.toLocaleString("en-US")} subscribers
+						Page {page} of {pageCount} · {total.toLocaleString("en-US")}{" "}
+						subscribers
 					</span>
 					<div className="flex gap-1">
 						<Button
@@ -238,7 +321,9 @@ export function SubscribersList({
 							size="icon-sm"
 							aria-label="Previous page"
 							disabled={page <= 1}
-							onClick={() => setParams({ page: page - 1 === 1 ? null : page - 1 })}
+							onClick={() =>
+								setParams({ page: page - 1 === 1 ? null : page - 1 })
+							}
 						>
 							<ChevronLeft className="size-4" />
 						</Button>
@@ -260,9 +345,15 @@ export function SubscribersList({
 					{selected && (
 						<>
 							<SheetHeader>
-								<SheetTitle className="[overflow-wrap:anywhere]">{selected.email}</SheetTitle>
+								<SheetTitle className="[overflow-wrap:anywhere]">
+									{selected.email}
+								</SheetTitle>
 								<SheetDescription>
-									Signed up {format(new Date(selected.createdAt), "MMMM d, yyyy 'at' h:mm a")}
+									Signed up{" "}
+									{format(
+										new Date(selected.createdAt),
+										"MMMM d, yyyy 'at' h:mm a",
+									)}
 								</SheetDescription>
 							</SheetHeader>
 							<div className="grid gap-4 px-4 pb-4 text-sm">
@@ -274,10 +365,32 @@ export function SubscribersList({
 										[
 											["Source", sourceLabel(selected.source)],
 											["Country", countryName(selected.country)],
-											["Headline variant", selected.testVariant ? (VARIANT_LABELS[selected.testVariant] ?? selected.testVariant) : "—"],
-											["Sent to email tool", selected.emailToolSyncedAt ? format(new Date(selected.emailToolSyncedAt), "MMM d, yyyy h:mm a") : "Not yet"],
+											[
+												"Headline variant",
+												selected.testVariant
+													? (VARIANT_LABELS[selected.testVariant] ??
+														selected.testVariant)
+													: "—",
+											],
+											[
+												"Sent to email tool",
+												selected.emailToolSyncedAt
+													? format(
+															new Date(selected.emailToolSyncedAt),
+															"MMM d, yyyy h:mm a",
+														)
+													: "Not yet",
+											],
 											...(selected.unsubscribedAt
-												? [["Unsubscribed", format(new Date(selected.unsubscribedAt), "MMM d, yyyy")]]
+												? [
+														[
+															"Unsubscribed",
+															format(
+																new Date(selected.unsubscribedAt),
+																"MMM d, yyyy",
+															),
+														],
+													]
 												: []),
 										] as [string, string][]
 									).map(([label, value]) => (
@@ -290,16 +403,29 @@ export function SubscribersList({
 								<div className="grid gap-1.5">
 									<h3 className="font-medium">Consent record</h3>
 									<p className="text-muted-foreground text-xs">
-										The exact text shown when they signed up, and when they agreed. Keep it as proof of consent.
+										The exact text shown when they signed up, and when they
+										agreed. Keep it as proof of consent.
 									</p>
-									<blockquote className="rounded-lg border p-3 whitespace-pre-wrap">{selected.consentText}</blockquote>
+									<blockquote className="rounded-lg border p-3 whitespace-pre-wrap">
+										{selected.consentText}
+									</blockquote>
 									<p className="text-muted-foreground text-xs">
-										{selected.marketingConsent ? "Agreed to the weekly emails" : "File only, no newsletter"} ·{" "}
-										{format(new Date(selected.consentAt), "MMM d, yyyy 'at' h:mm:ss a")}
+										{selected.marketingConsent
+											? "Agreed to the weekly emails"
+											: "File only, no newsletter"}{" "}
+										·{" "}
+										{format(
+											new Date(selected.consentAt),
+											"MMM d, yyyy 'at' h:mm:ss a",
+										)}
 									</p>
 								</div>
 								{canDelete && (
-									<Button variant="destructive" className="justify-self-start" onClick={() => setToDelete(selected)}>
+									<Button
+										variant="destructive"
+										className="justify-self-start"
+										onClick={() => setToDelete(selected)}
+									>
 										<Trash2 />
 										Delete subscriber
 									</Button>
@@ -319,7 +445,9 @@ export function SubscribersList({
 				destructive
 				onConfirm={async () => {
 					if (!toDelete) return true;
-					const res = await api.api.admin.subscribers[":id"].$delete({ param: { id: toDelete.id } });
+					const res = await api.api.admin.subscribers[":id"].$delete({
+						param: { id: toDelete.id },
+					});
 					if (!res.ok) {
 						toast.error("Couldn't delete the subscriber");
 						return false;

@@ -97,7 +97,7 @@ export function RatingSummary({ count, average }: { count: number; average: numb
 	return (
 		<a href="#reviews" className="text-foreground flex w-fit items-center gap-2 text-[14px] hover:underline">
 			<Stars rating={average} />
-			<span className="font-semibold">{averageLabel(average)}</span>
+			<span className="font-semibold">{averageLabel(average)} / 5.0</span>
 			<span className="text-body">
 				({count} review{count === 1 ? "" : "s"})
 			</span>

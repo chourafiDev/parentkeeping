@@ -1,8 +1,12 @@
-// Seeds the catalog from the build spec: 4 products and default settings. Run with: pnpm db:seed — safe to re-run (skips if seeded).
+// Seeds the catalog from the build spec (4 products, default settings) and,
+// in development only, a dev owner account so a fresh clone can sign in
+// right away. Run with: pnpm db:seed — safe to re-run (skips what's already there).
 // Stripe ids stay empty until the Stripe catalog is created.
-import { sql } from "drizzle-orm";
+// Production admin accounts are never seeded: use `pnpm auth:create-owner` instead.
+import { eq, sql } from "drizzle-orm";
+import { auth } from "@/server/auth";
 import { db } from "@/server/db";
-import { products, settings } from "@/server/db/schema";
+import { products, settings, users } from "@/server/db/schema";
 
 const PRODUCTS = [
   { slug: "family-care-system", title: "Parentkeeping Family Care System", kind: "bundle", status: "active", price: 3900, foundingPrice: 2900, sortOrder: 0 },
@@ -17,7 +21,15 @@ const SETTINGS = {
   contact: { supportEmail: null, privacyEmail: null, postalAddress: null, phone: null },
 };
 
-async function main() {
+// Overridable so a teammate can pick their own dev login; same fixed
+// defaults otherwise so the printed credentials below stay accurate.
+const SEED_OWNER = {
+  name: process.env.SEED_OWNER_NAME ?? "Dev Owner",
+  email: process.env.SEED_OWNER_EMAIL ?? "owner@parentkeeping.test",
+  password: process.env.SEED_OWNER_PASSWORD ?? "dev-password-123",
+};
+
+async function seedCatalog() {
   const [{ count }] = await db.select({ count: sql<number>`count(*)::int` }).from(products);
   if (count > 0) {
     console.log("Catalog already seeded — nothing to do.");
@@ -35,6 +47,29 @@ async function main() {
   });
 
   console.log(`Seeded ${PRODUCTS.length} products and default settings.`);
+}
+
+/**
+ * Dev-only admin login, so a fresh clone can sign in without the interactive
+ * `auth:create-owner` prompt. Never runs in production, and never overwrites
+ * a real owner account that already exists.
+ */
+async function seedOwner() {
+  if (process.env.NODE_ENV === "production") return;
+
+  const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.role, "owner")).limit(1);
+  if (existing) {
+    console.log("An owner account already exists — nothing to do.");
+    return;
+  }
+
+  await auth.api.createUser({ body: { ...SEED_OWNER, role: "owner" } });
+  console.log(`\nDev owner created. Sign in at /admin/login with:\n  ${SEED_OWNER.email}\n  ${SEED_OWNER.password}`);
+}
+
+async function main() {
+  await seedCatalog();
+  await seedOwner();
 }
 
 main()
