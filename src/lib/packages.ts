@@ -1,4 +1,5 @@
 import { BUMP_SLUG, BUNDLE_SLUG, BUY_LABELS } from "./catalog";
+import { formatStorePrice } from "./money";
 
 type Offer = { price: number } | null;
 
@@ -60,3 +61,42 @@ export function packageOptions({
 }
 
 export const DEFAULT_PACKAGE = "system";
+
+/**
+ * Medical Binder / Caregiver Agreement pages: the item the visitor came
+ * for, plus the System as a second choice. Defaults to the single item
+ * (never pre-selects the pricier option) — the System only earns the
+ * click if the visitor picks it.
+ */
+export function singleUpgradeOptions({
+	product,
+	system,
+}: {
+	product: { slug: string; title: string; price: number; compareAt: number | null; presale: boolean };
+	system: { price: number; compareAt: number | null };
+}) {
+	const diff = system.price - product.price;
+	return [
+		{
+			id: "single",
+			slug: product.slug,
+			title: product.title,
+			note: "Just this one",
+			price: product.price,
+			compareAt: product.compareAt,
+			cta: `${BUY_LABELS[product.slug] ?? "Buy now"}${product.presale ? " · Pre-order" : ""}`,
+		},
+		{
+			id: "system",
+			slug: BUNDLE_SLUG,
+			title: "Family Care System",
+			note: diff > 0 ? `All four parts, for ${formatStorePrice(diff)} more` : "All four parts, same price",
+			price: system.price,
+			compareAt: system.compareAt,
+			badge: "All four parts",
+			cta: BUY_LABELS[BUNDLE_SLUG],
+		},
+	];
+}
+
+export const DEFAULT_SINGLE_PACKAGE = "single";

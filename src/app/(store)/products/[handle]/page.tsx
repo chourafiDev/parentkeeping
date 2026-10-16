@@ -33,7 +33,7 @@ import {
 	presaleNote,
 	worldwideFaqItem,
 } from "@/lib/offer";
-import { DEFAULT_PACKAGE, packageOptions } from "@/lib/packages";
+import { DEFAULT_PACKAGE, DEFAULT_SINGLE_PACKAGE, packageOptions, singleUpgradeOptions } from "@/lib/packages";
 import { PREVIEWS_BY_PRODUCT } from "@/lib/page-previews";
 import {
 	type FactIcon,
@@ -334,6 +334,10 @@ export default async function ProductPage({
 
 	// Comparison rows.
 	const upgradeBy = system ? system.price - data.price : 0;
+	// Buy-box upgrade picker: Medical Binder and Caregiver Agreement only, and
+	// only once the System is itself sellable and actually costs more.
+	const showSystemUpgrade =
+		canBuy && data.sellable && !!system?.sellable && upgradeBy > 0 && ["medical-binder", "caregiver-agreement"].includes(product.slug);
 	const singleRows: CompareRow[] = OFFER_PARTS.map((part) => ({
 		label: part.name,
 		ours: { yes: true, text: "Included" },
@@ -495,6 +499,15 @@ export default async function ProductPage({
 										presale,
 									})}
 									defaultId={DEFAULT_PACKAGE}
+									buttonClassName={fullWidthDark}
+								/>
+							) : showSystemUpgrade && system ? (
+								<PackagePicker
+									options={singleUpgradeOptions({
+										product: { slug: product.slug, title: SHORT_NAME[product.slug] ?? copy.h1, price: data.price, compareAt: data.compareAt, presale },
+										system,
+									})}
+									defaultId={DEFAULT_SINGLE_PACKAGE}
 									buttonClassName={fullWidthDark}
 								/>
 							) : (
