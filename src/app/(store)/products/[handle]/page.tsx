@@ -39,9 +39,11 @@ import {
 import { reviewsFor } from "@/lib/reviews";
 import { siteUrl } from "@/lib/site-url";
 import { formatStoreDay } from "@/lib/store-time";
+import { DEFAULT_PACKAGE, packageOptions } from "@/lib/packages";
 import { cn } from "@/lib/utils";
 import { getSettings } from "@/server/queries/settings";
 import {
+	getPackageExtras,
 	getStoreProduct,
 	type StoreProduct,
 } from "@/server/queries/storefront";
@@ -61,8 +63,10 @@ import {
 } from "../../_components/product/compare";
 import { ProductDownloadCard } from "../../_components/product/download-card";
 import { ProductFaqBand } from "../../_components/product/faq-band";
+import { ProductFirstMonth } from "../../_components/product/first-month";
 import { ProductGallery } from "../../_components/product/gallery";
 import { ProductHighlights } from "../../_components/product/highlights";
+import { PackagePicker } from "../../_components/product/package-picker";
 import { ProductReviews } from "../../_components/product/reviews";
 import { ShareDialog } from "../../_components/product/share-dialog";
 import { ProductSteps } from "../../_components/product/steps";
@@ -72,6 +76,7 @@ import {
 	productJsonLd,
 	visitorCountry,
 } from "../../_components/product-data";
+import { ProblemTabs } from "../../_components/problem-tabs";
 import { container, pillDark, pillLight, section } from "../../_components/ui";
 
 export const dynamic = "force-dynamic";
@@ -152,13 +157,14 @@ export default async function ProductPage({
 	searchParams,
 }: PageProps<"/products/[handle]">) {
 	const [data, query] = await Promise.all([load(params), searchParams]);
-	const [country, { contact }] = await Promise.all([
+	const isBundle = data.product.slug === BUNDLE_SLUG;
+	const [country, { contact }, extras] = await Promise.all([
 		visitorCountry(query.country),
 		getSettings("contact"),
+		isBundle ? getPackageExtras() : null,
 	]);
 	const { product, images, assets, system, copy, pieces } = data;
 	const usVisitor = !country || country === "US";
-	const isBundle = product.slug === BUNDLE_SLUG;
 	const discount = data.compareAt
 		? Math.round((1 - data.price / data.compareAt) * 100)
 		: 0;
@@ -450,7 +456,20 @@ export default async function ProductPage({
 									{checkoutError}
 								</p>
 							)}
-							{buyButton(fullWidthDark)}
+							{extras && usVisitor && data.sellable ? (
+								<PackagePicker
+									options={packageOptions({
+										system: data,
+										binder: extras.binder,
+										emergency: extras.emergency,
+										presale,
+									})}
+									defaultId={DEFAULT_PACKAGE}
+									buttonClassName={fullWidthDark}
+								/>
+							) : (
+								buyButton(fullWidthDark)
+							)}
 							{usVisitor && data.sellable && (
 								<p className="text-green flex items-center gap-1.5 text-[14px] font-medium">
 									<Zap className="size-4 shrink-0 fill-current" />
@@ -508,12 +527,14 @@ export default async function ProductPage({
 			</div>
 
 			{reviews.length > 0 && <ProductReviews reviews={reviews} />}
+			{isBundle && <ProblemTabs />}
 			<ProductSteps steps={copy.steps} />
 			<ProductHighlights
 				slug={product.slug}
 				highlights={copy.highlights}
 				kinds={HIGHLIGHT_KINDS[product.slug] ?? []}
 			/>
+			{copy.firstMonth && <ProductFirstMonth timeline={copy.firstMonth} />}
 
 			{copy.sections.length > 0 && (
 				<section className={`${container} ${section} border-t`}>

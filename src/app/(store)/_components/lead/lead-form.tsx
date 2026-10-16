@@ -15,6 +15,7 @@ export function LeadForm({
 	devCountry,
 	id,
 	tone = "light",
+	stacked = false,
 }: {
 	magnet: LeadMagnet;
 	optIn: boolean;
@@ -22,6 +23,8 @@ export function LeadForm({
 	id: string;
 	/** "dark" sits on the deep closing banner. */
 	tone?: "light" | "dark";
+	/** Email above the button at every width (narrow spots like the popup). */
+	stacked?: boolean;
 }) {
 	const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 	const dark = tone === "dark";
@@ -31,7 +34,7 @@ export function LeadForm({
 			<label htmlFor={`${id}-email`} className="sr-only">
 				Email address
 			</label>
-			<div className="flex flex-col gap-2.5 sm:flex-row">
+			<div className={cn("flex flex-col gap-2.5", !stacked && "sm:flex-row")}>
 				<input
 					id={`${id}-email`}
 					name="email"

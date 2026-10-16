@@ -1,12 +1,13 @@
 import { Check, ShieldCheck, Zap } from "lucide-react";
 import Image from "next/image";
-import { BUY_LABELS } from "@/lib/catalog";
 import { AGREEMENT_LEGAL_LINE, BINDER_LEGAL_LINE, BUY_GUARANTEE_LINE, PRODUCT_DISCLAIMER_SHORT, SHEET_LEGAL_LINE } from "@/lib/legal";
 import { formatStorePrice } from "@/lib/money";
+import { DEFAULT_PACKAGE, packageOptions } from "@/lib/packages";
 import { OFFER_PARTS, PRICE_ANCHOR_TITLE, presaleNote } from "@/lib/offer";
 import { formatStoreDay } from "@/lib/store-time";
 import { cn } from "@/lib/utils";
 import { GuaranteeCard } from "../product/buy-details";
+import { PackagePicker } from "../product/package-picker";
 import { container, pillDark, section, sectionSubtitle, sectionTitle } from "../ui";
 import { BuyForm } from "./buy-form";
 import { DocMockup, type DocKind } from "./doc-mockup";
@@ -84,12 +85,20 @@ export function Bundle({ data }: { data: HomeData }) {
 							<span className="text-foreground text-[14px] font-medium">founding price until {formatStoreDay(data.foundingEndsAt)}</span>
 						)}
 					</p>
-					<BuyForm
-						product={system}
-						usVisitor={data.usVisitor}
-						className={`${pillDark} w-full`}
-						label={`${BUY_LABELS[system.slug] ?? "Buy now"}${system.presale ? " · Pre-order" : ""} · ${formatStorePrice(system.price)}`}
-					/>
+					{data.usVisitor && system.sellable ? (
+						<PackagePicker
+							options={packageOptions({
+								system,
+								binder: binder?.sellable ? binder : null,
+								emergency: data.emergency,
+								presale: system.presale,
+							})}
+							defaultId={DEFAULT_PACKAGE}
+							buttonClassName={`${pillDark} w-full`}
+						/>
+					) : (
+						<BuyForm product={system} usVisitor={data.usVisitor} className={`${pillDark} w-full`} />
+					)}
 					{data.usVisitor && system.sellable && (
 						<p className="text-green flex items-center gap-1.5 text-[14px] font-medium">
 							<Zap className="size-4 shrink-0 fill-current" />

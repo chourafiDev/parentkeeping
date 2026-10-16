@@ -39,6 +39,8 @@ export type ProductCopy = {
   intro?: string[];
   /** Buy box: icon facts (format, delivery, who it covers). */
   facts: { icon: FactIcon; text: string }[];
+  /** "Your first month": what the first weeks look like (answers "is this a lot of work?"). */
+  firstMonth?: { title: string; text: string; items: { when: string; title: string; text: string }[] };
   /** "How it works": three steps. */
   steps: { title: string; items: readonly { title: string; text: string }[]; note?: string };
   /** "What it does": zig-zag rows, the strongest parts of "What's inside". */
@@ -88,6 +90,17 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       { icon: "family", text: "Covers relatives who help care for the same parent" },
       { icon: "guarantee", text: "14-day “if it doesn't help” guarantee" },
     ],
+    // DRAFT, awaiting approval. No time estimates beyond the docs' own (the 10-minute Sunday check-in).
+    firstMonth: {
+      title: "Your first month",
+      text: "You don't have to do it all in one sitting. This is what the first weeks usually look like.",
+      items: [
+        { when: "Day 1", title: "Start with the medications", text: "Download, open the Medical Binder and fill in the medications page first. It's the one you'll reach for most." },
+        { when: "First weekend", title: "Finish the binder, share the sheet", text: "Add doctors, appointments and insurance. Make your copy of the Google Sheet and share the link with your siblings." },
+        { when: "Week 1", title: "Hold the first family meeting", text: "Use the Family Meeting Kit. Each person leaves with named jobs and dates on the job board." },
+        { when: "Week 4", title: "It runs on a Sunday check-in", text: "A 10-minute weekly review: what changed, what's coming up, who's paid what. Nobody has to keep score in their head." },
+      ],
+    },
     steps: { title: SHARING_TITLE, items: SHARING_STEPS, note: ONLY_CHILD_NOTE },
     highlights: {
       title: PARTS_TITLE,
@@ -148,6 +161,17 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       { icon: "download", text: "Instant download after checkout" },
       { icon: "family", text: "Covers relatives caring for the same parent" },
     ],
+    // DRAFT, awaiting approval.
+    firstMonth: {
+      title: "Your first month",
+      text: "You don't have to fill it in all at once. This is what the first weeks usually look like.",
+      items: [
+        { when: "Day 1", title: "Start with the medications", text: "Fill in the medications page first, on your computer or by hand. It's the page you'll use most." },
+        { when: "First weekend", title: "Add doctors and paperwork", text: "Doctors, upcoming appointments, insurance and benefits. Then print it." },
+        { when: "Week 1", title: "Give every job a name", text: "Fill in the “Who does what” page and print a copy for each sibling, or keep one at Mom's house." },
+        { when: "Week 4", title: "Keep it current on Sundays", text: "The 10-minute Sunday check-in page: what changed, what's coming up, what needs a hand." },
+      ],
+    },
     steps: {
       title: "How sharing works",
       items: [
@@ -235,6 +259,17 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       { icon: "download", text: "Instant download after checkout" },
       { icon: "attorney", text: "Signature page with space for the attorney's review" },
     ],
+    // DRAFT, awaiting approval.
+    firstMonth: {
+      title: "From first talk to a signed agreement",
+      text: "Go at your family's pace. Nobody signs anything until an attorney has reviewed it.",
+      items: [
+        { when: "Day 1", title: "Read the plain-words guide", text: "See which questions the agreement asks: who provides care, the schedule, and whether it's paid." },
+        { when: "Week 1", title: "Talk it through as a family", text: "Settle the questions together first, so the attorney's billed hour goes further." },
+        { when: "Week 2", title: "Fill in the template", text: "Who's involved, the care to be provided, the hours, and if it's paid, the rate and how payments are made." },
+        { when: "Before signing", title: "Attorney review", text: "An elder-law attorney in your parent's state reviews and adjusts it before anyone signs or any payment is made." },
+      ],
+    },
     steps: {
       // DRAFT heading and step titles; texts follow the doc's wording.
       title: "From the kitchen table to a signed agreement",
@@ -379,6 +414,17 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       { icon: "download", text: "Instant download" },
       { icon: "family", text: "Give each sibling a copy or a photo of the summary page" },
     ],
+    // DRAFT, awaiting approval. "In an afternoon" is the doc's own setup checklist.
+    firstMonth: {
+      title: "Ready in an afternoon",
+      text: "Set it up once, then keep it current. This is how most families do it.",
+      items: [
+        { when: "Start here", title: "Fill in the summary page", text: "Name, date of birth, conditions, allergies and medications, ready to hand to a paramedic." },
+        { when: "Same afternoon", title: "Finish the rest", text: "Contacts, the home page with keys and pets, and the grab-and-go checklist. Print the fridge sheet." },
+        { when: "That week", title: "Put it where it's needed", text: "By the front door or with the fridge sheet. Give each sibling a copy or a photo of the summary page." },
+        { when: "Ongoing", title: "Update when anything changes", text: "A new medication or a new doctor means a quick update now, not a scramble later." },
+      ],
+    },
     steps: {
       title: "Where to keep it",
       items: [

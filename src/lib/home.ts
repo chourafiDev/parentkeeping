@@ -32,10 +32,36 @@ export const SOUND_FAMILIAR = [
   },
 ] as const;
 
-/** "Why Parentkeeping" icon boxes. */
-export const WHY = [
-  { icon: "one-place", title: "One place", text: "Medications, doctors, appointments, insurance and paperwork in one binder and one sheet, not in your head." },
-  { icon: "fair", title: "Shared fairly", text: "A job board and a cost tracker that show who does what and who pays what, so the work can finally be split." },
-  { icon: "no-app", title: "No new app", text: "Printable PDFs and a Google Sheet you already know how to use. Nobody installs anything or creates an account." },
-  { icon: "guarantee", title: "14-day guarantee", text: "If it doesn't help you get organized and shared, email us within 14 days for a full refund." },
-] as const;
+/**
+ * "Parentkeeping vs. the usual way" (home). DRAFT copy, awaiting approval.
+ * No competitor names; the app column describes caregiving apps in general,
+ * so every "no" must hold for that category as a whole.
+ */
+export type UsualWayCell = { mark: "yes" | "no" | "some"; text?: string };
+export const USUAL_WAY_COLUMNS = ["Parentkeeping", "Group texts + memory", "Caregiving apps"] as const;
+export const USUAL_WAY: { label: string; cells: [UsualWayCell, UsualWayCell, UsualWayCell] }[] = [
+  {
+    label: "Everyone can see who does what",
+    cells: [{ mark: "yes" }, { mark: "no", text: "Lost in the thread" }, { mark: "yes" }],
+  },
+  {
+    label: "Medications, doctors and insurance in one place",
+    cells: [{ mark: "yes" }, { mark: "no", text: "In one person's head" }, { mark: "yes" }],
+  },
+  {
+    label: "Who paid what, written down",
+    cells: [{ mark: "yes" }, { mark: "no" }, { mark: "some", text: "Some apps" }],
+  },
+  {
+    label: "Nothing to install, no new accounts",
+    cells: [{ mark: "yes" }, { mark: "yes" }, { mark: "no", text: "Everyone needs the app" }],
+  },
+  {
+    label: "Works on paper, for Mom, aides and the ER",
+    cells: [{ mark: "yes" }, { mark: "no" }, { mark: "some", text: "Mostly on a screen" }],
+  },
+  {
+    label: "One price, no subscription",
+    cells: [{ mark: "yes" }, { mark: "yes", text: "Free" }, { mark: "some", text: "Often a monthly fee" }],
+  },
+];

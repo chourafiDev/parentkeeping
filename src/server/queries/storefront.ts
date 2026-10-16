@@ -1,6 +1,6 @@
 import "server-only";
 import { and, asc, eq, inArray } from "drizzle-orm";
-import { BUNDLE_SLUG } from "@/lib/catalog";
+import { BUMP_SLUG, BUNDLE_SLUG } from "@/lib/catalog";
 import { db } from "@/server/db";
 import { files, productFiles, productImages, products } from "@/server/db/schema";
 import { getFoundingPrice } from "./settings";
@@ -77,3 +77,25 @@ export async function getStoreProduct(slug: string) {
 }
 
 export type StoreProduct = NonNullable<Awaited<ReturnType<typeof getStoreProduct>>>;
+
+/**
+ * The other two choices in the System's package picker: the Medical Binder
+ * on its own, and the Emergency Binder as an add-on (only once it has files,
+ * same rule as its page). null = not offered right now.
+ */
+export async function getPackageExtras() {
+	const [rows, founding] = await Promise.all([
+		db.select().from(products).where(and(inArray(products.slug, ["medical-binder", BUMP_SLUG]), eq(products.status, "active"))),
+		getFoundingPrice(),
+	]);
+	const offer = async (slug: string) => {
+		const p = rows.find((r) => r.slug === slug);
+		if (!p) return null;
+		const foundingOn = founding.active && p.foundingPrice !== null && !!p.foundingPriceId;
+		if (!(foundingOn ? p.foundingPriceId : p.stripePriceId)) return null;
+		if (p.kind === "bump" && !(await hasFiles(p.id))) return null;
+		return { title: p.title, price: foundingOn ? p.foundingPrice! : p.price };
+	};
+	const [binder, emergency] = await Promise.all([offer("medical-binder"), offer(BUMP_SLUG)]);
+	return { binder, emergency };
+}

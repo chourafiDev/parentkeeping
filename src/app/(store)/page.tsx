@@ -9,6 +9,7 @@ import { siteUrl } from "@/lib/site-url";
 import { db } from "@/server/db";
 import { files, productFiles, products } from "@/server/db/schema";
 import { getFoundingPrice, getSettings } from "@/server/queries/settings";
+import { getPackageExtras } from "@/server/queries/storefront";
 import { BlogSection } from "./_components/blog/blog-section";
 import { Bundle } from "./_components/home/bundle";
 import { ClosingBanner } from "./_components/home/closing-banner";
@@ -22,7 +23,8 @@ import { PartsHighlights } from "./_components/home/parts-highlights";
 import { type ShopCard, ShopGrid } from "./_components/home/shop-grid";
 import { SoundFamiliar } from "./_components/home/sound-familiar";
 import type { HomeData, HomeProduct } from "./_components/home/types";
-import { Why } from "./_components/home/why";
+import { UsualWay } from "./_components/home/usual-way";
+import { ProblemTabs } from "./_components/problem-tabs";
 import {
 	jsonLdHtml,
 	productJsonLd,
@@ -46,7 +48,7 @@ export const dynamic = "force-dynamic";
 async function loadHome(
 	searchParams: Record<string, string | string[] | undefined>,
 ): Promise<HomeData> {
-	const [rows, founding, country, jar, { contact }] = await Promise.all([
+	const [rows, founding, country, jar, { contact }, extras] = await Promise.all([
 		db
 			.select()
 			.from(products)
@@ -61,6 +63,7 @@ async function loadHome(
 		visitorCountry(searchParams.country),
 		cookies(),
 		getSettings("contact"),
+		getPackageExtras(),
 	]);
 	const presale = await db
 		.select({
@@ -114,6 +117,7 @@ async function loadHome(
 			availableAt: f.availableAt!,
 		})),
 		supportEmail: contact.supportEmail,
+		emergency: extras.emergency,
 		checkoutError:
 			typeof searchParams.checkout_error === "string"
 				? searchParams.checkout_error
@@ -180,10 +184,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			<PartsHighlights data={data} />
 			<ShopGrid cards={cards} usVisitor={data.usVisitor} />
 			<MomentBanner />
+			<ProblemTabs />
 			<HowItWorks />
 			<Bundle data={data} />
 			<SoundFamiliar />
-			<Why />
+			<UsualWay />
 			<Faq data={data} />
 			<ClosingStrips data={data} />
 			<ClosingBanner data={data} />

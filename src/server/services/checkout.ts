@@ -39,10 +39,13 @@ async function presaleNotes(productIds: string[]) {
  */
 export async function createCheckoutSession({
   slug,
+  addon,
   country,
   variant,
 }: {
   slug: string;
+  /** The package picker's "System + Emergency Binder": the bump as a second line item. */
+  addon?: string | null;
   /** Visitor's country from the edge (x-vercel-ip-country); null in dev. */
   country: string | null;
   variant: string | null;
@@ -64,9 +67,19 @@ export async function createCheckoutSession({
   const priceId = useFounding ? product.foundingPriceId : product.stripePriceId;
   if (!priceId) throw new CheckoutError("This product isn't for sale yet.", 404);
 
-  // Order bump: System only, when switched on and sellable.
+  // Emergency Binder chosen up front (package picker): System only, and only
+  // once the binder has files (same rule as its own page).
+  let addonProduct: typeof product | undefined;
+  if (addon) {
+    if (slug !== BUNDLE_SLUG || addon !== BUMP_SLUG) throw new CheckoutError("This combination isn't for sale.", 404);
+    [addonProduct] = await db.select().from(products).where(eq(products.slug, BUMP_SLUG));
+    if (!addonProduct?.stripePriceId || addonProduct.status !== "active" || !(await hasFiles(addonProduct.id)))
+      throw new CheckoutError("The Emergency Binder isn't for sale right now.", 404);
+  }
+
+  // Order bump: System only, when switched on and sellable (not when it's already in the order).
   let bump: typeof product | undefined;
-  if (slug === BUNDLE_SLUG) {
+  if (slug === BUNDLE_SLUG && !addonProduct) {
     const { checkout } = await getSettings("checkout");
     if (checkout.bumpEnabled) {
       [bump] = await db.select().from(products).where(eq(products.slug, BUMP_SLUG));
@@ -75,12 +88,13 @@ export async function createCheckoutSession({
   }
 
   const base = siteUrl();
-  const notes = await presaleNotes([product.id, ...(bump ? [bump.id] : [])]);
+  const extra = addonProduct ?? bump;
+  const notes = await presaleNotes([product.id, ...(extra ? [extra.id] : [])]);
   const testVariant = VARIANTS.find((v) => v === variant) ?? "";
 
   return stripe.checkout.sessions.create({
     mode: "payment",
-    line_items: [{ price: priceId, quantity: 1 }],
+    line_items: [{ price: priceId, quantity: 1 }, ...(addonProduct ? [{ price: addonProduct.stripePriceId!, quantity: 1 }] : [])],
     // One Emergency Binder, quantity locked (spec: "quantity 1, not adjustable").
     ...(bump && { optional_items: [{ price: bump.stripePriceId!, quantity: 1, adjustable_quantity: { enabled: false } }] }),
     // US-only store priced in dollars: no conversion to the visitor's local currency.

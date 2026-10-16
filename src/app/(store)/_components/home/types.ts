@@ -26,6 +26,8 @@ export type HomeData = {
 	/** Settings → contact; used by the guarantee line. */
 	supportEmail: string | null;
 	checkoutError: string | null;
+	/** Emergency Binder add-on for the package picker; null = not offered. */
+	emergency: { price: number } | null;
 };
 
 /** Latest "arrives by" date of the System's pre-sale parts (the copy's [delivery date]). */

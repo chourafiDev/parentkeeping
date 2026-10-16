@@ -34,13 +34,14 @@ export const storeRoutes = new Hono()
    */
   .post("/checkout", async (c) => {
     const isForm = (c.req.header("content-type") ?? "").includes("form");
-    const slug = isForm
-      ? String((await c.req.parseBody()).slug ?? "")
-      : String(((await c.req.json().catch(() => ({}))) as { slug?: string }).slug ?? "");
+    const body = (isForm ? await c.req.parseBody() : await c.req.json().catch(() => ({}))) as Record<string, unknown>;
+    const slug = String(body.slug ?? "");
+    const addon = body.addon ? String(body.addon) : null;
 
     try {
       const session = await createCheckoutSession({
         slug,
+        addon,
         country: c.req.header("x-vercel-ip-country") ?? null,
         variant: getCookie(c, VARIANT_COOKIE) ?? null,
       });
