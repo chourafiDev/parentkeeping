@@ -19,6 +19,7 @@ export async function saveSettings(input: SettingsInput) {
       postalAddress: orNull(input.contact.postalAddress),
       phone: orNull(input.contact.phone),
     },
+    proof: { showFamilies: input.proof.showFamilies, showRefundRate: input.proof.showRefundRate },
   };
   await db
     .insert(settings)

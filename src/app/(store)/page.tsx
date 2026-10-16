@@ -10,7 +10,11 @@ import { siteUrl } from "@/lib/site-url";
 import { db } from "@/server/db";
 import { files, productFiles, products } from "@/server/db/schema";
 import { getFoundingPrice, getSettings } from "@/server/queries/settings";
+import { getProductReviews } from "@/server/queries/reviews";
+import { getSocialProof } from "@/server/queries/social-proof";
 import { getPackageExtras } from "@/server/queries/storefront";
+import { MIN_REVIEWS_FOR_SUMMARY } from "@/lib/social-proof";
+import { ProductReviews } from "./_components/product/reviews";
 import { BlogSection } from "./_components/blog/blog-section";
 import { Bundle } from "./_components/home/bundle";
 import { ClosingBanner } from "./_components/home/closing-banner";
@@ -50,7 +54,7 @@ export const dynamic = "force-dynamic";
 async function loadHome(
 	searchParams: Record<string, string | string[] | undefined>,
 ): Promise<HomeData> {
-	const [rows, founding, country, jar, { contact }, extras] = await Promise.all([
+	const [rows, founding, country, jar, { contact }, extras, proof] = await Promise.all([
 		db
 			.select()
 			.from(products)
@@ -66,6 +70,7 @@ async function loadHome(
 		cookies(),
 		getSettings("contact"),
 		getPackageExtras(),
+		getSocialProof(),
 	]);
 	const presale = await db
 		.select({
@@ -120,6 +125,7 @@ async function loadHome(
 		})),
 		supportEmail: contact.supportEmail,
 		emergency: extras.emergency,
+		proof,
 		checkoutError:
 			typeof searchParams.checkout_error === "string"
 				? searchParams.checkout_error
@@ -128,7 +134,8 @@ async function loadHome(
 }
 
 export default async function HomePage({ searchParams }: PageProps<"/">) {
-	const data = await loadHome(await searchParams);
+	const [data, systemReviews] = await Promise.all([loadHome(await searchParams), getProductReviews(BUNDLE_SLUG, 12)]);
+	const showReviews = systemReviews.count >= MIN_REVIEWS_FOR_SUMMARY;
 	const cards: ShopCard[] = [
 		{
 			product: data.system,
@@ -173,6 +180,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 		price: data.system.price,
 		url: `${siteUrl()}/`,
 		inStock: data.system.sellable,
+		rating: showReviews && systemReviews.average !== null ? { average: systemReviews.average, count: systemReviews.count } : null,
 	});
 
 	return (
@@ -190,7 +198,12 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			<HowItWorks />
 			<PagePreviews groupIds={PREVIEWS_BY_PRODUCT[BUNDLE_SLUG]} />
 			<Bundle data={data} />
-			<SoundFamiliar />
+			{/* Real reviews take over from "Sound familiar?" once there are enough. */}
+			{showReviews ? (
+				<ProductReviews reviews={systemReviews.reviews} count={systemReviews.count} average={systemReviews.average} />
+			) : (
+				<SoundFamiliar />
+			)}
 			<UsualWay />
 			<Faq data={data} />
 			<ClosingStrips data={data} />

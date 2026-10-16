@@ -48,6 +48,7 @@ export const orders = pgTable(
     testVariant: text(), // headline test: "fairness" | "one_place"
     status: orderStatus().default("paid").notNull(),
     confirmationSentAt: timestamp({ withTimezone: true }), // order email sent
+    reviewRequestedAt: timestamp({ withTimezone: true }), // the one "how is it going?" email
     refundedAt: timestamp({ withTimezone: true }),
     // Support reset the download limits: only downloads after this count toward the cap.
     downloadsResetAt: timestamp({ withTimezone: true }),

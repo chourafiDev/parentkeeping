@@ -13,7 +13,7 @@ const DELAY_MS = 40_000;
 const QUIET_DAYS = 30;
 
 /** Pages where an interruption would be wrong: sign-up pages themselves, legal, contact, after purchase. */
-const NEVER = [FREE_LIST_PATH, "/pages/caregiver-checklists", "/pages/contact", "/pages/disclaimer", "/pages/unsubscribe", "/policies", "/thank-you"];
+const NEVER = [FREE_LIST_PATH, "/pages/caregiver-checklists", "/pages/contact", "/pages/disclaimer", "/pages/unsubscribe", "/policies", "/thank-you", "/reviews"];
 const neverHere = (pathname: string) => isExcludedPath(pathname) || NEVER.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
 function recentlySeen() {

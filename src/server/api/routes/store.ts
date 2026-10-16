@@ -17,6 +17,9 @@ import { FREE_LIST, LEAD_MAGNETS } from "@/lib/lead-magnets";
 import { z } from "zod";
 import { CheckoutError, createCheckoutSession } from "@/server/services/checkout";
 import { handleStripeEvent } from "@/server/services/stripe-webhook";
+import { ReviewError, sendReviewRequests, submitReviews } from "@/server/services/reviews";
+import { reviewSubmitSchema } from "@/lib/validations/review";
+import { validate } from "../lib/validate";
 
 const trackSchema = z.object({
   sessionId: z.uuid(),
@@ -165,6 +168,23 @@ export const storeRoutes = new Hono()
     return c.body(null, 204);
   })
   /** "Ask a question" on a product page: one email to support, reply-to the visitor. */
+  /** Buyer reviews from the signed link in the review-request email. Saved as pending. */
+  .post("/reviews", validate("json", reviewSubmitSchema), async (c) => {
+    try {
+      const result = await submitReviews(c.req.valid("json"), c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? null);
+      return c.json({ ok: true, ...result });
+    } catch (err) {
+      if (err instanceof ReviewError) return c.json({ error: err.message }, err.status);
+      console.error("Review submit failed", err);
+      return c.json({ error: "Something went wrong. Please try again." }, 500);
+    }
+  })
+  /** Vercel Cron, daily: the one review request per order (see vercel.json). */
+  .get("/cron/review-requests", async (c) => {
+    const secret = process.env.CRON_SECRET;
+    if (!secret || c.req.header("authorization") !== `Bearer ${secret}`) return c.json({ error: "Unauthorized" }, 401);
+    return c.json(await sendReviewRequests());
+  })
   .post("/contact", async (c) => {
     const body = (await c.req.json().catch(() => ({}))) as Record<string, unknown>;
     if (body.website) return c.json({ ok: true }); // honeypot: pretend

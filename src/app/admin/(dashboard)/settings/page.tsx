@@ -6,6 +6,7 @@ import { hasPermission } from "@/server/auth/permissions";
 import { requireStaffPage } from "@/server/auth/session";
 import { db } from "@/server/db";
 import { files, productFiles, products } from "@/server/db/schema";
+import { getProofStats } from "@/server/queries/reviews";
 import { getSettings } from "@/server/queries/settings";
 import { LaunchChecklist } from "./_components/launch-checklist";
 import { SettingsForm } from "./_components/settings-form";
@@ -35,9 +36,10 @@ async function getBumpProduct() {
 
 export default async function SettingsPage() {
 	const { user } = await requireStaffPage({ settings: ["read"] });
-	const [{ pricing, checkout, contact }, bump] = await Promise.all([
-		getSettings("pricing", "checkout", "contact"),
+	const [{ pricing, checkout, contact, proof }, bump, proofStats] = await Promise.all([
+		getSettings("pricing", "checkout", "contact", "proof"),
 		getBumpProduct(),
+		getProofStats(),
 	]);
 
 	const env = process.env;
@@ -61,7 +63,9 @@ export default async function SettingsPage() {
 						postalAddress: contact.postalAddress ?? "",
 						phone: contact.phone ?? "",
 					},
+					proof,
 				}}
+				proofStats={proofStats}
 				bump={bump && { ...bump, availableAt: bump.availableAt?.toISOString() ?? null }}
 			/>
 			<LaunchChecklist

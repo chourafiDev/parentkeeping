@@ -5,6 +5,7 @@ import { analyticsRoutes } from "./analytics";
 import { assetRoutes } from "./assets";
 import { orderRoutes } from "./orders";
 import { productRoutes } from "./products";
+import { reviewRoutes } from "./reviews";
 import { settingsRoutes } from "./settings";
 import { subscriberRoutes } from "./subscribers";
 
@@ -26,4 +27,5 @@ export const adminRoutes = new Hono<AuthEnv>()
   .route("/orders", orderRoutes)
   .route("/subscribers", subscriberRoutes)
   .route("/settings", settingsRoutes)
-  .route("/analytics", analyticsRoutes);
+  .route("/analytics", analyticsRoutes)
+  .route("/reviews", reviewRoutes);

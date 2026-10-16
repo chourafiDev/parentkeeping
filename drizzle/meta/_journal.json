@@ -57,6 +57,13 @@
       "when": 1791901630102,
       "tag": "0007_tidy_warlock",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792155744847,
+      "tag": "0008_slippery_tomas",
+      "breakpoints": true
     }
   ]
 }

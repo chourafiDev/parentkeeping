@@ -7,6 +7,7 @@ import {
   HiEnvelope,
   HiShoppingCart,
   HiSquares2X2,
+  HiStar,
   HiUserCircle,
 } from "react-icons/hi2";
 import type { Permissions } from "@/server/auth/permissions";
@@ -35,6 +36,12 @@ export const navGroups: { label: string; items: NavItem[] }[] = [
         href: "/admin/products",
         icon: HiCube,
         permission: { product: ["read"] },
+      },
+      {
+        title: "Reviews",
+        href: "/admin/reviews",
+        icon: HiStar,
+        permission: { review: ["read"] },
       },
       {
         title: "Subscribers",

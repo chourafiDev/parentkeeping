@@ -36,13 +36,16 @@ import {
 	PRODUCT_COPY,
 	type ProductCopy,
 } from "@/lib/product-copy";
-import { reviewsFor } from "@/lib/reviews";
+import { placeholderReviews } from "@/lib/reviews";
+import { MIN_REVIEWS_FOR_SUMMARY } from "@/lib/social-proof";
 import { siteUrl } from "@/lib/site-url";
 import { formatStoreDay } from "@/lib/store-time";
 import { PREVIEWS_BY_PRODUCT } from "@/lib/page-previews";
 import { DEFAULT_PACKAGE, packageOptions } from "@/lib/packages";
 import { cn } from "@/lib/utils";
 import { getSettings } from "@/server/queries/settings";
+import { getProductReviews } from "@/server/queries/reviews";
+import { getSocialProof } from "@/server/queries/social-proof";
 import {
 	getPackageExtras,
 	getStoreProduct,
@@ -68,7 +71,7 @@ import { ProductFirstMonth } from "../../_components/product/first-month";
 import { ProductGallery } from "../../_components/product/gallery";
 import { ProductHighlights } from "../../_components/product/highlights";
 import { PackagePicker } from "../../_components/product/package-picker";
-import { ProductReviews } from "../../_components/product/reviews";
+import { ProductReviews, RatingSummary } from "../../_components/product/reviews";
 import { ShareDialog } from "../../_components/product/share-dialog";
 import { ProductSteps } from "../../_components/product/steps";
 import { StickyBuyBar } from "../../_components/product/sticky-buy-bar";
@@ -160,10 +163,12 @@ export default async function ProductPage({
 }: PageProps<"/products/[handle]">) {
 	const [data, query] = await Promise.all([load(params), searchParams]);
 	const isBundle = data.product.slug === BUNDLE_SLUG;
-	const [country, { contact }, extras] = await Promise.all([
+	const [country, { contact }, extras, reviewData, proof] = await Promise.all([
 		visitorCountry(query.country),
 		getSettings("contact"),
 		isBundle ? getPackageExtras() : null,
+		getProductReviews(data.product.slug),
+		getSocialProof(),
 	]);
 	const { product, images, assets, system, copy, pieces } = data;
 	const usVisitor = !country || country === "US";
@@ -178,7 +183,11 @@ export default async function ProductPage({
 		product.description && textOf(product.description)
 			? product.description
 			: null;
-	const reviews = reviewsFor(product.slug);
+	const reviews = reviewData.count > 0 ? reviewData.reviews : placeholderReviews();
+	const rating =
+		reviewData.average !== null && reviewData.count >= MIN_REVIEWS_FOR_SUMMARY
+			? { average: reviewData.average, count: reviewData.count }
+			: null;
 	const facts = [
 		...copy.facts,
 		{
@@ -352,6 +361,7 @@ export default async function ProductPage({
 						url,
 						image: images[0]?.url,
 						inStock: data.sellable,
+						rating,
 					}),
 				)}
 			/>
@@ -421,8 +431,13 @@ export default async function ProductPage({
 									</span>
 								)}
 							</p>
+							<RatingSummary
+								count={reviewData.count}
+								average={reviewData.average}
+							/>
 							<p className="text-primary text-[13px] font-medium">
 								{ONE_PRICE_BADGE}
+								{proof.families && ` · Bought by ${proof.families} families`}
 							</p>
 						</div>
 
@@ -486,7 +501,10 @@ export default async function ProductPage({
 							</div>
 						</div>
 
-						<GuaranteeCard supportEmail={contact.supportEmail} />
+						<GuaranteeCard
+							supportEmail={contact.supportEmail}
+							refundRate={proof.refundRate}
+						/>
 
 						<div className="grid justify-items-center gap-3 rounded-[10px] bg-[#f5f5f5] p-5">
 							<p className="text-foreground text-[15px] font-semibold">
@@ -529,7 +547,13 @@ export default async function ProductPage({
 				</div>
 			</div>
 
-			{reviews.length > 0 && <ProductReviews reviews={reviews} />}
+			{reviews.length > 0 && (
+				<ProductReviews
+					reviews={reviews}
+					count={reviewData.count}
+					average={reviewData.average}
+				/>
+			)}
 			{isBundle && <ProblemTabs />}
 			<ProductSteps steps={copy.steps} />
 			<ProductHighlights

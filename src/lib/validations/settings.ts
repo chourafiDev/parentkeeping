@@ -22,6 +22,10 @@ export const settingsInputSchema = z.object({
     postalAddress: z.string().trim().max(400),
     phone: z.string().trim().max(30),
   }),
+  proof: z.object({
+    showFamilies: z.boolean(),
+    showRefundRate: z.boolean(),
+  }),
 });
 
 export type SettingsInput = z.infer<typeof settingsInputSchema>;

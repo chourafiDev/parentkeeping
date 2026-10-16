@@ -28,6 +28,8 @@ export type HomeData = {
 	checkoutError: string | null;
 	/** Emergency Binder add-on for the package picker; null = not offered. */
 	emergency: { price: number } | null;
+	/** Computed social proof lines (null = hidden). */
+	proof: { families: string | null; refundRate: string | null };
 };
 
 /** Latest "arrives by" date of the System's pre-sale parts (the copy's [delivery date]). */

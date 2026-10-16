@@ -114,6 +114,35 @@ ${[SITE.name, p.footer.postalAddress].filter(Boolean).join("\n")}`,
   };
 }
 
+/**
+ * The one review request, after the 14-day guarantee window. No incentive,
+ * and it asks for honest reviews either way (FTC: no asking only happy buyers).
+ */
+export function reviewRequestEmail(p: { orderNumber: number; productTitles: string[]; reviewUrl: string; footer: EmailFooter }) {
+  const what = p.productTitles.join(", ");
+  return {
+    subject: "How is Parentkeeping working for your family?",
+    html: layout({
+      footer: p.footer,
+      preheader: "Two minutes, good or bad. It helps the next family decide.",
+      body: `<h1 style="font-size:20px;margin:20px 0 8px">How is it going?</h1>
+<p style="font-size:15px;line-height:1.6;margin:0 0 12px">It's been about two weeks since your order #${p.orderNumber} (${escape(what)}). Would you write a short review for the next family deciding whether it's right for them?</p>
+<p style="font-size:15px;line-height:1.6;margin:0">Good or bad, we publish honest reviews. It takes about two minutes.</p>
+${button(p.reviewUrl, "Write a review")}
+<p style="font-size:14px;line-height:1.6;margin:0">We'll only ask this once.${p.footer.supportEmail ? ` If something isn't working, reply to this email or write to ${escape(p.footer.supportEmail)} and a person will help.` : ""}</p>`,
+    }),
+    text: `How is it going?
+
+It's been about two weeks since your order #${p.orderNumber} (${what}). Would you write a short review for the next family deciding whether it's right for them? Good or bad, we publish honest reviews.
+
+Write a review: ${p.reviewUrl}
+
+We'll only ask this once.${p.footer.supportEmail ? ` If something isn't working, write to ${p.footer.supportEmail}.` : ""}
+
+${[SITE.name, p.footer.postalAddress].filter(Boolean).join("\n")}`,
+  };
+}
+
 /** Non-US billing country: polite refund (paid products are US-only for now). */
 export function nonUsRefundEmail(p: { orderNumber: number; amount: string; freeListUrl: string; footer: EmailFooter }) {
   return {

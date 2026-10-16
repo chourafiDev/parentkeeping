@@ -16,6 +16,8 @@ export function productJsonLd(p: {
 	url: string;
 	image?: string | null;
 	inStock: boolean;
+	/** Published verified-buyer reviews (only passed once there are enough to summarize). */
+	rating?: { average: number; count: number } | null;
 }) {
 	return {
 		"@context": "https://schema.org",
@@ -24,6 +26,9 @@ export function productJsonLd(p: {
 		description: p.description,
 		...(p.image && { image: p.image }),
 		brand: { "@type": "Brand", name: "Parentkeeping" },
+		...(p.rating && {
+			aggregateRating: { "@type": "AggregateRating", ratingValue: p.rating.average.toFixed(1), reviewCount: p.rating.count, bestRating: 5, worstRating: 1 },
+		}),
 		offers: {
 			"@type": "Offer",
 			url: p.url,

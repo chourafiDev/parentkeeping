@@ -3,7 +3,7 @@ import Link from "next/link";
 import { GUARANTEE_TITLE, guaranteeText } from "@/lib/offer";
 
 /** Compact guarantee card under the Buy button. */
-export function GuaranteeCard({ supportEmail }: { supportEmail: string | null }) {
+export function GuaranteeCard({ supportEmail, refundRate = null }: { supportEmail: string | null; refundRate?: string | null }) {
 	return (
 		<div className="flex items-start gap-4 rounded-[10px] border p-4">
 			<span className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-full">
@@ -11,7 +11,10 @@ export function GuaranteeCard({ supportEmail }: { supportEmail: string | null })
 			</span>
 			<div className="grid gap-1">
 				<p className="text-foreground text-[15px] font-semibold">{GUARANTEE_TITLE}</p>
-				<p className="text-body text-[13px] leading-relaxed">{guaranteeText(supportEmail)}</p>
+				<p className="text-body text-[13px] leading-relaxed">
+					{guaranteeText(supportEmail)}
+					{refundRate && ` So far, ${refundRate} of buyers have asked for one.`}
+				</p>
 			</div>
 		</div>
 	);

@@ -17,6 +17,13 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api-client";
 import { formatPrice } from "@/lib/money";
+import {
+	familiesLabel,
+	MIN_FAMILIES,
+	MIN_ORDERS_FOR_REFUND_RATE,
+	MIN_REVIEWS_FOR_SUMMARY,
+	refundRateLabel,
+} from "@/lib/social-proof";
 import { type SettingsInput, settingsInputSchema } from "@/lib/validations/settings";
 import { FormCard } from "../../_components/shared/form-card";
 import { UnsavedChangesBar } from "../../_components/shared/unsaved-changes-bar";
@@ -47,13 +54,43 @@ function FoundingStatus({ endsOn }: { endsOn: string | null }) {
 	);
 }
 
+type ProofStats = { families: number; settledOrders: number; refundRate: number | null };
+
+/** One "Social proof" switch, with the live number and whether it has enough data. */
+function ProofSwitch({
+	label,
+	description,
+	status,
+	checked,
+	onChange,
+}: {
+	label: string;
+	description: string;
+	status: { ready: boolean; text: string };
+	checked: boolean;
+	onChange: (v: boolean) => void;
+}) {
+	return (
+		<label className="flex items-start justify-between gap-4">
+			<span className="grid gap-0.5">
+				<span className="text-sm font-medium">{label}</span>
+				<span className="text-muted-foreground text-xs">{description}</span>
+				<span className={status.ready ? "text-xs text-emerald-700" : "text-xs text-amber-800"}>{status.text}</span>
+			</span>
+			<Switch checked={checked} onCheckedChange={onChange} aria-label={label} />
+		</label>
+	);
+}
+
 export function SettingsForm({
 	defaultValues,
 	bump,
+	proofStats,
 	readOnly,
 }: {
 	defaultValues: SettingsInput;
 	bump: BumpProduct;
+	proofStats: ProofStats;
 	readOnly: boolean;
 }) {
 	const router = useRouter();
@@ -178,6 +215,50 @@ export function SettingsForm({
 									</div>
 								)}
 							</div>
+						)}
+					/>
+				</FormCard>
+
+				<FormCard title="Social proof" contentClassName="grid gap-4">
+					<p className="text-muted-foreground text-xs">
+						Worked out from real orders, rounded so they never overstate, and only shown once there&apos;s enough data. Star ratings
+						appear on their own once a product has {MIN_REVIEWS_FOR_SUMMARY} published reviews.
+					</p>
+					<Controller
+						control={control}
+						name="proof.showFamilies"
+						render={({ field }) => (
+							<ProofSwitch
+								label="“Bought by N+ families”"
+								description="Under the price on product pages and the home buy box."
+								status={
+									proofStats.families >= MIN_FAMILIES
+										? { ready: true, text: `Would show: “Bought by ${familiesLabel(proofStats.families)} families” (${proofStats.families} buyers)` }
+										: { ready: false, text: `Not enough data yet: ${proofStats.families} of ${MIN_FAMILIES} buyers` }
+								}
+								checked={field.value}
+								onChange={field.onChange}
+							/>
+						)}
+					/>
+					<Controller
+						control={control}
+						name="proof.showRefundRate"
+						render={({ field }) => (
+							<ProofSwitch
+								label="Refund rate in the guarantee card"
+								description="Counts only orders whose 14-day window has closed."
+								status={
+									proofStats.settledOrders >= MIN_ORDERS_FOR_REFUND_RATE && proofStats.refundRate !== null
+										? {
+												ready: true,
+												text: `Would show: “${refundRateLabel(proofStats.refundRate)} of buyers have asked for one” (${(proofStats.refundRate * 100).toFixed(1)}% of ${proofStats.settledOrders} orders)`,
+											}
+										: { ready: false, text: `Not enough data yet: ${proofStats.settledOrders} of ${MIN_ORDERS_FOR_REFUND_RATE} orders past 14 days` }
+								}
+								checked={field.value}
+								onChange={field.onChange}
+							/>
 						)}
 					/>
 				</FormCard>

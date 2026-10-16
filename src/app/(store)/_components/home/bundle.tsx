@@ -85,6 +85,7 @@ export function Bundle({ data }: { data: HomeData }) {
 							<span className="text-foreground text-[14px] font-medium">founding price until {formatStoreDay(data.foundingEndsAt)}</span>
 						)}
 					</p>
+					{data.proof.families && <p className="text-primary -mt-1 text-[13px] font-medium">Bought by {data.proof.families} families</p>}
 					{data.usVisitor && system.sellable ? (
 						<PackagePicker
 							options={packageOptions({
@@ -113,7 +114,7 @@ export function Bundle({ data }: { data: HomeData }) {
 						</p>
 					</div>
 					<div className="bg-background mt-2 rounded-[10px]">
-						<GuaranteeCard supportEmail={data.supportEmail} />
+						<GuaranteeCard supportEmail={data.supportEmail} refundRate={data.proof.refundRate} />
 					</div>
 					<ul className="flex flex-wrap items-center gap-1.5" aria-label="Accepted cards">
 						{["visa", "mastercard", "amex", "discover", "paypal"].map((card) => (

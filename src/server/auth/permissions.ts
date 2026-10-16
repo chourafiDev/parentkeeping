@@ -11,6 +11,7 @@ export const statements = {
   settings: ["read", "update"],
   finance: ["read"], // revenue figures
   analytics: ["read"], // Live View, reports
+  review: ["read", "update"], // update = publish / hide
 } as const;
 
 export const ac = createAccessControl(statements);
@@ -24,6 +25,7 @@ export const owner = ac.newRole({
   settings: ["read", "update"],
   finance: ["read"],
   analytics: ["read"],
+  review: ["read", "update"],
 });
 
 // One account: the store owner. The permission checks stay in place (they

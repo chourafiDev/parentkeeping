@@ -8,12 +8,15 @@ export type StoreSettings = {
   pricing: { foundingEndsAt: string | null };
   checkout: { bumpEnabled: boolean };
   contact: { supportEmail: string | null; privacyEmail: string | null; postalAddress: string | null; phone: string | null };
+  /** Owner's switches for the computed numbers (each also needs enough data, see lib/social-proof). */
+  proof: { showFamilies: boolean; showRefundRate: boolean };
 };
 
 const DEFAULTS: StoreSettings = {
   pricing: { foundingEndsAt: null },
   checkout: { bumpEnabled: false },
   contact: { supportEmail: null, privacyEmail: null, postalAddress: null, phone: null },
+  proof: { showFamilies: false, showRefundRate: false },
 };
 
 export async function getSettings<K extends keyof StoreSettings>(...keys: K[]): Promise<Pick<StoreSettings, K>> {
