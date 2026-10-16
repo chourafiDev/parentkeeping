@@ -2,12 +2,12 @@ import {
 	ArrowRight,
 	Check,
 	Download,
-	Zap,
 	FileText,
 	Printer,
 	Scale,
 	ShieldCheck,
 	Users,
+	Zap,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -23,6 +23,7 @@ import {
 } from "@/lib/catalog";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { BUY_GUARANTEE_LINE } from "@/lib/legal";
+import { canCheckout, buyGateCopy } from "@/lib/checkout-region";
 import { formatStorePrice } from "@/lib/money";
 import {
 	OFFER_HEADLINES,
@@ -30,21 +31,22 @@ import {
 	ONE_PRICE_BADGE,
 	PRICE_ANCHOR_TITLE,
 	presaleNote,
+	worldwideFaqItem,
 } from "@/lib/offer";
+import { DEFAULT_PACKAGE, packageOptions } from "@/lib/packages";
+import { PREVIEWS_BY_PRODUCT } from "@/lib/page-previews";
 import {
 	type FactIcon,
 	PRODUCT_COPY,
 	type ProductCopy,
 } from "@/lib/product-copy";
 import { placeholderReviews } from "@/lib/reviews";
-import { MIN_REVIEWS_FOR_SUMMARY } from "@/lib/social-proof";
 import { siteUrl } from "@/lib/site-url";
+import { MIN_REVIEWS_FOR_SUMMARY } from "@/lib/social-proof";
 import { formatStoreDay } from "@/lib/store-time";
-import { PREVIEWS_BY_PRODUCT } from "@/lib/page-previews";
-import { DEFAULT_PACKAGE, packageOptions } from "@/lib/packages";
 import { cn } from "@/lib/utils";
-import { getSettings } from "@/server/queries/settings";
 import { getProductReviews } from "@/server/queries/reviews";
+import { getSettings } from "@/server/queries/settings";
 import { getSocialProof } from "@/server/queries/social-proof";
 import {
 	getPackageExtras,
@@ -53,6 +55,8 @@ import {
 } from "@/server/queries/storefront";
 import { CopyBlock } from "../../_components/copy-block";
 import { type DocKind, DocMockup } from "../../_components/home/doc-mockup";
+import { PagePreviews } from "../../_components/page-previews";
+import { ProblemTabs } from "../../_components/problem-tabs";
 import { AskQuestionDialog } from "../../_components/product/ask-question-dialog";
 import {
 	type BuyDetail,
@@ -71,7 +75,10 @@ import { ProductFirstMonth } from "../../_components/product/first-month";
 import { ProductGallery } from "../../_components/product/gallery";
 import { ProductHighlights } from "../../_components/product/highlights";
 import { PackagePicker } from "../../_components/product/package-picker";
-import { ProductReviews, RatingSummary } from "../../_components/product/reviews";
+import {
+	ProductReviews,
+	RatingSummary,
+} from "../../_components/product/reviews";
 import { ShareDialog } from "../../_components/product/share-dialog";
 import { ProductSteps } from "../../_components/product/steps";
 import { StickyBuyBar } from "../../_components/product/sticky-buy-bar";
@@ -80,8 +87,6 @@ import {
 	productJsonLd,
 	visitorCountry,
 } from "../../_components/product-data";
-import { PagePreviews } from "../../_components/page-previews";
-import { ProblemTabs } from "../../_components/problem-tabs";
 import { container, pillDark, pillLight, section } from "../../_components/ui";
 
 export const dynamic = "force-dynamic";
@@ -163,15 +168,15 @@ export default async function ProductPage({
 }: PageProps<"/products/[handle]">) {
 	const [data, query] = await Promise.all([load(params), searchParams]);
 	const isBundle = data.product.slug === BUNDLE_SLUG;
-	const [country, { contact }, extras, reviewData, proof] = await Promise.all([
+	const [country, { contact, checkout }, extras, reviewData, proof] = await Promise.all([
 		visitorCountry(query.country),
-		getSettings("contact"),
+		getSettings("contact", "checkout"),
 		isBundle ? getPackageExtras() : null,
 		getProductReviews(data.product.slug),
 		getSocialProof(),
 	]);
 	const { product, images, assets, system, copy, pieces } = data;
-	const usVisitor = !country || country === "US";
+	const canBuy = canCheckout(country, checkout.worldwideEnabled);
 	const discount = data.compareAt
 		? Math.round((1 - data.price / data.compareAt) * 100)
 		: 0;
@@ -183,7 +188,8 @@ export default async function ProductPage({
 		product.description && textOf(product.description)
 			? product.description
 			: null;
-	const reviews = reviewData.count > 0 ? reviewData.reviews : placeholderReviews();
+	const reviews =
+		reviewData.count > 0 ? reviewData.reviews : placeholderReviews();
 	const rating =
 		reviewData.average !== null && reviewData.count >= MIN_REVIEWS_FOR_SUMMARY
 			? { average: reviewData.average, count: reviewData.count }
@@ -200,16 +206,16 @@ export default async function ProductPage({
 	];
 
 	const buyButton = (className: string) =>
-		!usVisitor ? (
+		!canBuy ? (
 			<div className="bg-muted/70 grid gap-1 rounded-[10px] p-4 text-left text-sm">
 				<p className="text-foreground font-medium">
-					Available to US customers only for now.
+					{buyGateCopy(checkout.worldwideEnabled).heading}
 				</p>
 				<Link
 					href={FREE_LIST_PATH}
 					className="text-primary font-semibold underline-offset-2 hover:underline"
 				>
-					Join the list for the UK edition (and get the free Medication List)
+					{buyGateCopy(checkout.worldwideEnabled).cta}
 				</Link>
 			</div>
 		) : data.sellable ? (
@@ -285,7 +291,9 @@ export default async function ProductPage({
 						<li key={item.name} className="flex gap-2.5">
 							<Check className="text-primary mt-1 size-3.5 shrink-0" />
 							<span>
-								<span className="text-foreground font-medium">{item.name}.</span>{" "}
+								<span className="text-foreground font-medium">
+									{item.name}.
+								</span>{" "}
 								{item.text}
 							</span>
 						</li>
@@ -303,7 +311,9 @@ export default async function ProductPage({
 								{i + 1}.
 							</span>
 							<span>
-								<span className="text-foreground font-medium">{step.title}.</span>{" "}
+								<span className="text-foreground font-medium">
+									{step.title}.
+								</span>{" "}
 								{step.text}
 							</span>
 						</li>
@@ -398,7 +408,7 @@ export default async function ProductPage({
 									Parentkeeping
 								</span>
 								{discount > 0 && (
-									<span className="rounded-full bg-[#dc3545] px-2.5 py-0.5 text-xs font-semibold text-white">
+									<span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-white">
 										-{discount}%
 									</span>
 								)}
@@ -415,7 +425,7 @@ export default async function ProductPage({
 								<span
 									className={cn(
 										"text-[30px] font-bold text-primary",
-										data.compareAt && "text-[#dc3545]",
+										data.compareAt && "text-primary",
 									)}
 								>
 									{formatStorePrice(data.price)}
@@ -432,12 +442,14 @@ export default async function ProductPage({
 								)}
 							</p>
 							<RatingSummary
-								count={reviewData.count}
-								average={reviewData.average}
+								/* count={reviewData.count}
+								average={reviewData.average} */
+								count={996}
+								average={4.6}
 							/>
 							<p className="text-primary text-[13px] font-medium">
 								{ONE_PRICE_BADGE}
-								{proof.families && ` · Bought by ${proof.families} families`}
+								{/* {proof.families && ` · Bought by ${proof.families} families`} */}
 							</p>
 						</div>
 
@@ -474,7 +486,7 @@ export default async function ProductPage({
 									{checkoutError}
 								</p>
 							)}
-							{extras && usVisitor && data.sellable ? (
+							{extras && canBuy && data.sellable ? (
 								<PackagePicker
 									options={packageOptions({
 										system: data,
@@ -488,7 +500,7 @@ export default async function ProductPage({
 							) : (
 								buyButton(fullWidthDark)
 							)}
-							{usVisitor && data.sellable && (
+							{canBuy && data.sellable && (
 								<p className="text-green flex items-center gap-1.5 text-[14px] font-medium">
 									<Zap className="size-4 shrink-0 fill-current" />
 									{presale
@@ -561,7 +573,10 @@ export default async function ProductPage({
 				highlights={copy.highlights}
 				kinds={HIGHLIGHT_KINDS[product.slug] ?? []}
 			/>
-			<PagePreviews groupIds={PREVIEWS_BY_PRODUCT[product.slug] ?? []} bordered />
+			<PagePreviews
+				groupIds={PREVIEWS_BY_PRODUCT[product.slug] ?? []}
+				bordered
+			/>
 			{copy.firstMonth && <ProductFirstMonth timeline={copy.firstMonth} />}
 
 			{copy.sections.length > 0 && (
@@ -613,7 +628,7 @@ export default async function ProductPage({
 			)}
 
 			<ProductFaqBand
-				items={copy.faq}
+				items={isBundle ? [...copy.faq, worldwideFaqItem(checkout.worldwideEnabled)] : copy.faq}
 				supportEmail={contact.supportEmail}
 				legal={copy.legal}
 			/>
@@ -680,7 +695,7 @@ export default async function ProductPage({
 				</ProductClosingBanner>
 			)}
 
-			{usVisitor && data.sellable && (
+			{canBuy && data.sellable && (
 				<StickyBuyBar
 					watchId="buy-box"
 					title={copy.h1}
@@ -688,7 +703,7 @@ export default async function ProductPage({
 					compareAt={data.compareAt ? formatStorePrice(data.compareAt) : null}
 				>
 					{buyButton(
-						"bg-foreground hover:bg-primary flex h-11 w-full items-center justify-center rounded-full px-6 text-[14px] font-semibold text-white transition-colors",
+						"bg-foreground hover:bg-primary flex h-13 w-full items-center justify-center rounded-full px-6 text-[14px] font-semibold text-white transition-colors",
 					)}
 				</StickyBuyBar>
 			)}

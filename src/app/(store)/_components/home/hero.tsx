@@ -1,4 +1,5 @@
 import { ShieldCheck } from "lucide-react";
+import { buyGateCopy } from "@/lib/checkout-region";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { PRODUCT_DISCLAIMER_SHORT } from "@/lib/legal";
 import { OFFER_HEADLINES, OFFER_SUBHEAD } from "@/lib/offer";
@@ -92,13 +93,13 @@ export function HomeHero({ data }: { data: HomeData }) {
                         absolute inset-0 z-10
 
                         bg-gradient-to-t
-                        from-black/50
-                        via-black/25
-                        to-black/15
+                        from-deep
+                        via-deep/80
+                        to-deep/20
 
                         md:bg-gradient-to-r
-                        md:from-black/60
-                        md:via-black/25
+                        md:from-deep
+                        md:via-deep/70
                         md:to-transparent
                     "
 				/>
@@ -107,7 +108,7 @@ export function HomeHero({ data }: { data: HomeData }) {
 				<div
 					className="
                         relative z-20
-                        grid max-w-[770px] gap-5
+                        grid max-w-[780px] gap-5
                         p-6 sm:p-10 md:p-12
                     "
 				>
@@ -149,7 +150,8 @@ export function HomeHero({ data }: { data: HomeData }) {
 					<div className="flex flex-wrap gap-3">
 						<BuyForm
 							product={system}
-							usVisitor={data.usVisitor}
+							canBuy={data.canBuy}
+							worldwideEnabled={data.worldwideEnabled}
 							className={pillLight}
 						/>
 
@@ -169,18 +171,18 @@ export function HomeHero({ data }: { data: HomeData }) {
 					</div>
 
 					{/* DISCLAIMERS */}
-					<div className="grid gap-1 text-xs text-white/80">
+					<div className="space-y-2 text-xs text-white/80">
 						<p>
-							{data.usVisitor
-								? "Available to US customers. "
-								: "Paid products are US-only for now. "}
+							{!data.canBuy && `${buyGateCopy(data.worldwideEnabled).heading} `}
 							{PRODUCT_DISCLAIMER_SHORT}
 						</p>
 
-						<p className="flex items-center gap-1.5">
-							<ShieldCheck className="size-3.5" />
-							14-day “if it doesn&apos;t help” guarantee
-						</p>
+						<div className="bg-primary/30 rounded-md p-2 inline-flex">
+							<p className="flex items-center gap-1.5">
+								<ShieldCheck className="size-3.5" />
+								14-day “if it doesn&apos;t help” guarantee
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>

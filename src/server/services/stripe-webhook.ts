@@ -4,12 +4,14 @@ import type Stripe from "stripe";
 import { BUMP_SLUG, BUNDLE_SLUG } from "@/lib/catalog";
 import { formatPrice } from "@/lib/money";
 import { siteUrl } from "@/lib/site-url";
+import { canCheckout } from "@/lib/checkout-region";
 import { db } from "@/server/db";
 import { downloadTokens, orderEvents, orderItems, orders, products, stripeEvents } from "@/server/db/schema";
 import { nonUsRefundEmail } from "@/server/emails/buyer";
 import { buyerFooter } from "@/server/emails/buyer-footer";
 import { sendEmail } from "@/server/lib/email";
 import { getStripe } from "@/server/lib/stripe";
+import { getSettings } from "@/server/queries/settings";
 import { sendOrderEmail } from "./orders";
 
 // Stripe is the source of truth for money: orders are only written here,
@@ -51,7 +53,10 @@ async function recordPaidSession(sessionId: string) {
 
   const mainSlug = session.metadata?.slug;
   const country = session.customer_details?.address?.country ?? null;
-  const flagged = country !== "US";
+  // Same rule the checkout page used to decide whether to show the Buy
+  // button, checked again now the buyer's real billing country is known.
+  const { checkout } = await getSettings("checkout");
+  const flagged = !canCheckout(country, checkout.worldwideEnabled);
   const paymentIntentId = idOf(session.payment_intent);
 
   // Map Stripe line items to our products before writing anything.
@@ -136,7 +141,7 @@ async function refundNonUs(orderId: string) {
     await db.insert(orderEvents).values({
       orderId,
       type: "flagged_non_us",
-      message: `Billing country ${order.billingCountry ?? "unknown"}: paid products are US-only`,
+      message: `Billing country ${order.billingCountry ?? "unknown"} is outside where Parentkeeping currently sells`,
     });
   }
   if (!order.stripePaymentIntentId) return;

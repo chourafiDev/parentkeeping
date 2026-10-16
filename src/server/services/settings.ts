@@ -12,7 +12,7 @@ const orNull = (v: string) => (v === "" ? null : v);
 export async function saveSettings(input: SettingsInput) {
   const values: StoreSettings = {
     pricing: { foundingEndsAt: input.pricing.foundingEndsOn ? endOfStoreDay(input.pricing.foundingEndsOn).toISOString() : null },
-    checkout: { bumpEnabled: input.checkout.bumpEnabled },
+    checkout: { bumpEnabled: input.checkout.bumpEnabled, worldwideEnabled: input.checkout.worldwideEnabled },
     contact: {
       supportEmail: orNull(input.contact.supportEmail.toLowerCase()),
       privacyEmail: orNull(input.contact.privacyEmail.toLowerCase()),

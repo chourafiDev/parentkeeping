@@ -35,7 +35,10 @@ async function main() {
         product: productId!,
         currency: "usd",
         unit_amount: amount,
-        tax_behavior: "exclusive", // sales tax is added on top at checkout
+        // Worldwide, tax-inclusive pricing: the buyer always pays exactly this
+    // amount, and tax comes out of it instead of being added on top (EU/UK/AU
+    // consumer rules expect the displayed price to include tax).
+    tax_behavior: "inclusive",
         nickname,
         metadata: { slug: p.slug },
       });

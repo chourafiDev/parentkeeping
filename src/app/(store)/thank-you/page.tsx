@@ -74,8 +74,8 @@ export default async function ThankYouPage({ searchParams }: PageProps<"/thank-y
 				</h1>
 				<p className="text-muted-foreground mt-2">
 					{order.refundedAt
-						? "Our paid products are only available to US customers for now, so we've refunded the full amount. We sent you an email with the details and a free list that works anywhere."
-						: "Our paid products are only available to US customers for now, so we're refunding the full amount. You'll get an email once it's done, with a free list that works anywhere."}
+						? "We can't sell our paid products to your billing country right now, so we've refunded the full amount. We sent you an email with the details and a free list that works anywhere."
+						: "We can't sell our paid products to your billing country right now, so we're refunding the full amount. You'll get an email once it's done, with a free list that works anywhere."}
 				</p>
 						</div>
 		</StoreCard>

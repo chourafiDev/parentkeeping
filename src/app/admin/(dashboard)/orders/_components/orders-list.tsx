@@ -22,7 +22,7 @@ const TAB_LABELS: Record<(typeof ORDER_TABS)[number], string> = {
 	all: "All",
 	paid: "Paid",
 	refunded: "Refunded",
-	flagged_non_us: "Non-US",
+	flagged_non_us: "Blocked",
 };
 
 /** Orders table: status tabs, search by email/name/#number, 25 per page. */

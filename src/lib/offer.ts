@@ -124,12 +124,24 @@ export const OFFER_FAQ: FaqItem[] = [
     q: "When do the pre-sale parts arrive?",
     a: "By the date shown on the page. We'll email you the moment each part is ready. If we miss the date, ask for a full refund.",
   },
-  {
-    q: "I'm not in the US. Can I buy it?",
-    a: "Not yet. Paid products are for US customers for now.",
-    link: { label: "Join the list for the UK edition.", href: "/pages/free-medication-list" },
-  },
 ];
+
+/**
+ * "I'm not in the US. Can I buy it?" — the one FAQ answer that depends on
+ * Settings → Checkout → Sell worldwide, so it's computed per request rather
+ * than baked into OFFER_FAQ. Appended wherever OFFER_FAQ is shown.
+ */
+export const worldwideFaqItem = (worldwideEnabled: boolean): FaqItem =>
+  worldwideEnabled
+    ? {
+        q: "I'm not in the US. Can I buy it?",
+        a: "Yes. The System sells worldwide, in your own currency, with sales tax or VAT already included in the price. A handful of countries aren't supported yet by our payment processor; checkout will tell you if yours is one of them.",
+      }
+    : {
+        q: "I'm not in the US. Can I buy it?",
+        a: "Not yet, but we're working on it. Join the free Medication List and we'll let you know the moment it opens in your country.",
+        link: { label: "Get the free Medication List", href: "/pages/free-medication-list" },
+      };
 
 /** Strips at the end of the home page. */
 export const DOWNSELL_STRIP = {

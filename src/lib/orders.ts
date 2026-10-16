@@ -5,7 +5,7 @@ export type OrderStatus = "paid" | "refunded" | "flagged_non_us";
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   paid: "Paid",
   refunded: "Refunded",
-  flagged_non_us: "Non-US",
+  flagged_non_us: "Blocked",
 };
 
 export const ORDER_STATUS_TONES: Record<OrderStatus, string> = {

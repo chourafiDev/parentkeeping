@@ -1,3 +1,4 @@
+import { buyGateCopy } from "@/lib/checkout-region";
 import { BUY_LABELS } from "@/lib/catalog";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { formatStorePrice } from "@/lib/money";
@@ -6,23 +7,26 @@ import type { HomeProduct } from "./types";
 
 /**
  * Buy button = plain form POST to Stripe Checkout (no JavaScript needed).
- * Non-US visitors get the UK-edition list link instead; unsellable → disabled.
+ * A visitor Stripe can't check out yet (almost nobody once worldwide
+ * selling is on) gets the free list instead; unsellable → disabled.
  */
 export function BuyForm({
 	product,
-	usVisitor,
+	canBuy,
+	worldwideEnabled,
 	className,
 	label,
 }: {
 	product: HomeProduct;
-	usVisitor: boolean;
+	canBuy: boolean;
+	worldwideEnabled: boolean;
 	className: string;
 	label?: string;
 }) {
-	if (!usVisitor) {
+	if (!canBuy) {
 		return (
 			<a href={FREE_LIST_PATH} className={className}>
-				Join the list for the UK edition
+				{buyGateCopy(worldwideEnabled).cta}
 			</a>
 		);
 	}

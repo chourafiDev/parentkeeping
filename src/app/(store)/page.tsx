@@ -4,18 +4,17 @@ import { cookies } from "next/headers";
 import { BUNDLE_SLUG, PRODUCT_PATHS, VARIANT_COOKIE } from "@/lib/catalog";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { MARQUEE } from "@/lib/home";
-import { PREVIEWS_BY_PRODUCT } from "@/lib/page-previews";
 import { HOME_SEO, OFFER_SUBHEAD } from "@/lib/offer";
+import { PREVIEWS_BY_PRODUCT } from "@/lib/page-previews";
 import { siteUrl } from "@/lib/site-url";
+import { MIN_REVIEWS_FOR_SUMMARY } from "@/lib/social-proof";
+import { canCheckout } from "@/lib/checkout-region";
 import { db } from "@/server/db";
 import { files, productFiles, products } from "@/server/db/schema";
-import { getFoundingPrice, getSettings } from "@/server/queries/settings";
 import { getProductReviews } from "@/server/queries/reviews";
+import { getFoundingPrice, getSettings } from "@/server/queries/settings";
 import { getSocialProof } from "@/server/queries/social-proof";
 import { getPackageExtras } from "@/server/queries/storefront";
-import { MIN_REVIEWS_FOR_SUMMARY } from "@/lib/social-proof";
-import { ProductReviews } from "./_components/product/reviews";
-import { BlogSection } from "./_components/blog/blog-section";
 import { Bundle } from "./_components/home/bundle";
 import { ClosingBanner } from "./_components/home/closing-banner";
 import { ClosingStrips } from "./_components/home/closing-strips";
@@ -31,6 +30,7 @@ import type { HomeData, HomeProduct } from "./_components/home/types";
 import { UsualWay } from "./_components/home/usual-way";
 import { PagePreviews } from "./_components/page-previews";
 import { ProblemTabs } from "./_components/problem-tabs";
+import { ProductReviews } from "./_components/product/reviews";
 import {
 	jsonLdHtml,
 	productJsonLd,
@@ -54,24 +54,25 @@ export const dynamic = "force-dynamic";
 async function loadHome(
 	searchParams: Record<string, string | string[] | undefined>,
 ): Promise<HomeData> {
-	const [rows, founding, country, jar, { contact }, extras, proof] = await Promise.all([
-		db
-			.select()
-			.from(products)
-			.where(
-				inArray(products.slug, [
-					BUNDLE_SLUG,
-					"medical-binder",
-					"caregiver-agreement",
-				]),
-			),
-		getFoundingPrice(),
-		visitorCountry(searchParams.country),
-		cookies(),
-		getSettings("contact"),
-		getPackageExtras(),
-		getSocialProof(),
-	]);
+	const [rows, founding, country, jar, { contact, checkout }, extras, proof] =
+		await Promise.all([
+			db
+				.select()
+				.from(products)
+				.where(
+					inArray(products.slug, [
+						BUNDLE_SLUG,
+						"medical-binder",
+						"caregiver-agreement",
+					]),
+				),
+			getFoundingPrice(),
+			visitorCountry(searchParams.country),
+			cookies(),
+			getSettings("contact", "checkout"),
+			getPackageExtras(),
+			getSocialProof(),
+		]);
 	const presale = await db
 		.select({
 			productId: productFiles.productId,
@@ -114,7 +115,8 @@ async function loadHome(
 	return {
 		variant:
 			jar.get(VARIANT_COOKIE)?.value === "fairness" ? "fairness" : "one_place",
-		usVisitor: !country || country === "US",
+		canBuy: canCheckout(country, checkout.worldwideEnabled),
+		worldwideEnabled: checkout.worldwideEnabled,
 		system,
 		binder: toHome("medical-binder"),
 		agreement: toHome("caregiver-agreement"),
@@ -134,7 +136,10 @@ async function loadHome(
 }
 
 export default async function HomePage({ searchParams }: PageProps<"/">) {
-	const [data, systemReviews] = await Promise.all([loadHome(await searchParams), getProductReviews(BUNDLE_SLUG, 12)]);
+	const [data, systemReviews] = await Promise.all([
+		loadHome(await searchParams),
+		getProductReviews(BUNDLE_SLUG, 12),
+	]);
 	const showReviews = systemReviews.count >= MIN_REVIEWS_FOR_SUMMARY;
 	const cards: ShopCard[] = [
 		{
@@ -180,7 +185,10 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 		price: data.system.price,
 		url: `${siteUrl()}/`,
 		inStock: data.system.sellable,
-		rating: showReviews && systemReviews.average !== null ? { average: systemReviews.average, count: systemReviews.count } : null,
+		rating:
+			showReviews && systemReviews.average !== null
+				? { average: systemReviews.average, count: systemReviews.count }
+				: null,
 	});
 
 	return (
@@ -192,7 +200,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			<HomeHero data={data} />
 			<Marquee messages={MARQUEE} />
 			<PartsHighlights data={data} />
-			<ShopGrid cards={cards} usVisitor={data.usVisitor} />
+			<ShopGrid cards={cards} canBuy={data.canBuy} worldwideEnabled={data.worldwideEnabled} />
 			<MomentBanner />
 			<ProblemTabs />
 			<HowItWorks />
@@ -200,7 +208,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			<Bundle data={data} />
 			{/* Real reviews take over from "Sound familiar?" once there are enough. */}
 			{showReviews ? (
-				<ProductReviews reviews={systemReviews.reviews} count={systemReviews.count} average={systemReviews.average} />
+				<ProductReviews
+					reviews={systemReviews.reviews}
+					count={systemReviews.count}
+					average={systemReviews.average}
+				/>
 			) : (
 				<SoundFamiliar />
 			)}
@@ -208,7 +220,6 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			<Faq data={data} />
 			<ClosingStrips data={data} />
 			<ClosingBanner data={data} />
-			<BlogSection />
 		</main>
 	);
 }

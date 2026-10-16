@@ -149,16 +149,16 @@ export function nonUsRefundEmail(p: { orderNumber: number; amount: string; freeL
     subject: `Your Parentkeeping order #${p.orderNumber} has been refunded`,
     html: layout({
       footer: p.footer,
-      preheader: `We've refunded ${p.amount}: our paid products are US-only for now.`,
+      preheader: `We've refunded ${p.amount}: we can't sell to your billing country right now.`,
       body: `<h1 style="font-size:20px;margin:20px 0 8px">We've refunded your order</h1>
-<p style="font-size:15px;line-height:1.6;margin:0 0 12px">Thank you for your order #${p.orderNumber}. Our paid products are only available to US customers for now (US-specific forms, laws and sales tax), so we've refunded the full ${escape(p.amount)} to your card. It usually shows within 5 to 10 business days.</p>
+<p style="font-size:15px;line-height:1.6;margin:0 0 12px">Thank you for your order #${p.orderNumber}. We can't sell our paid products to your billing country right now, so we've refunded the full ${escape(p.amount)} to your card. It usually shows within 5 to 10 business days.</p>
 <p style="font-size:15px;line-height:1.6;margin:0">Our free Medication List &amp; Daily Medication Chart works anywhere:</p>
 ${button(p.freeListUrl, "Get the free list")}
 <p style="font-size:14px;line-height:1.6;margin:0">We're sorry for the trouble.${p.footer.supportEmail ? ` Questions? Write to ${escape(p.footer.supportEmail)}.` : ""}</p>`,
     }),
     text: `We've refunded your order #${p.orderNumber}
 
-Our paid products are only available to US customers for now, so we've refunded the full ${p.amount} to your card (5 to 10 business days).
+We can't sell our paid products to your billing country right now, so we've refunded the full ${p.amount} to your card (5 to 10 business days).
 
 Our free Medication List works anywhere: ${p.freeListUrl}
 ${p.footer.supportEmail ? `\nQuestions? Write to ${p.footer.supportEmail}.` : ""}

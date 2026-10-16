@@ -35,7 +35,6 @@ export function productJsonLd(p: {
 			priceCurrency: "USD",
 			price: (p.price / 100).toFixed(2),
 			availability: p.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-			eligibleRegion: { "@type": "Country", name: "US" },
 		},
 	};
 }

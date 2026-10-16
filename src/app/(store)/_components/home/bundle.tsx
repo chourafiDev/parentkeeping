@@ -86,7 +86,7 @@ export function Bundle({ data }: { data: HomeData }) {
 						)}
 					</p>
 					{data.proof.families && <p className="text-primary -mt-1 text-[13px] font-medium">Bought by {data.proof.families} families</p>}
-					{data.usVisitor && system.sellable ? (
+					{data.canBuy && system.sellable ? (
 						<PackagePicker
 							options={packageOptions({
 								system,
@@ -98,9 +98,9 @@ export function Bundle({ data }: { data: HomeData }) {
 							buttonClassName={`${pillDark} w-full`}
 						/>
 					) : (
-						<BuyForm product={system} usVisitor={data.usVisitor} className={`${pillDark} w-full`} />
+						<BuyForm product={system} canBuy={data.canBuy} worldwideEnabled={data.worldwideEnabled} className={`${pillDark} w-full`} />
 					)}
-					{data.usVisitor && system.sellable && (
+					{data.canBuy && system.sellable && (
 						<p className="text-green flex items-center gap-1.5 text-[14px] font-medium">
 							<Zap className="size-4 shrink-0 fill-current" />
 							{delivery ? "Pre-order: each file downloads the moment it's ready" : "Instant download, ready the moment you pay"}

@@ -21,7 +21,7 @@ export function ClosingBanner({ data }: { data: HomeData }) {
 					<h2 className="text-[32px] leading-[1.15] font-semibold tracking-[-0.034em] md:text-[40px]">{GUARANTEE_TITLE}</h2>
 					<p className="text-[16px] leading-relaxed text-white/85">{guaranteeText(data.supportEmail)}</p>
 					<div className="mt-3">
-						<BuyForm product={data.system} usVisitor={data.usVisitor} className={pillLight} />
+						<BuyForm product={data.system} canBuy={data.canBuy} worldwideEnabled={data.worldwideEnabled} className={pillLight} />
 					</div>
 					<div className="grid gap-1 text-xs text-white/70">
 						<p>{PRODUCT_DISCLAIMER_SHORT}</p>

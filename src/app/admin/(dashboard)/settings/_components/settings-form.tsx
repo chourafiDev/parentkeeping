@@ -176,7 +176,36 @@ export function SettingsForm({
 					/>
 				</FormCard>
 
-				<FormCard title="Checkout">
+				<FormCard title="Checkout" contentClassName="grid gap-5">
+					<Controller
+						control={control}
+						name="checkout.worldwideEnabled"
+						render={({ field }) => (
+							<div className="grid gap-3">
+								<label className="flex items-start justify-between gap-4">
+									<span className="grid gap-0.5">
+										<span className="text-sm font-medium">Sell worldwide</span>
+										<span className="text-muted-foreground text-xs">
+											Opens paid checkout to every country, with Stripe Managed Payments as the merchant of record
+											for sales tax, VAT and GST. Off = US customers only, as now.
+										</span>
+									</span>
+									<Switch checked={field.value} onCheckedChange={field.onChange} aria-label="Sell worldwide" />
+								</label>
+								<div className="bg-muted/70 grid gap-1 rounded-lg p-3 text-xs">
+									<span>
+										Needs Stripe Managed Payments approved for this account first (Stripe Dashboard → Payments →
+										Managed Payments). Turning this on before approval will fail orders from outside the US.
+									</span>
+									<span>
+										Also needs: every product&apos;s Stripe prices created tax-inclusive (clear a product&apos;s price
+										ids and run <code className="rounded bg-black/5 px-1">pnpm stripe:sync</code> again), and the
+										statement descriptor set to PARENTKEEPING in the Stripe Dashboard.
+									</span>
+								</div>
+							</div>
+						)}
+					/>
 					<Controller
 						control={control}
 						name="checkout.bumpEnabled"

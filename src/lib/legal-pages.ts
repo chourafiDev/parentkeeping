@@ -1,9 +1,9 @@
 // Terms of Service, Privacy Policy and Refund Policy. Written in plain
-// language and grounded in what this store actually does (Stripe for
-// payment, Resend for email, Cloudflare R2 for files, the 14-day guarantee,
-// US-only checkout, the no-cookie analytics, the quiz's browser-only
-// scoring). Have a lawyer review before launch — this is a solid first
-// draft, not legal advice.
+// language and grounded in what this store actually does (Stripe Checkout
+// with Stripe Managed Payments once Settings → Checkout → Sell worldwide is
+// on, Resend for email, Cloudflare R2 for files, the 14-day guarantee, the
+// no-cookie analytics, the quiz's browser-only scoring). Have a lawyer
+// review before launch — this is a solid first draft, not legal advice.
 //
 // `[support email]` / `[postal address]` are filled in at render time from
 // Settings → Business details, so these pages always match what's live.
@@ -20,7 +20,7 @@ import {
 } from "./legal";
 import type { CopySection } from "./product-copy";
 
-export const LAST_UPDATED = "October 13, 2026";
+export const LAST_UPDATED = "October 16, 2026";
 
 /** Fills in "[support email]" etc. with the real values from Settings → Business details. */
 export function fillContact(sections: CopySection[], contact: { supportEmail: string | null; privacyEmail: string | null }) {
@@ -56,8 +56,8 @@ export const TERMS_SECTIONS: CopySection[] = [
   {
     title: "Who can buy",
     paragraphs: [
-      "Paid products are available to customers billing from the United States only, for now. We check this at checkout and again when your payment is confirmed. If an order is placed from outside the US, we'll refund it automatically and email you to explain.",
       "Our free downloads (the Medication List, the Caregiver Checklists) and the Caregiver Burnout Quiz are available to anyone, anywhere.",
+      "Paid products sell worldwide, except in a short list of countries our payment processor can't serve. If you're one of the rare visitors we can't sell to yet, checkout will tell you before you pay, and we'll never take payment from a country we can't deliver to.",
     ],
   },
   {
@@ -71,10 +71,16 @@ export const TERMS_SECTIONS: CopySection[] = [
     ],
   },
   {
+    title: "Templates",
+    paragraphs: [
+      "The Family Caregiver Agreement and any other templates are starting points only. The Agreement is written for families in the United States; laws vary by state and country. Outside the US, use it only as a conversation guide. You are responsible for having templates reviewed by a qualified attorney where you live before use.",
+    ],
+  },
+  {
     title: "Instant delivery, and your right to cancel",
     paragraphs: [
-      "Because these are digital files, you get access right after payment, not after a waiting period. When you check out, you specifically ask for immediate access and agree that, once that access is granted, you give up any legal right to cancel or get a refund under a standard cooling-off period.",
-      "That doesn't leave you unprotected, though: our own 14-day guarantee (below) still applies, on top of and separate from any legal cancellation right you're agreeing to waive.",
+      "Because these are digital files, you get access right after payment, not after a waiting period. When you check out, you specifically ask for immediate access and agree that, once that access is granted, you give up any legal right to cancel under a standard cooling-off period — including the EU and UK's statutory 14-day right to withdraw, which otherwise applies to digital downloads bought from the EU or UK.",
+      "That doesn't leave you unprotected, though: our own 14-day guarantee (below) still applies, on top of and separate from any legal cancellation right you're agreeing to waive. And this doesn't affect any other right you have under the consumer-protection law of the country you live in, which can't be signed away.",
     ],
   },
   {
@@ -96,6 +102,12 @@ export const TERMS_SECTIONS: CopySection[] = [
     ],
   },
   {
+    title: "How your order is sold",
+    paragraphs: [
+      "Purchases are sold through Link, operated by Stripe, which acts as the seller of record and handles payment, tax and your receipt. Link's own terms apply to the payment itself. Parentkeeping provides the files and this license, and stays responsible for the products and their support — email us, not Stripe, with a question about a file.",
+    ],
+  },
+  {
     title: "Download links",
     paragraphs: [
       "Your order confirmation email includes a link to your downloads. That link stays valid for one year, and each file can be downloaded a set number of times (shown on the product page). If a link stops working or you need it reset, email us and we'll sort it out.",
@@ -110,12 +122,14 @@ export const TERMS_SECTIONS: CopySection[] = [
   {
     title: "Our liability",
     paragraphs: [
-      "Our products and this site are provided as they are, without warranties beyond the 14-day guarantee above. To the extent allowed by law, Parentkeeping isn't liable for indirect, incidental or consequential damages arising from your use of our products or this site, and our total liability for any claim is limited to the amount you paid us.",
+      "Our products and this site are provided as they are, without warranties beyond the 14-day guarantee above. To the extent allowed by law, Parentkeeping isn't liable for indirect, incidental or consequential damages arising from your use of our products or this site — including decisions made about a person's care, health, money or legal affairs — and our total liability for any claim is limited to the amount you paid us. This doesn't limit any right you have that can't be limited by law.",
     ],
   },
   {
     title: "Governing law",
-    paragraphs: ["These terms are governed by the laws of the State of Wyoming, without regard to its conflict-of-law rules."],
+    paragraphs: [
+      "These terms are governed by the laws of the State of Wyoming, without regard to its conflict-of-law rules, except where the consumer law of your home country gives you protections that can't be waived — those protections still apply, whatever these terms say.",
+    ],
   },
   {
     title: "Questions",
@@ -137,10 +151,13 @@ export const PRIVACY_SECTIONS: CopySection[] = [
   },
   {
     title: "What we collect, and why",
+    paragraphs: [
+      "If you're in the EU or UK, our legal basis for this is your consent (for the newsletter and any non-essential cookies) and performing our contract with you (for orders).",
+    ],
     bullets: [
       {
         lead: "When you buy something:",
-        text: "your email, your name if you give it, your billing country, and what you bought. Payment itself is handled entirely by Stripe — we never see or store your full card number.",
+        text: "your email, your name if you give it, your billing country, and what you bought. Purchases are sold through Link, operated by Stripe, which acts as the seller of record; Stripe handles your payment details under its own privacy policy, and we never see or store your full card number.",
       },
       {
         lead: "When you sign up for a free download or the quiz's email option:",
@@ -167,7 +184,13 @@ export const PRIVACY_SECTIONS: CopySection[] = [
   {
     title: "The Caregiver Burnout Quiz",
     paragraphs: [
-      "Your answers are scored entirely in your own browser and are never sent to us. If you choose to email yourself a copy of your result, only your email address is sent to us; your answers themselves are not.",
+      "Your answers are scored entirely in your own browser and are never sent to us. If you choose to email yourself a copy of your result, only your email address is sent to us; your answers themselves are not. We don't tag or treat you differently based on your result, and we never share quiz activity with advertising platforms.",
+    ],
+  },
+  {
+    title: "Consumer health data (Washington and other US states)",
+    paragraphs: [
+      "We do not sell health data. If you think we hold any health-related information about you, email [privacy email or support email] to see it, have it deleted, or withdraw consent.",
     ],
   },
   {
@@ -193,6 +216,12 @@ export const PRIVACY_SECTIONS: CopySection[] = [
     ],
   },
   {
+    title: "International transfers",
+    paragraphs: [
+      "We are based in the United States and use service providers there and elsewhere. Where EU or UK law applies to your information, we rely on our providers' standard contractual clauses or an equivalent safeguard.",
+    ],
+  },
+  {
     title: "How long we keep information",
     paragraphs: [
       "We keep order records as long as needed for accounting, tax and customer support. We keep your email on our subscriber list until you unsubscribe, or ask us to delete it sooner.",
@@ -201,7 +230,7 @@ export const PRIVACY_SECTIONS: CopySection[] = [
   {
     title: "Your choices",
     paragraphs: [
-      "You can ask us to see, correct or delete the personal information we hold about you by emailing [privacy email or support email]. We'll respond within a reasonable time.",
+      "Wherever you live, you can ask to see, correct or delete the personal information we hold about you, or stop marketing emails, by emailing [privacy email or support email]. In the EU and UK you also have the right to object, to data portability, and to complain to your local data protection authority. We reply within 30 days.",
     ],
   },
   {
@@ -223,15 +252,25 @@ export const REFUND_SEO = {
 
 export const REFUND_SECTIONS: CopySection[] = [
   {
-    title: "The guarantee",
+    title: "Our 14-day guarantee",
     paragraphs: [
-      "Use what you bought for 14 days from your purchase date. If it doesn't help your family, email us and we'll refund you in full. No forms, no hard feelings, and no need to explain why.",
+      "Parentkeeping products are digital downloads, so you get them instantly. If a product doesn't help your family, email [support email] within 14 days of purchase and we'll refund you. No forms, no hard feelings, and no need to explain why.",
     ],
   },
   {
     title: "How to ask for a refund",
     paragraphs: [
-      "Email [support email] within 14 days of your order, with your order number (it's in your confirmation email, e.g. #1001). We'll refund the full amount to your original payment method. Stripe usually shows the refund within 5–10 business days, depending on your bank.",
+      "Email [support email] with your order number (it's in your confirmation email, e.g. #1001). We'll refund the full amount to your original payment method. Stripe usually shows the refund within 5–10 business days, depending on your bank.",
+    ],
+  },
+  {
+    title: "Problems with a file",
+    paragraphs: ["If a file won't open, is missing pages or has an error, tell us and we'll fix it or send a new copy right away."],
+  },
+  {
+    title: "Who processes your order",
+    paragraphs: [
+      "Orders are sold through Link, Stripe's checkout, which acts as the seller of record and sends your receipt. You can ask us or Link support for a refund; either way, our guarantee applies.",
     ],
   },
   {
@@ -241,10 +280,14 @@ export const REFUND_SECTIONS: CopySection[] = [
     ],
   },
   {
-    title: "Orders from outside the US",
+    title: "Your legal rights",
     paragraphs: [
-      "Paid products are for US customers only for now. If an order is placed from outside the US, it's automatically refunded in full, and you'll get an email letting you know.",
+      "If you're in the EU or UK, you agreed at checkout to immediate download, which ends your statutory 14-day right to cancel once the download starts. This doesn't affect our guarantee above, or any other right you have under the law where you live.",
     ],
+  },
+  {
+    title: "Bundles",
+    paragraphs: ["Bundles are refunded as a whole."],
   },
   {
     title: "After a refund",
@@ -259,7 +302,10 @@ export const DISCLAIMER_SEO = {
 
 /** Every disclaimer line already shown on the site, in one place — word for word, nothing rewritten. */
 export const DISCLAIMER_SECTIONS: CopySection[] = [
-  { title: "Every Parentkeeping product", paragraphs: [PRODUCT_DISCLAIMER_SHORT, GENERAL_INFO_LINE] },
+  {
+    title: "Every Parentkeeping product",
+    paragraphs: [PRODUCT_DISCLAIMER_SHORT, GENERAL_INFO_LINE, "In an emergency, call 911 or your local emergency number."],
+  },
   { title: "Medical Binder for an Elderly Parent", paragraphs: [BINDER_LEGAL_LINE] },
   { title: "Shared Family Care Sheet", paragraphs: [SHEET_LEGAL_LINE] },
   { title: "Family Caregiver Agreement Template", paragraphs: [AGREEMENT_LEGAL_LINE] },

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { buyGateCopy } from "@/lib/checkout-region";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { formatStorePrice } from "@/lib/money";
 import { cn } from "@/lib/utils";
@@ -28,7 +29,7 @@ const action =
 	"inline-flex h-11 w-full items-center justify-center rounded-full border border-foreground px-4 text-[15px] font-semibold tracking-[-0.024em] text-foreground transition-colors hover:bg-foreground hover:text-white";
 
 /** Glozin "Best Selling": tabs, light-grey media, sale / pre-order badges, price. */
-export function ShopGrid({ cards, usVisitor }: { cards: ShopCard[]; usVisitor: boolean }) {
+export function ShopGrid({ cards, canBuy, worldwideEnabled }: { cards: ShopCard[]; canBuy: boolean; worldwideEnabled: boolean }) {
 	const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("all");
 	const shown = cards.filter((c) => tab === "all" || c.tab === tab);
 
@@ -82,9 +83,9 @@ export function ShopGrid({ cards, usVisitor }: { cards: ShopCard[]; usVisitor: b
 								)}
 							</p>
 							{p ? (
-								!usVisitor ? (
+								!canBuy ? (
 									<a href={FREE_LIST_PATH} className={action}>
-										US only for now
+										{buyGateCopy(worldwideEnabled).cta}
 									</a>
 								) : p.sellable ? (
 									<form action="/api/checkout" method="post">
@@ -108,7 +109,8 @@ export function ShopGrid({ cards, usVisitor }: { cards: ShopCard[]; usVisitor: b
 				})}
 			</ul>
 			<p className="text-body mt-8 text-center text-xs">
-				Paid products available to US customers · An organizing tool, not medical or legal advice · 14-day “if it doesn&apos;t help” guarantee
+				{!worldwideEnabled && "Paid products available to US customers · "}An organizing tool, not medical or legal advice · 14-day “if it
+				doesn&apos;t help” guarantee
 			</p>
 		</section>
 	);

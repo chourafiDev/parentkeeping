@@ -16,7 +16,10 @@ export type HomeProduct = {
 
 export type HomeData = {
 	variant: "fairness" | "one_place";
-	usVisitor: boolean;
+	/** Can this visitor's country check out right now? */
+	canBuy: boolean;
+	/** Settings → Checkout → Sell worldwide. */
+	worldwideEnabled: boolean;
 	system: HomeProduct;
 	binder: HomeProduct | null;
 	agreement: HomeProduct | null;
