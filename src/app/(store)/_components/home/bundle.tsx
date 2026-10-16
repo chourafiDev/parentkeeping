@@ -1,8 +1,12 @@
-import { Check, ShieldCheck } from "lucide-react";
+import { Check, ShieldCheck, Zap } from "lucide-react";
+import Image from "next/image";
+import { BUY_LABELS } from "@/lib/catalog";
 import { AGREEMENT_LEGAL_LINE, BINDER_LEGAL_LINE, BUY_GUARANTEE_LINE, PRODUCT_DISCLAIMER_SHORT, SHEET_LEGAL_LINE } from "@/lib/legal";
 import { formatStorePrice } from "@/lib/money";
 import { OFFER_PARTS, PRICE_ANCHOR_TITLE, presaleNote } from "@/lib/offer";
 import { formatStoreDay } from "@/lib/store-time";
+import { cn } from "@/lib/utils";
+import { GuaranteeCard } from "../product/buy-details";
 import { container, pillDark, section, sectionSubtitle, sectionTitle } from "../ui";
 import { BuyForm } from "./buy-form";
 import { DocMockup, type DocKind } from "./doc-mockup";
@@ -47,28 +51,69 @@ export function Bundle({ data }: { data: HomeData }) {
 				))}
 			</ul>
 
-			{/* Glozin's "Bundle Contents" bar */}
-			<div className="mt-10 grid items-center gap-5 rounded-[10px] bg-[#f5f5f5] p-6 md:grid-cols-[1fr_auto] md:p-8">
-				<div className="grid gap-1">
-					<p className="text-foreground text-[20px] font-semibold tracking-[-0.02em]">Family Care System · all four parts</p>
-					<p className="text-body text-[15px]">
-						Binder {binder ? formatStorePrice(binder.price) : ""} + Agreement {agreement ? formatStorePrice(agreement.price) : ""} ={" "}
-						{formatStorePrice(separately)} separately · the Sheet and Meeting Kit come only with the System.
+			{/* Buy box: everything needed to decide, right where the price is. */}
+			<div className="mt-10 grid gap-8 rounded-[10px] bg-[#f5f5f5] p-6 md:grid-cols-2 md:p-10 lg:gap-[60px]">
+				<div className="grid content-start gap-4">
+					<p className="text-foreground text-[24px] leading-tight font-semibold tracking-[-0.03em]">Family Care System · all four parts</p>
+					<ul className="grid gap-2.5">
+						{OFFER_PARTS.map((part) => (
+							<li key={part.name} className="text-foreground flex items-start gap-3 text-[15px]">
+								<Check className="text-primary mt-0.5 size-4 shrink-0" strokeWidth={2.25} />
+								<span>
+									<span className="font-medium">{part.name}</span>
+									<span className="text-body"> · {part.format}</span>
+								</span>
+							</li>
+						))}
+					</ul>
+					<p className="text-body text-[14px]">
+						{binder && agreement
+							? `Binder ${formatStorePrice(binder.price)} + Agreement ${formatStorePrice(agreement.price)} = ${formatStorePrice(separately)} separately. `
+							: ""}
+						The Sheet and Meeting Kit come only with the System. One purchase covers relatives caring for the same parent.
 					</p>
 				</div>
-				<div className="grid justify-items-start gap-3 md:justify-items-end">
-					<p className="flex items-baseline gap-2 tabular-nums">
-						<span className="text-foreground text-[30px] font-semibold tracking-tight">{formatStorePrice(system.price)}</span>
+
+				<div className="grid content-start gap-3">
+					<p className="flex items-baseline gap-2.5 tabular-nums">
+						<span className={cn("text-primary text-[34px] font-bold tracking-tight", system.compareAt && "text-[#dc3545]")}>
+							{formatStorePrice(system.price)}
+						</span>
 						{system.compareAt && <span className="text-body text-lg line-through">{formatStorePrice(system.compareAt)}</span>}
+						{data.foundingEndsAt && (
+							<span className="text-foreground text-[14px] font-medium">founding price until {formatStoreDay(data.foundingEndsAt)}</span>
+						)}
 					</p>
-					<BuyForm product={system} usVisitor={data.usVisitor} className={pillDark} />
-					<div className="text-body grid gap-1 text-xs md:text-right">
+					<BuyForm
+						product={system}
+						usVisitor={data.usVisitor}
+						className={`${pillDark} w-full`}
+						label={`${BUY_LABELS[system.slug] ?? "Buy now"}${system.presale ? " · Pre-order" : ""} · ${formatStorePrice(system.price)}`}
+					/>
+					{data.usVisitor && system.sellable && (
+						<p className="text-green flex items-center gap-1.5 text-[14px] font-medium">
+							<Zap className="size-4 shrink-0 fill-current" />
+							{delivery ? "Pre-order: each file downloads the moment it's ready" : "Instant download, ready the moment you pay"}
+						</p>
+					)}
+					<div className="text-body grid gap-1 text-xs">
 						<p>{PRODUCT_DISCLAIMER_SHORT}</p>
-						<p className="flex items-center gap-1.5 md:justify-end">
-							<ShieldCheck className="text-primary size-3.5" />
+						<p className="flex items-center gap-1.5">
+							<ShieldCheck className="text-primary size-3.5 shrink-0" />
 							{BUY_GUARANTEE_LINE}
 						</p>
 					</div>
+					<div className="bg-background mt-2 rounded-[10px]">
+						<GuaranteeCard supportEmail={data.supportEmail} />
+					</div>
+					<ul className="flex flex-wrap items-center gap-1.5" aria-label="Accepted cards">
+						{["visa", "mastercard", "amex", "discover", "paypal"].map((card) => (
+							<li key={card} className="rounded-[4px] border bg-white p-0.5">
+								<Image src={`/images/cards/${card}.png`} alt={card} width={35} height={20} />
+							</li>
+						))}
+						<li className="text-body ms-1 text-xs">Secure payment by Stripe</li>
+					</ul>
 				</div>
 			</div>
 

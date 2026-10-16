@@ -4,6 +4,7 @@ import { AnalyticsTracker } from "./_components/analytics-tracker";
 import { StoreGoogleAnalytics } from "./_components/google-analytics";
 import { StoreFooter } from "./_components/store-footer";
 import { StoreHeader } from "./_components/store-header";
+import { TrustBar } from "./_components/trust-bar";
 
 /** Every public store page: header with the spec nav, footer with the legal links. */
 export default async function StoreLayout({ children }: LayoutProps<"/">) {
@@ -14,6 +15,7 @@ export default async function StoreLayout({ children }: LayoutProps<"/">) {
 		<>
 			<StoreHeader />
 			<div className="flex flex-1 flex-col">{children}</div>
+			<TrustBar />
 			<StoreFooter />
 			<AnalyticsTracker />
 			{gaId && <StoreGoogleAnalytics measurementId={gaId} euOrUkVisitor={!!country && OPT_IN_COUNTRIES.has(country)} />}

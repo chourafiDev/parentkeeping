@@ -1,6 +1,8 @@
 import {
 	ArrowRight,
+	Check,
 	Download,
+	Zap,
 	FileText,
 	Printer,
 	Scale,
@@ -27,6 +29,7 @@ import {
 	OFFER_PARTS,
 	ONE_PRICE_BADGE,
 	PRICE_ANCHOR_TITLE,
+	presaleNote,
 } from "@/lib/offer";
 import {
 	type FactIcon,
@@ -45,6 +48,12 @@ import {
 import { CopyBlock } from "../../_components/copy-block";
 import { type DocKind, DocMockup } from "../../_components/home/doc-mockup";
 import { AskQuestionDialog } from "../../_components/product/ask-question-dialog";
+import {
+	type BuyDetail,
+	BuyDetails,
+	DeliveryAndRefunds,
+	GuaranteeCard,
+} from "../../_components/product/buy-details";
 import { ProductClosingBanner } from "../../_components/product/closing-banner";
 import {
 	type CompareRow,
@@ -57,6 +66,7 @@ import { ProductHighlights } from "../../_components/product/highlights";
 import { ProductReviews } from "../../_components/product/reviews";
 import { ShareDialog } from "../../_components/product/share-dialog";
 import { ProductSteps } from "../../_components/product/steps";
+import { StickyBuyBar } from "../../_components/product/sticky-buy-bar";
 import {
 	jsonLdHtml,
 	productJsonLd,
@@ -190,7 +200,7 @@ export default async function ProductPage({
 				<input type="hidden" name="slug" value={product.slug} />
 				<button type="submit" className={className}>
 					{BUY_LABELS[product.slug] ?? "Buy now"}
-					{presale ? " · Pre-order" : ""}
+					{presale ? " · Pre-order" : ""} · {formatStorePrice(data.price)}
 				</button>
 			</form>
 		) : (
@@ -224,6 +234,76 @@ export default async function ProductPage({
 				)?.availableAt ?? null)
 			: null,
 	);
+
+	// Pre-order: the date the last file arrives.
+	const lastArrival = assets
+		.map((a) => a.availableAt)
+		.filter((d): d is Date => !!d)
+		.sort((a, b) => b.getTime() - a.getTime())[0];
+	const presaleLine = !presale
+		? null
+		: isBundle && lastArrival
+			? presaleNote(formatStoreDay(lastArrival))
+			: lastArrival
+				? `Pre-order: your files arrive by ${formatStoreDay(lastArrival)}. If we miss that date, you can have a full refund.`
+				: null;
+
+	const details: BuyDetail[] = [
+		{
+			title: "What it is",
+			body: description ? (
+				<div
+					className="rich-text"
+					dangerouslySetInnerHTML={{ __html: description }}
+				/>
+			) : (
+				(copy.intro ?? [copy.subhead]).map((p) => <p key={p}>{p}</p>)
+			),
+		},
+		{
+			title: "What's inside",
+			body: (
+				<ul className="grid gap-2">
+					{copy.inside.items.map((item) => (
+						<li key={item.name} className="flex gap-2.5">
+							<Check className="text-primary mt-1 size-3.5 shrink-0" />
+							<span>
+								<span className="text-foreground font-medium">{item.name}.</span>{" "}
+								{item.text}
+							</span>
+						</li>
+					))}
+				</ul>
+			),
+		},
+		{
+			title: "How to use it",
+			body: (
+				<ol className="grid gap-2">
+					{copy.steps.items.map((step, i) => (
+						<li key={step.title} className="flex gap-2.5">
+							<span className="text-foreground font-semibold tabular-nums">
+								{i + 1}.
+							</span>
+							<span>
+								<span className="text-foreground font-medium">{step.title}.</span>{" "}
+								{step.text}
+							</span>
+						</li>
+					))}
+				</ol>
+			),
+		},
+		{
+			title: "Delivery & refunds",
+			body: (
+				<DeliveryAndRefunds
+					presaleLine={presaleLine}
+					supportEmail={contact.supportEmail}
+				/>
+			),
+		},
+	];
 
 	// Comparison rows.
 	const upgradeBy = system ? system.price - data.price : 0;
@@ -337,26 +417,11 @@ export default async function ProductPage({
 							</p>
 						</div>
 
-						{/* Hook + story (Slate's bold headline and short problem-led paragraphs) */}
-						<div className="grid gap-3">
-							<p className="text-foreground text-[18px] leading-snug font-semibold tracking-[-0.02em]">
-								{copy.subhead}
-							</p>
-							{description ? (
-								<div
-									className="rich-text text-body text-[15px] leading-[1.714]"
-									dangerouslySetInnerHTML={{ __html: description }}
-								/>
-							) : (
-								copy.intro?.map((p) => (
-									<p key={p} className="text-body text-[15px] leading-[1.714]">
-										{p}
-									</p>
-								))
-							)}
-						</div>
+						<p className="text-foreground text-[18px] leading-snug font-semibold tracking-[-0.02em]">
+							{copy.subhead}
+						</p>
 
-						<ul className="grid gap-2.5 border-t pt-5">
+						<ul className="bg-primary/[0.07] grid gap-2.5 rounded-[10px] p-5">
 							{facts.map((f) => {
 								const Icon = FACT_ICONS[f.icon];
 								return (
@@ -374,24 +439,32 @@ export default async function ProductPage({
 							})}
 						</ul>
 
-						<div className="flex flex-wrap items-center gap-5 border-y py-4">
-							{contact.supportEmail && (
-								<AskQuestionDialog productTitle={copy.h1} />
+						<div id="buy-box" className="grid gap-3">
+							{copy.aboveButton && (
+								<p className="text-body text-[13px] leading-relaxed">
+									{copy.aboveButton}
+								</p>
 							)}
-							<ShareDialog title={copy.h1} />
-						</div>
-
-						<div className="grid gap-3">
 							{checkoutError && (
 								<p className="bg-destructive/10 text-destructive rounded-[10px] p-3 text-sm">
 									{checkoutError}
 								</p>
 							)}
 							{buyButton(fullWidthDark)}
+							{usVisitor && data.sellable && (
+								<p className="text-green flex items-center gap-1.5 text-[14px] font-medium">
+									<Zap className="size-4 shrink-0 fill-current" />
+									{presale
+										? "Pre-order: each file downloads the moment it's ready"
+										: "Instant download, ready the moment you pay"}
+								</p>
+							)}
 							<div className="text-body grid gap-1 text-[13px] [&>p]:justify-start">
 								{underButton}
 							</div>
 						</div>
+
+						<GuaranteeCard supportEmail={contact.supportEmail} />
 
 						<div className="grid justify-items-center gap-3 rounded-[10px] bg-[#f5f5f5] p-5">
 							<p className="text-foreground text-[15px] font-semibold">
@@ -420,6 +493,15 @@ export default async function ProductPage({
 							<p className="text-body text-xs">
 								Secure payment by Stripe. Sales tax is calculated at checkout.
 							</p>
+						</div>
+
+						<BuyDetails items={details} />
+
+						<div className="flex flex-wrap items-center gap-5">
+							{contact.supportEmail && (
+								<AskQuestionDialog productTitle={copy.h1} />
+							)}
+							<ShareDialog title={copy.h1} />
 						</div>
 					</div>
 				</div>
@@ -547,6 +629,19 @@ export default async function ProductPage({
 						{underButton}
 					</div>
 				</ProductClosingBanner>
+			)}
+
+			{usVisitor && data.sellable && (
+				<StickyBuyBar
+					watchId="buy-box"
+					title={copy.h1}
+					price={formatStorePrice(data.price)}
+					compareAt={data.compareAt ? formatStorePrice(data.compareAt) : null}
+				>
+					{buyButton(
+						"bg-foreground hover:bg-primary flex h-11 w-full items-center justify-center rounded-full px-6 text-[14px] font-semibold text-white transition-colors",
+					)}
+				</StickyBuyBar>
 			)}
 		</main>
 	);
