@@ -4,8 +4,8 @@ import { X } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { FREE_LIST_PATH } from "@/lib/free-list";
 import { isExcludedPath } from "@/lib/analytics";
+import { FREE_LIST_PATH } from "@/lib/free-list";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "pk_signup_popup";
@@ -13,8 +13,19 @@ const DELAY_MS = 40_000;
 const QUIET_DAYS = 30;
 
 /** Pages where an interruption would be wrong: sign-up pages themselves, legal, contact, after purchase. */
-const NEVER = [FREE_LIST_PATH, "/pages/caregiver-checklists", "/pages/contact", "/pages/disclaimer", "/pages/unsubscribe", "/policies", "/thank-you", "/reviews"];
-const neverHere = (pathname: string) => isExcludedPath(pathname) || NEVER.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+const NEVER = [
+	FREE_LIST_PATH,
+	"/pages/caregiver-checklists",
+	"/pages/contact",
+	"/pages/disclaimer",
+	"/pages/unsubscribe",
+	"/policies",
+	"/thank-you",
+	"/reviews",
+];
+const neverHere = (pathname: string) =>
+	isExcludedPath(pathname) ||
+	NEVER.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
 function recentlySeen() {
 	try {
@@ -45,7 +56,9 @@ export function SignupPopup({ children }: { children: React.ReactNode }) {
 
 	useEffect(() => {
 		if (neverHere(pathname) || recentlySeen()) return;
-		const isMobile = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
+		const isMobile = window.matchMedia(
+			"(max-width: 767px), (pointer: coarse)",
+		).matches;
 		const productPage = pathname.startsWith("/products/");
 		if (isMobile && productPage) return;
 
@@ -70,7 +83,9 @@ export function SignupPopup({ children }: { children: React.ReactNode }) {
 
 	useEffect(() => {
 		if (!open) return;
-		panelRef.current?.querySelector<HTMLInputElement>("input[type=email]")?.focus({ preventScroll: true });
+		panelRef.current
+			?.querySelector<HTMLInputElement>("input[type=email]")
+			?.focus({ preventScroll: true });
 		const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
 		document.addEventListener("keydown", onKey);
 		return () => document.removeEventListener("keydown", onKey);
@@ -79,14 +94,24 @@ export function SignupPopup({ children }: { children: React.ReactNode }) {
 	const close = () => setOpen(false);
 	const body = (
 		<div className="grid gap-3">
-			<p className="text-primary text-xs font-bold tracking-[0.02em] uppercase">Free printable</p>
-			<h2 className="text-foreground text-[24px] leading-tight font-semibold tracking-[-0.034em]">The Medication List &amp; Daily Chart</h2>
+			<p className="text-primary text-xs font-bold tracking-[0.02em] uppercase">
+				Free printable
+			</p>
+			<h2 className="text-foreground text-[24px] leading-tight font-semibold tracking-[-0.034em]">
+				The Medication List &amp; Daily Chart
+			</h2>
 			<p className="text-body text-[15px] leading-[1.6]">
-				One list of your parent&apos;s medications to bring to every appointment, plus a daily chart and wallet cards. Fillable PDF, sent to your inbox.
+				One list of your parent&apos;s medications to bring to every
+				appointment, plus a daily chart and wallet cards. Fillable PDF, sent to
+				your inbox.
 			</p>
 			{/* The form stays mounted, so Turnstile (when on) renders before it opens. */}
 			<div onSubmitCapture={remember}>{children}</div>
-			<button type="button" onClick={close} className="text-body hover:text-foreground justify-self-start text-sm underline underline-offset-2">
+			<button
+				type="button"
+				onClick={close}
+				className="text-body hover:text-foreground justify-self-start text-sm underline underline-offset-2"
+			>
 				No thanks
 			</button>
 		</div>
@@ -104,7 +129,15 @@ export function SignupPopup({ children }: { children: React.ReactNode }) {
 				mobile && "pointer-events-none",
 			)}
 		>
-			{!mobile && <button type="button" aria-label="Close" tabIndex={-1} onClick={close} className="absolute inset-0 bg-black/40" />}
+			{!mobile && (
+				<button
+					type="button"
+					aria-label="Close"
+					tabIndex={-1}
+					onClick={close}
+					className="absolute inset-0 bg-black/40"
+				/>
+			)}
 			<div
 				ref={panelRef}
 				role="dialog"
@@ -118,12 +151,23 @@ export function SignupPopup({ children }: { children: React.ReactNode }) {
 					mobile && (open ? "translate-y-0" : "translate-y-[110%]"),
 				)}
 			>
-				<button type="button" onClick={close} aria-label="Close" className="text-foreground absolute top-3 right-3 z-10 rounded-full bg-white/90 p-1.5 hover:bg-white">
+				<button
+					type="button"
+					onClick={close}
+					aria-label="Close"
+					className="text-foreground absolute top-3 right-3 z-10 rounded-full bg-white/90 p-1.5 hover:bg-white"
+				>
 					<X className="size-4" />
 				</button>
 				{!mobile && (
 					<div className="relative hidden min-h-[420px] bg-[#f5f5f5] md:block">
-						<Image src="/images/home/promo-free-list.png" alt="" fill sizes="400px" className="object-cover" />
+						<Image
+							src="/images/home/promo-free-list.png"
+							alt=""
+							fill
+							sizes="400px"
+							className="object-cover"
+						/>
 					</div>
 				)}
 				<div className={mobile ? "" : "p-8"}>{body}</div>

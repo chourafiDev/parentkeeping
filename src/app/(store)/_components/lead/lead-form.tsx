@@ -43,7 +43,7 @@ export function LeadForm({
 					autoComplete="email"
 					placeholder="Enter your email address"
 					className={cn(
-						"text-foreground placeholder:text-body h-[50px] min-w-0 rounded-full border bg-white px-5 text-[15px] outline-none sm:flex-1",
+						"text-foreground placeholder:text-body min-w-0 rounded-full border bg-white px-5 py-3 text-[15px] outline-none sm:flex-1",
 						"focus-visible:border-foreground focus-visible:ring-foreground/10 focus-visible:ring-4",
 						dark ? "border-white" : "border-[#e5e5e5]",
 					)}
