@@ -40,7 +40,8 @@ export const FREE_LIST: LeadMagnet = {
   pdf: FREE_LIST_PDF,
   seo: {
     title: "Free Printable Medication List & Daily Medication Chart",
-    description: "Free printable medication list template and daily medication chart for an elderly parent. Fillable PDF with wallet cards, sent to your inbox.",
+    description:
+      "Free printable medication list template and daily medication chart for an elderly parent. Fillable PDF with wallet cards, sent straight to your inbox.",
   },
   h1: "Free Printable Medication List & Daily Medication Chart",
   subheads: {
@@ -48,21 +49,21 @@ export const FREE_LIST: LeadMagnet = {
     fairness: "One medication list the whole family can see, so it doesn't all sit with you.",
   },
   intro:
-    "A free medication list template made for adult children keeping track of a parent's medications. Fill it in on your computer or print it, bring it to every appointment, and keep a copy in Mom's wallet. Nine pages, US Letter, fillable PDF.",
+    "A free medication list template made for adult children keeping track of a parent's medications. Fill it in on your computer or print it, bring it to every appointment, and keep a copy in Mom's wallet. 9 pages, fillable PDF, in US Letter and A4.",
   button: "Send me the free list",
   noticeWhat: "the list",
   inside: {
     title: "What's inside the free PDF",
     items: [
-      { title: "About Mom or Dad", text: "Allergies, conditions, doctors, pharmacy and emergency contacts on one page." },
-      { title: "Prescription Medication List", text: "Name, strength, how it's taken, prescriber and why, exactly as the label says." },
-      { title: "Over-the-Counter & Supplements list", text: "The vitamins and pain relievers doctors always ask about and families forget." },
+      { title: "About Mom or Dad", text: "Allergies, conditions, doctors, pharmacy and an emergency contact on one page." },
+      { title: "Prescription Medication List", text: "Name, strength, how it's taken, who prescribed it and why, copied exactly from the label." },
+      { title: "Over-the-Counter & Supplements", text: "The vitamins and pain relievers doctors always ask about and families forget." },
       {
         title: "Daily Medication Chart",
         text: "One week per page, with a box to initial each dose, so two people never wonder “did she already take it?”",
       },
-      { title: "Medication Changes Log", text: "What changed, when and who said so." },
-      { title: "Two fold-over wallet cards", text: "A free printable medication list for a wallet or purse, for the ER or a new specialist." },
+      { title: "Medication Changes Log", text: "What changed, when, and who said so." },
+      { title: "Two fold-over wallet cards", text: "A free printable medication list for a wallet or purse, ready for the ER or a new specialist." },
     ],
   },
   previews: [
@@ -95,13 +96,13 @@ export const FREE_LIST: LeadMagnet = {
     {
       title: "Keep it current",
       paragraphs: [
-        "A medication list template only helps if it matches the pill bottles. Update the list the same day a medication starts, stops or changes, and note it in the Medication Changes Log. Ask the pharmacist to review the whole list at least once a year and whenever something changes.",
+        "A medication list template only helps if it matches the pill bottles. Update the list the same day a medication starts, stops or changes, and note it in the Medication Changes Log. Ask the pharmacist to review the list whenever a medication changes.",
       ],
     },
     {
       title: "Printable PDF or a medication log app?",
       paragraphs: [
-        "Apps are useful if the whole family uses the same one. Paper works for everyone, including Mom, the home health aide and the ER. Many families keep both: the printable medication list in the binder and wallet, and a shared sheet for day-to-day tracking.",
+        "Apps work if the whole family uses the same one. Paper works for everyone, including Mom, the home health aide and the ER. Many families keep both: the printable list in the binder and wallet, and a shared sheet for day-to-day tracking.",
       ],
     },
   ],
@@ -112,13 +113,13 @@ export const FREE_LIST: LeadMagnet = {
     },
     {
       q: "Can I fill it in on my computer?",
-      a: "Yes. It's a fillable PDF. Type in it with any PDF reader, save it, then print as many copies as you need.",
+      a: "Yes. It's a fillable PDF. Type in it with any PDF reader, including free Adobe Acrobat Reader, save it, and print as many copies as you need.",
     },
     {
       q: "Is there a Word or Excel version?",
-      a: "The free list is a PDF. The paid Family Care System includes a Google Sheets medication tracker your siblings can share.",
+      a: "The free list is a PDF. The Family Care System includes a Google Sheets medication tracker your siblings can share.",
     },
-    { q: "What paper size is it?", a: "US Letter (8.5 × 11 in). It also prints on A4." },
+    { q: "What paper size is it?", a: "You get both US Letter (8.5 × 11 in) and A4." },
   ],
   legal: GENERAL_INFO_LINE,
   closingTitle: "Get the free medication list",
