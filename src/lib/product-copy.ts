@@ -132,37 +132,51 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
     },
     schemaName: "Parentkeeping Medical Binder for an Elderly Parent",
     h1: "Medical Binder for an Elderly Parent",
-    subhead: "Mom's medications, doctors, appointments and paperwork in one binder anyone in the family can pick up and use. Fillable PDF and printable.",
+    subhead: "Mom's medications, doctors, appointments, and paperwork, in one binder anyone in the family can pick up and use.",
     underButton: PRODUCT_DISCLAIMER_SHORT,
     intro: [
-      "This medical binder is for the daughter or son who already knows every pill and every doctor, and is tired of being the only one who does. Fill it in once on your computer, print it, and the answers live in the binder instead of in your head.",
+      "This medical binder is for the daughter or son who already knows every pill and every doctor and is tired of being the only one who does. Fill it in once on your computer, print it, and the answers live in the binder instead of in your head.",
     ],
     inside: {
       title: "What's inside",
       items: [
         {
-          name: "Medications",
-          text: "Prescriptions, over-the-counter medicines and supplements, plus a medication changes log. A medication binder the pharmacist can review in two minutes.",
+          name: "Parent at a Glance",
+          text: "About Mom or Dad, emergency contacts, family and helpers, daily routines, and an “About me” page for new aides and hospital staff.",
         },
-        { name: "Doctors and specialists", text: "Names, numbers, portals and what each one handles." },
+        { name: "Health History", text: "Conditions, surgeries and hospital stays, allergies, vaccinations, equipment and supplies." },
         {
-          name: "Appointments",
-          text: "Upcoming visits, questions to ask, and notes from each visit, so the next sibling knows what the cardiologist said.",
+          name: "Care Team",
+          text: "Doctors and specialists with phone numbers, patient portals and what each one handles, plus pharmacy and other services.",
         },
-        { name: "Insurance and benefits", text: "Medicare, supplemental and drug plan details, member numbers and who to call." },
         {
-          name: "Paperwork",
-          text: "Where the important documents are kept (power of attorney, advance directive, will), without storing the originals in the binder.",
+          name: "Medications & Refills",
+          text: "Prescription and over-the-counter lists, a daily medication chart, a changes log, a refill tracker and fold-over wallet cards. A medication binder the pharmacist can review in two minutes.",
         },
-        { name: "“Who does what” page", text: "One page that names who handles refills, rides, bills and calls, so jobs stop defaulting to you." },
-        { name: "Sunday check-in page", text: "A 10-minute weekly review: what changed, what's coming up, what needs a hand." },
+        {
+          name: "Appointments & Visits",
+          text: "Month at a glance, an appointment log with “who's driving”, visit prep and notes, tests and referrals.",
+        },
+        {
+          name: "Daily Care",
+          text: "Weekly care schedule, daily care log with a handover note, meals and sleep, health readings, symptoms, falls and incidents.",
+        },
+        { name: "Hospital Stay", text: "A hospital bag checklist, stay notes and the questions to ask before discharge." },
+        {
+          name: "Insurance, Costs & Paperwork",
+          text: "Medicare and other plans, insurance call log, bills, medical expenses, mileage, and where important documents are kept (power of attorney, advance directive, will), without storing the originals.",
+        },
+        {
+          name: "Sharing the Care",
+          text: "A “Who does what” page that names who handles refills, rides, bills and calls, a 10-minute Sunday check-in, a family update log and a backup plan. Plus notes pages, printable tab labels and a spine label.",
+        },
       ],
     },
-    badges: ["Fillable PDF", "US Letter, prints on A4", "No app"],
+    badges: ["Fillable PDF", "US Letter & A4", "No app"],
     facts: [
-      { icon: "format", text: "Fillable PDF: type in it, save it, print it" },
-      { icon: "print", text: "US Letter, prints on A4. Print as many copies as your family needs." },
-      { icon: "download", text: "Instant download after checkout" },
+      { icon: "format", text: "Fillable PDF: type on screen, save it, print fresh copies anytime, or print it blank and fill in by hand" },
+      { icon: "print", text: "Two files, US Letter and A4, with a clickable contents page to jump to any section" },
+      { icon: "download", text: "Instant download after checkout. Print as many copies as your family needs." },
       { icon: "family", text: "Covers relatives caring for the same parent" },
     ],
     // DRAFT, awaiting approval.
@@ -179,8 +193,6 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
     steps: {
       title: "How sharing works",
       items: [
-        // DRAFT step titles; the texts are the doc's own sentences.
-        { title: "Fill it in once", text: "Fill it in once on your computer, print it, and the answers live in the binder instead of in your head." },
         { title: "Print a copy for each sibling", text: "Print a copy for each sibling, or keep one at Mom's house by the phone." },
         { title: "Give every job a name", text: "The “Who does what” page turns “let me know if you need anything” into a named job with a date." },
       ],
