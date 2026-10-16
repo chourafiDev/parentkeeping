@@ -6,7 +6,18 @@ import { cn } from "@/lib/utils";
 type Image = { url: string; alt: string; width: number | null; height: number | null };
 
 /** Glozin product gallery: large image on a light-grey panel, thumbnails under it. */
-export function ProductGallery({ images, title, fallback }: { images: Image[]; title: string; fallback: React.ReactNode }) {
+export function ProductGallery({
+	images,
+	title,
+	fallback,
+	badges = [],
+}: {
+	images: Image[];
+	title: string;
+	fallback: React.ReactNode;
+	/** Chips over the first image only (later slides are infographics with their own text). */
+	badges?: string[];
+}) {
 	const [index, setIndex] = useState(0);
 	const current = images[index];
 
@@ -18,6 +29,15 @@ export function ProductGallery({ images, title, fallback }: { images: Image[]; t
 					<img src={current.url} alt={current.alt || title} className="size-full object-cover" />
 				) : (
 					<div className="flex size-full items-center justify-center px-[26%] py-[12%]">{fallback}</div>
+				)}
+				{index === 0 && badges.length > 0 && (
+					<ul className="absolute top-3 left-3 flex flex-wrap gap-1.5 pe-3" aria-label="Format">
+						{badges.map((b) => (
+							<li key={b} className="text-foreground rounded-full bg-white/95 px-3 py-1 text-[12px] font-semibold shadow-sm">
+								{b}
+							</li>
+						))}
+					</ul>
 				)}
 			</div>
 			{images.length > 1 && (

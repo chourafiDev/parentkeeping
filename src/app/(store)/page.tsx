@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { BUNDLE_SLUG, PRODUCT_PATHS, VARIANT_COOKIE } from "@/lib/catalog";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { MARQUEE } from "@/lib/home";
+import { PREVIEWS_BY_PRODUCT } from "@/lib/page-previews";
 import { HOME_SEO, OFFER_SUBHEAD } from "@/lib/offer";
 import { siteUrl } from "@/lib/site-url";
 import { db } from "@/server/db";
@@ -24,6 +25,7 @@ import { type ShopCard, ShopGrid } from "./_components/home/shop-grid";
 import { SoundFamiliar } from "./_components/home/sound-familiar";
 import type { HomeData, HomeProduct } from "./_components/home/types";
 import { UsualWay } from "./_components/home/usual-way";
+import { PagePreviews } from "./_components/page-previews";
 import { ProblemTabs } from "./_components/problem-tabs";
 import {
 	jsonLdHtml,
@@ -186,6 +188,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			<MomentBanner />
 			<ProblemTabs />
 			<HowItWorks />
+			<PagePreviews groupIds={PREVIEWS_BY_PRODUCT[BUNDLE_SLUG]} />
 			<Bundle data={data} />
 			<SoundFamiliar />
 			<UsualWay />

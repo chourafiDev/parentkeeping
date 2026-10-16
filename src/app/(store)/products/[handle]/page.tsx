@@ -39,6 +39,7 @@ import {
 import { reviewsFor } from "@/lib/reviews";
 import { siteUrl } from "@/lib/site-url";
 import { formatStoreDay } from "@/lib/store-time";
+import { PREVIEWS_BY_PRODUCT } from "@/lib/page-previews";
 import { DEFAULT_PACKAGE, packageOptions } from "@/lib/packages";
 import { cn } from "@/lib/utils";
 import { getSettings } from "@/server/queries/settings";
@@ -76,6 +77,7 @@ import {
 	productJsonLd,
 	visitorCountry,
 } from "../../_components/product-data";
+import { PagePreviews } from "../../_components/page-previews";
 import { ProblemTabs } from "../../_components/problem-tabs";
 import { container, pillDark, pillLight, section } from "../../_components/ui";
 
@@ -369,6 +371,7 @@ export default async function ProductPage({
 						<ProductGallery
 							images={images}
 							title={copy.h1}
+							badges={copy.badges}
 							fallback={
 								<DocMockup
 									kind={DOC_KIND[product.slug] ?? "binder"}
@@ -534,6 +537,7 @@ export default async function ProductPage({
 				highlights={copy.highlights}
 				kinds={HIGHLIGHT_KINDS[product.slug] ?? []}
 			/>
+			<PagePreviews groupIds={PREVIEWS_BY_PRODUCT[product.slug] ?? []} bordered />
 			{copy.firstMonth && <ProductFirstMonth timeline={copy.firstMonth} />}
 
 			{copy.sections.length > 0 && (

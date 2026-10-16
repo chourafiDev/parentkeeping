@@ -37,6 +37,8 @@ export type ProductCopy = {
   underButton: string;
   /** Story paragraphs under the hook (the subhead). */
   intro?: string[];
+  /** Chips on the gallery's first image (format at a glance). Each must match the facts. */
+  badges?: string[];
   /** Buy box: icon facts (format, delivery, who it covers). */
   facts: { icon: FactIcon; text: string }[];
   /** "Your first month": what the first weeks look like (answers "is this a lot of work?"). */
@@ -84,6 +86,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       items: OFFER_PARTS.map((p) => ({ name: p.name, text: p.what, meta: p.format })),
     },
     intro: OFFER_MOMENT.paragraphs,
+    badges: ["Printable binder", "Shared Google Sheet", "No app"],
     facts: [
       { icon: "download", text: "Instant download after checkout" },
       { icon: "format", text: "A printable binder and a Google Sheet. Nothing to install." },
@@ -155,6 +158,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
         { name: "Sunday check-in page", text: "A 10-minute weekly review: what changed, what's coming up, what needs a hand." },
       ],
     },
+    badges: ["Fillable PDF", "US Letter, prints on A4", "No app"],
     facts: [
       { icon: "format", text: "Fillable PDF: type in it, save it, print it" },
       { icon: "print", text: "US Letter, prints on A4. Print as many copies as your family needs." },
@@ -253,6 +257,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
     intro: [
       "Most care arrangements start with “I'll just help out.” A year later one sibling is there four days a week, another sends money now and then, and nobody has said out loud what's fair.",
     ],
+    badges: ["Fillable PDF", "Editable doc for your attorney"],
     facts: [
       { icon: "format", text: "Fillable PDF plus an editable document your attorney can mark up" },
       { icon: "print", text: "US Letter" },
@@ -408,6 +413,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
         { name: "Emergency binder checklist", text: "How to set it up in an afternoon and when to update it." },
       ],
     },
+    badges: ["Printable PDF", "Fillable on screen"],
     facts: [
       { icon: "format", text: "Printable PDF, fillable on screen" },
       { icon: "print", text: "US Letter" },
