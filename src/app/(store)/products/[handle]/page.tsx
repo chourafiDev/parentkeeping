@@ -21,9 +21,9 @@ import {
 	PRODUCT_PATHS,
 	SLUG_BY_HANDLE,
 } from "@/lib/catalog";
+import { buyGateCopy, canCheckout } from "@/lib/checkout-region";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { BUY_GUARANTEE_LINE } from "@/lib/legal";
-import { canCheckout, buyGateCopy } from "@/lib/checkout-region";
 import { formatStorePrice } from "@/lib/money";
 import {
 	OFFER_HEADLINES,
@@ -33,7 +33,12 @@ import {
 	presaleNote,
 	worldwideFaqItem,
 } from "@/lib/offer";
-import { DEFAULT_PACKAGE, DEFAULT_SINGLE_PACKAGE, packageOptions, singleUpgradeOptions } from "@/lib/packages";
+import {
+	DEFAULT_PACKAGE,
+	DEFAULT_SINGLE_PACKAGE,
+	packageOptions,
+	singleUpgradeOptions,
+} from "@/lib/packages";
 import { PREVIEWS_BY_PRODUCT } from "@/lib/page-previews";
 import {
 	type FactIcon,
@@ -168,13 +173,14 @@ export default async function ProductPage({
 }: PageProps<"/products/[handle]">) {
 	const [data, query] = await Promise.all([load(params), searchParams]);
 	const isBundle = data.product.slug === BUNDLE_SLUG;
-	const [country, { contact, checkout }, extras, reviewData, proof] = await Promise.all([
-		visitorCountry(query.country),
-		getSettings("contact", "checkout"),
-		isBundle ? getPackageExtras() : null,
-		getProductReviews(data.product.slug),
-		getSocialProof(),
-	]);
+	const [country, { contact, checkout }, extras, reviewData, proof] =
+		await Promise.all([
+			visitorCountry(query.country),
+			getSettings("contact", "checkout"),
+			isBundle ? getPackageExtras() : null,
+			getProductReviews(data.product.slug),
+			getSocialProof(),
+		]);
 	const { product, images, assets, system, copy, pieces } = data;
 	const canBuy = canCheckout(country, checkout.worldwideEnabled);
 	const discount = data.compareAt
@@ -337,7 +343,11 @@ export default async function ProductPage({
 	// Buy-box upgrade picker: Medical Binder and Caregiver Agreement only, and
 	// only once the System is itself sellable and actually costs more.
 	const showSystemUpgrade =
-		canBuy && data.sellable && !!system?.sellable && upgradeBy > 0 && ["medical-binder", "caregiver-agreement"].includes(product.slug);
+		canBuy &&
+		data.sellable &&
+		!!system?.sellable &&
+		upgradeBy > 0 &&
+		["medical-binder", "caregiver-agreement"].includes(product.slug);
 	const singleRows: CompareRow[] = OFFER_PARTS.map((part) => ({
 		label: part.name,
 		ours: { yes: true, text: "Included" },
@@ -504,7 +514,13 @@ export default async function ProductPage({
 							) : showSystemUpgrade && system ? (
 								<PackagePicker
 									options={singleUpgradeOptions({
-										product: { slug: product.slug, title: SHORT_NAME[product.slug] ?? copy.h1, price: data.price, compareAt: data.compareAt, presale },
+										product: {
+											slug: product.slug,
+											title: SHORT_NAME[product.slug] ?? copy.h1,
+											price: data.price,
+											compareAt: data.compareAt,
+											presale,
+										},
 										system,
 									})}
 									defaultId={DEFAULT_SINGLE_PACKAGE}
@@ -572,13 +588,13 @@ export default async function ProductPage({
 				</div>
 			</div>
 
-			{reviews.length > 0 && (
-				<ProductReviews
-					reviews={reviews}
-					count={reviewData.count}
-					average={reviewData.average}
-				/>
-			)}
+			{/* {reviews.length > 0 && ( */}
+			<ProductReviews
+				reviews={reviews}
+				count={reviewData.count}
+				average={reviewData.average}
+			/>
+			{/* )} */}
 			{isBundle && <ProblemTabs />}
 			<ProductSteps steps={copy.steps} />
 			<ProductHighlights
@@ -641,7 +657,11 @@ export default async function ProductPage({
 			)}
 
 			<ProductFaqBand
-				items={isBundle ? [...copy.faq, worldwideFaqItem(checkout.worldwideEnabled)] : copy.faq}
+				items={
+					isBundle
+						? [...copy.faq, worldwideFaqItem(checkout.worldwideEnabled)]
+						: copy.faq
+				}
 				supportEmail={contact.supportEmail}
 				legal={copy.legal}
 			/>
