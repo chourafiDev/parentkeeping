@@ -38,7 +38,9 @@ export function PackagePicker({
 	return (
 		<form action="/api/checkout" method="post" className="grid gap-3">
 			<fieldset className="grid gap-2.5">
-				<legend className="text-foreground mb-2.5 text-[14px] font-semibold">Choose your package</legend>
+				<legend className="text-foreground mb-2.5 text-[14px] font-semibold">
+					Choose your package
+				</legend>
 				{options.map((o) => {
 					const checked = o.id === selected.id;
 					return (
@@ -46,7 +48,9 @@ export function PackagePicker({
 							key={o.id}
 							className={cn(
 								"relative flex cursor-pointer items-center gap-3.5 rounded-[10px] border-2 bg-white px-4 py-3.5 transition-colors",
-								checked ? "border-foreground" : "hover:border-foreground/40 border-[#e5e5e5]",
+								checked
+									? "border-primary"
+									: "hover:border-foreground/40 border-[#e5e5e5]",
 							)}
 						>
 							<input
@@ -55,15 +59,25 @@ export function PackagePicker({
 								value={o.id}
 								checked={checked}
 								onChange={() => setSelectedId(o.id)}
-								className="accent-foreground size-4 shrink-0"
+								className="accent-primary size-4 shrink-0"
 							/>
 							<span className="grid min-w-0 flex-1 gap-0.5">
-								<span className="text-foreground text-[15px] leading-snug font-semibold">{o.title}</span>
-								<span className="text-body text-[13px] leading-snug">{o.note}</span>
+								<span className="text-foreground text-[15px] leading-snug font-semibold">
+									{o.title}
+								</span>
+								<span className="text-body text-[13px] leading-snug">
+									{o.note}
+								</span>
 							</span>
 							<span className="grid shrink-0 justify-items-end tabular-nums">
-								<span className="text-foreground text-[16px] font-semibold">{formatStorePrice(o.price)}</span>
-								{o.compareAt && <span className="text-body text-[13px] line-through">{formatStorePrice(o.compareAt)}</span>}
+								<span className="text-foreground text-[16px] font-semibold">
+									{formatStorePrice(o.price)}
+								</span>
+								{o.compareAt && (
+									<span className="text-body text-[13px] line-through">
+										{formatStorePrice(o.compareAt)}
+									</span>
+								)}
 							</span>
 							{o.badge && (
 								<span className="bg-primary absolute -top-2.5 right-4 rounded-full px-2.5 py-0.5 text-[11px] font-semibold text-white">
@@ -75,7 +89,9 @@ export function PackagePicker({
 				})}
 			</fieldset>
 			<input type="hidden" name="slug" value={selected.slug} />
-			{selected.addon && <input type="hidden" name="addon" value={selected.addon} />}
+			{selected.addon && (
+				<input type="hidden" name="addon" value={selected.addon} />
+			)}
 			<button type="submit" className={buttonClassName}>
 				{selected.cta} · {formatStorePrice(selected.price)}
 			</button>

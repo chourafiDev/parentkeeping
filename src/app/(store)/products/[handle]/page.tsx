@@ -45,7 +45,6 @@ import {
 	PRODUCT_COPY,
 	type ProductCopy,
 } from "@/lib/product-copy";
-import { placeholderReviews } from "@/lib/reviews";
 import { siteUrl } from "@/lib/site-url";
 import { MIN_REVIEWS_FOR_SUMMARY } from "@/lib/social-proof";
 import { formatStoreDay } from "@/lib/store-time";
@@ -194,8 +193,7 @@ export default async function ProductPage({
 		product.description && textOf(product.description)
 			? product.description
 			: null;
-	const reviews =
-		reviewData.count > 0 ? reviewData.reviews : placeholderReviews();
+	
 	const rating =
 		reviewData.average !== null && reviewData.count >= MIN_REVIEWS_FOR_SUMMARY
 			? { average: reviewData.average, count: reviewData.count }
@@ -589,12 +587,9 @@ export default async function ProductPage({
 			</div>
 
 			{/* {reviews.length > 0 && ( */}
-			<ProductReviews
-				reviews={reviews}
-				count={reviewData.count}
-				average={reviewData.average}
-			/>
+			<ProductReviews />
 			{/* )} */}
+
 			{isBundle && <ProblemTabs />}
 			<ProductSteps steps={copy.steps} />
 			<ProductHighlights

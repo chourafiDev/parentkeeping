@@ -1,23 +1,68 @@
 "use client";
 
-import { BadgeCheck, ChevronLeft, ChevronRight, Star } from "lucide-react";
-import { useRef } from "react";
-import type { ReviewCard } from "@/lib/reviews";
+import { BadgeCheck, Star } from "lucide-react";
+import { useState } from "react";
+
+import {
+	Carousel,
+	CarouselContent,
+	CarouselItem,
+	CarouselNext,
+	CarouselPrevious,
+} from "@/components/ui/carousel";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { REVIEW_TABS, type ReviewCard } from "@/lib/reviews";
+
 import { averageLabel, MIN_REVIEWS_FOR_SUMMARY } from "@/lib/social-proof";
+
 import { cn } from "@/lib/utils";
+
 import { container, eyebrow, section, sectionTitle } from "../ui";
 
-export function Stars({ rating, size = "sm" }: { rating: number; size?: "sm" | "md" }) {
+// ==========================================
+// STAR RATING
+// ==========================================
+
+export function Stars({
+	rating,
+	size = "sm",
+}: {
+	rating: number;
+	size?: "sm" | "md";
+}) {
+	const value = Math.max(0, Math.min(5, rating));
+
 	return (
-		<span className="flex gap-0.5" role="img" aria-label={`${averageLabel(rating)} out of 5 stars`}>
+		<span
+			className="flex gap-0.5"
+			role="img"
+			aria-label={`${value.toFixed(1)} out of 5 stars`}
+		>
 			{Array.from({ length: 5 }, (_, i) => {
-				// Partial star for averages (4.6 → the fifth star 60% filled).
-				const fill = Math.max(0, Math.min(1, rating - i));
+				const fill = Math.max(0, Math.min(1, value - i));
+
 				return (
-					<span key={i} className={cn("relative", size === "md" ? "size-5" : "size-3.5")}>
+					<span
+						key={i}
+						className={cn(
+							"relative shrink-0",
+							size === "md" ? "size-5" : "size-3.5",
+						)}
+					>
 						<Star className="absolute inset-0 size-full fill-[#e5e5e5] text-[#e5e5e5]" />
-						<span className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
-							<Star className={cn("fill-[#f5a524] text-[#f5a524]", size === "md" ? "size-5" : "size-3.5")} />
+
+						<span
+							className="absolute inset-0 overflow-hidden"
+							style={{ width: `${fill * 100}%` }}
+						>
+							<Star
+								className={cn(
+									"fill-[#f5a524] text-[#f5a524]",
+									size === "md" ? "size-5" : "size-3.5",
+								)}
+							/>
 						</span>
 					</span>
 				);
@@ -26,78 +71,233 @@ export function Stars({ rating, size = "sm" }: { rating: number; size?: "sm" | "
 	);
 }
 
-const fmtDate = (iso: string) => new Date(iso).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "America/New_York" });
+// ==========================================
+// DATE FORMAT
+// ==========================================
 
-/** Verified-buyer reviews: summary (once there are enough), then a row of cards that scrolls sideways. */
-export function ProductReviews({ reviews, count, average }: { reviews: ReviewCard[]; count: number; average: number | null }) {
-	const rail = useRef<HTMLUListElement>(null);
-	const scroll = (dir: 1 | -1) => rail.current?.scrollBy({ left: dir * rail.current.clientWidth * 0.8, behavior: "smooth" });
-	const summary = average !== null && count >= MIN_REVIEWS_FOR_SUMMARY;
+const fmtDate = (iso: string) =>
+	new Date(iso).toLocaleDateString("en-US", {
+		month: "long",
+		year: "numeric",
+		timeZone: "America/New_York",
+	});
 
+// ==========================================
+// REVIEW CARD
+// ==========================================
+
+function ReviewItem({ review }: { review: ReviewCard }) {
 	return (
-		<section id="reviews" className={`${container} ${section} scroll-mt-28 border-t`}>
-			<div className="mb-8 flex flex-wrap items-end justify-between gap-6 md:mb-10">
-				<div className="grid gap-3">
-					<p className={`${eyebrow} text-primary`}>From verified buyers</p>
-					<h2 className={sectionTitle}>What families say</h2>
-					{summary && (
-						<p className="text-foreground flex items-center gap-2.5 text-[15px]">
-							<Stars rating={average} size="md" />
-							<span className="font-semibold">{averageLabel(average)} out of 5</span>
-							<span className="text-body">
-								· {count} review{count === 1 ? "" : "s"}
-							</span>
-						</p>
-					)}
+		<article
+			className={cn(
+				"flex h-full min-h-[330px] w-full flex-col justify-between",
+				"rounded-[18px] border border-[#E5E7E3]",
+				"bg-white p-5",
+				"transition-colors duration-200",
+				"hover:border-[#C8D4C9]",
+			)}
+		>
+			{/* CARD CONTENT */}
+			<div className="flex flex-col gap-4">
+				{/* RATING */}
+				<div className="flex items-center gap-2">
+					<Stars rating={review.rating} />
+
+					<span className="text-foreground text-xs font-semibold">
+						({review.rating.toFixed(1)})
+					</span>
 				</div>
-				<div className="hidden shrink-0 gap-2 md:flex">
-					<button type="button" onClick={() => scroll(-1)} aria-label="Previous reviews" className="hover:border-foreground grid size-9 place-items-center rounded-full border transition-colors">
-						<ChevronLeft className="size-4" />
-					</button>
-					<button type="button" onClick={() => scroll(1)} aria-label="Next reviews" className="hover:border-foreground grid size-9 place-items-center rounded-full border transition-colors">
-						<ChevronRight className="size-4" />
-					</button>
-				</div>
+
+				{/* HEADLINE */}
+				<h4 className="text-[21px] font-semibold leading-[1.25] tracking-[-0.03em] text-[#1F2A24] sm:text-[23px]">
+					{review.headline}
+				</h4>
+
+				{/* BODY */}
+				<p className="whitespace-pre-line text-[15px] leading-[1.85] text-[#56615B] sm:text-[16px]">
+					{review.body}
+				</p>
 			</div>
 
-			<ul ref={rail} className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:px-0 md:gap-[30px]">
-				{reviews.map((r) => (
-					<li
-						key={r.id}
-						className="grid w-[85%] shrink-0 snap-start content-between gap-6 rounded-[10px] border bg-white p-6 sm:w-[calc(50%-8px)] lg:w-[calc((100%-60px)/3)]"
+			{/* CARD FOOTER */}
+			<div className="mt-8 border-t border-[#E5E7E3] pt-5">
+				<div className="flex items-center gap-3">
+					{/* AVATAR */}
+					<span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#F3F3F0] text-[16px] font-semibold text-[#1F2A24]">
+						{review.name.trim().charAt(0).toUpperCase() || "?"}
+					</span>
+
+					{/* NAME + STATUS */}
+					<div className="grid gap-1">
+						<p className="text-[14px] font-semibold text-[#1F2A24]">
+							{review.name}
+						</p>
+
+						<p className="flex flex-wrap items-center gap-1.5 text-[12px] text-[#5E6A63]">
+							<span>Verified Buyer</span>
+							<BadgeCheck className="size-4 text-[#5D7D68]" />
+						</p>
+					</div>
+				</div>
+			</div>
+		</article>
+	);
+}
+
+// ==========================================
+// PRODUCT REVIEWS
+// STATIC DATA + SHADCN TABS + CAROUSEL
+// ==========================================
+
+export function ProductReviews() {
+	const [activeTabId, setActiveTabId] = useState(REVIEW_TABS[0].id);
+
+	const activeTab =
+		REVIEW_TABS.find((tab) => tab.id === activeTabId) ?? REVIEW_TABS[0];
+
+	return (
+		<section
+			id="reviews"
+			className={`${container} ${section} scroll-mt-28 border-t`}
+		>
+			{/* SECTION HEADER */}
+			<div className="mb-8 grid gap-3">
+				<p className={`${eyebrow} text-primary`}>MADE FOR FAMILY CAREGIVERS</p>
+
+				<h2 className={sectionTitle}>What matters to families</h2>
+
+				<p className="text-body max-w-2xl text-[14px] leading-relaxed">
+					Explore common caregiving concerns, from managing medications and
+					organizing paperwork to sharing responsibilities with family.
+				</p>
+			</div>
+
+			{/* CATEGORY TABS */}
+			<Tabs
+				value={activeTabId}
+				onValueChange={setActiveTabId}
+				className="w-full"
+			>
+				<div className="-mx-4 mb-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:px-0">
+					<TabsList
+						className={cn(
+							"flex h-auto w-max min-w-full",
+							"justify-start gap-2 bg-transparent p-0",
+						)}
 					>
-						<div className="grid gap-3">
-							{r.placeholder && (
-								<span className="justify-self-start rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-semibold text-amber-900">Placeholder</span>
-							)}
-							<Stars rating={r.rating} />
-							<p className="text-foreground text-[17px] leading-snug font-semibold tracking-[-0.02em]">{r.headline}</p>
-							<p className="text-body text-[15px] leading-[1.714] whitespace-pre-line">{r.body}</p>
+						{REVIEW_TABS.map((tab) => (
+							<TabsTrigger
+								key={tab.id}
+								value={tab.id}
+								className={cn(
+									"shrink-0 rounded-full border",
+									"border-[#DDE3DC]",
+									"bg-white px-5 py-3",
+									"text-[13px] font-semibold",
+									"text-[#53665A]",
+									"transition-all duration-200",
+									"hover:border-[#4F6F5A]",
+									"data-[state=active]:border-[#24332B]",
+									"data-[state=active]:bg-[#24332B]",
+									"data-[state=active]:text-white",
+									"data-[state=active]:shadow-sm",
+								)}
+							>
+								{tab.label}
+							</TabsTrigger>
+						))}
+					</TabsList>
+				</div>
+
+				{/* CAROUSEL FOR SELECTED CATEGORY */}
+				<TabsContent value={activeTab.id} className="mt-0 outline-none">
+					<Carousel
+						key={activeTab.id}
+						opts={{
+							align: "start",
+							containScroll: "trimSnaps",
+							loop: false,
+						}}
+						className="w-full"
+					>
+						{/* FIVE STATIC CARDS */}
+						<CarouselContent className="-ml-4 items-stretch">
+							{activeTab.reviews.map((review) => (
+								<CarouselItem
+									key={review.id}
+									className={cn(
+										"flex pl-4",
+										"basis-[88%]",
+										"sm:basis-1/2",
+										"lg:basis-1/3",
+									)}
+								>
+									<ReviewItem review={review} />
+								</CarouselItem>
+							))}
+						</CarouselContent>
+
+						{/* CAROUSEL ARROWS */}
+						<div className="mt-5 flex items-center justify-center gap-2">
+							<CarouselPrevious
+								className={cn(
+									"!static !translate-y-0",
+									"size-10 rounded-full",
+									"border-[#DDE3DC]",
+									"bg-white text-[#24332B]",
+									"hover:bg-[#F1F5F0]",
+								)}
+							/>
+
+							<CarouselNext
+								className={cn(
+									"!static !translate-y-0",
+									"size-10 rounded-full",
+									"border-[#DDE3DC]",
+									"bg-white text-[#24332B]",
+									"hover:bg-[#F1F5F0]",
+								)}
+							/>
 						</div>
-						<div className="flex items-center gap-3 border-t pt-4">
-							<span className="bg-muted text-foreground grid size-10 shrink-0 place-items-center rounded-full text-sm font-semibold">{r.name.charAt(0)}</span>
-							<div className="grid gap-0.5">
-								<p className="text-foreground text-[14px] font-semibold">{r.name}</p>
-								<p className="text-body flex items-center gap-1 text-[12px]">
-									<BadgeCheck className="text-primary size-3.5" />
-									Verified buyer{r.placeholder ? "" : ` · ${fmtDate(r.date)}`}
-								</p>
-							</div>
-						</div>
-					</li>
-				))}
-			</ul>
+
+						{/* MOBILE SWIPE HINT */}
+						{activeTab.reviews.length > 1 && (
+							<p className="mt-4 text-center text-xs text-[#758177] md:hidden">
+								Swipe to explore more →
+							</p>
+						)}
+					</Carousel>
+				</TabsContent>
+			</Tabs>
 		</section>
 	);
 }
 
-/** Stars + count by the title, linking down to the reviews. Only with enough reviews. */
-export function RatingSummary({ count, average }: { count: number; average: number | null }) {
-	if (average === null || count < MIN_REVIEWS_FOR_SUMMARY) return null;
+// ==========================================
+// RATING SUMMARY
+// FOR GENUINE CUSTOMER RATINGS ONLY
+// ==========================================
+
+export function RatingSummary({
+	count,
+	average,
+}: {
+	count: number;
+	average: number | null;
+}) {
+	if (average === null || count < MIN_REVIEWS_FOR_SUMMARY) {
+		return null;
+	}
+
 	return (
-		<a href="#reviews" className="text-foreground flex w-fit items-center gap-2 text-[14px] hover:underline">
+		<a
+			href="#reviews"
+			className="text-foreground flex w-fit items-center gap-2 text-[14px] hover:underline"
+		>
 			<Stars rating={average} />
+
 			<span className="font-semibold">{averageLabel(average)} / 5.0</span>
+
 			<span className="text-body">
 				({count} review{count === 1 ? "" : "s"})
 			</span>
