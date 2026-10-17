@@ -1,7 +1,7 @@
 "use client";
 
 import { BadgeCheck, Star } from "lucide-react";
-import { useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 
 import {
 	Carousel,
@@ -72,17 +72,6 @@ export function Stars({
 }
 
 // ==========================================
-// DATE FORMAT
-// ==========================================
-
-const fmtDate = (iso: string) =>
-	new Date(iso).toLocaleDateString("en-US", {
-		month: "long",
-		year: "numeric",
-		timeZone: "America/New_York",
-	});
-
-// ==========================================
 // REVIEW CARD
 // ==========================================
 
@@ -90,7 +79,7 @@ function ReviewItem({ review }: { review: ReviewCard }) {
 	return (
 		<article
 			className={cn(
-				"flex h-full min-h-[330px] w-full flex-col justify-between",
+				"flex h-full min-h-82.5 w-full flex-col justify-between",
 				"rounded-[18px] border border-[#E5E7E3]",
 				"bg-white p-5",
 				"transition-colors duration-200",
@@ -109,7 +98,7 @@ function ReviewItem({ review }: { review: ReviewCard }) {
 				</div>
 
 				{/* HEADLINE */}
-				<h4 className="text-[21px] font-semibold leading-[1.25] tracking-[-0.03em] text-[#1F2A24] sm:text-[23px]">
+				<h4 className="text-[21px] font-semibold leading-tight tracking-[-0.03em] text-[#1F2A24] sm:text-[23px]">
 					{review.headline}
 				</h4>
 
@@ -175,10 +164,10 @@ export function ProductReviews() {
 			{/* CATEGORY TABS */}
 			<Tabs
 				value={activeTabId}
-				onValueChange={setActiveTabId}
+				onValueChange={setActiveTabId as Dispatch<SetStateAction<string>>}
 				className="w-full"
 			>
-				<div className="-mx-4 mb-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:px-0">
+				<div className="-mx-4 mb-2 overflow-x-auto px-4 pb-2 scrollbar-none sm:mx-0 sm:px-0">
 					<TabsList
 						className={cn(
 							"flex h-auto w-max min-w-full",
@@ -241,7 +230,7 @@ export function ProductReviews() {
 						<div className="mt-5 flex items-center justify-center gap-2">
 							<CarouselPrevious
 								className={cn(
-									"!static !translate-y-0",
+									"static! translate-y-0!",
 									"size-10 rounded-full",
 									"border-[#DDE3DC]",
 									"bg-white text-[#24332B]",
@@ -251,7 +240,7 @@ export function ProductReviews() {
 
 							<CarouselNext
 								className={cn(
-									"!static !translate-y-0",
+									"static! translate-y-0!",
 									"size-10 rounded-full",
 									"border-[#DDE3DC]",
 									"bg-white text-[#24332B]",
