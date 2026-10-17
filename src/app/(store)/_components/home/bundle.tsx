@@ -77,7 +77,7 @@ export function Bundle({ data }: { data: HomeData }) {
 
 				<div className="grid content-start gap-3">
 					<p className="flex items-baseline gap-2.5 tabular-nums">
-						<span className={cn("text-primary text-[34px] font-bold tracking-tight", system.compareAt && "text-[#dc3545]")}>
+						<span className={cn("text-primary text-[34px] font-bold tracking-tight", system.compareAt && "text-primary")}>
 							{formatStorePrice(system.price)}
 						</span>
 						{system.compareAt && <span className="text-body text-lg line-through">{formatStorePrice(system.compareAt)}</span>}

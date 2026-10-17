@@ -64,7 +64,7 @@ export function ShopGrid({ cards, canBuy, worldwideEnabled }: { cards: ShopCard[
 									<DocMockup kind={card.kind} title={card.title} />
 								</span>
 								<span className="absolute top-3 left-3 grid justify-items-start gap-1.5">
-									{discount > 0 && <span className="rounded-full bg-[#dc3545] px-2.5 py-0.5 text-xs font-semibold text-white">-{discount}%</span>}
+									{discount > 0 && <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-white">-{discount}%</span>}
 									{p?.presale && <span className="rounded-full bg-[#6c4cf1] px-2.5 py-0.5 text-xs font-semibold text-white">Pre-order</span>}
 									{!p && <span className="bg-primary rounded-full px-2.5 py-0.5 text-xs font-semibold text-white">Free</span>}
 								</span>
@@ -75,7 +75,7 @@ export function ShopGrid({ cards, canBuy, worldwideEnabled }: { cards: ShopCard[
 							<p className="text-[15px] font-semibold tabular-nums">
 								{p ? (
 									<>
-										<span className={cn(p.compareAt && "text-[#dc3545]")}>{formatStorePrice(p.price)}</span>
+										<span className={cn(p.compareAt && "text-primary")}>{formatStorePrice(p.price)}</span>
 										{p.compareAt && <span className="text-body ms-2 font-normal line-through">{formatStorePrice(p.compareAt)}</span>}
 									</>
 								) : (

@@ -2,13 +2,13 @@ import { and, eq, inArray, isNotNull } from "drizzle-orm";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { BUNDLE_SLUG, PRODUCT_PATHS, VARIANT_COOKIE } from "@/lib/catalog";
+import { canCheckout } from "@/lib/checkout-region";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { MARQUEE } from "@/lib/home";
 import { HOME_SEO, OFFER_SUBHEAD } from "@/lib/offer";
 import { PREVIEWS_BY_PRODUCT } from "@/lib/page-previews";
 import { siteUrl } from "@/lib/site-url";
 import { MIN_REVIEWS_FOR_SUMMARY } from "@/lib/social-proof";
-import { canCheckout } from "@/lib/checkout-region";
 import { db } from "@/server/db";
 import { files, productFiles, products } from "@/server/db/schema";
 import { getProductReviews } from "@/server/queries/reviews";
@@ -30,7 +30,6 @@ import type { HomeData, HomeProduct } from "./_components/home/types";
 import { UsualWay } from "./_components/home/usual-way";
 import { PagePreviews } from "./_components/page-previews";
 import { ProblemTabs } from "./_components/problem-tabs";
-import { ProductReviews } from "./_components/product/reviews";
 import {
 	jsonLdHtml,
 	productJsonLd,
@@ -200,22 +199,17 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			<HomeHero data={data} />
 			<Marquee messages={MARQUEE} />
 			<PartsHighlights data={data} />
-			<ShopGrid cards={cards} canBuy={data.canBuy} worldwideEnabled={data.worldwideEnabled} />
+			<ShopGrid
+				cards={cards}
+				canBuy={data.canBuy}
+				worldwideEnabled={data.worldwideEnabled}
+			/>
 			<MomentBanner />
 			<ProblemTabs />
 			<HowItWorks />
 			<PagePreviews groupIds={PREVIEWS_BY_PRODUCT[BUNDLE_SLUG]} />
 			<Bundle data={data} />
-			{/* Real reviews take over from "Sound familiar?" once there are enough. */}
-			{showReviews ? (
-				<ProductReviews
-					reviews={systemReviews.reviews}
-					count={systemReviews.count}
-					average={systemReviews.average}
-				/>
-			) : (
-				<SoundFamiliar />
-			)}
+			<SoundFamiliar />
 			<UsualWay />
 			<Faq data={data} />
 			<ClosingStrips data={data} />
