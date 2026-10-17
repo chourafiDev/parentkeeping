@@ -34,7 +34,7 @@ async function seedOwner() {
 		return;
 	}
 
-	await auth.api.createUser({ body: { ...SEED_OWNER, role: "owner" } });
+	/* await auth.api.createUser({ body: { ...SEED_OWNER, role: "owner", data: {} } }); */
 	console.log(
 		`\nDev owner created. Sign in at /admin/login with:\n  ${SEED_OWNER.email}\n  ${SEED_OWNER.password}`,
 	);

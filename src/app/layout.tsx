@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 		? new URL(process.env.BETTER_AUTH_URL)
 		: undefined,
 	title: { default: SITE.name, template: `%s · ${SITE.name}` },
+	
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
