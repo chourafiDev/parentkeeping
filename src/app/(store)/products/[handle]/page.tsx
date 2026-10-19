@@ -244,7 +244,7 @@ export default async function ProductPage({
 	const underButton = (
 		<>
 			<p>{copy.underButton}</p>
-			<p className="flex items-center justify-center gap-1.5">
+			<p className="bg-white/10 p-2 rounded-md flex items-center justify-center gap-1.5">
 				<ShieldCheck className="text-primary size-4 shrink-0" />
 				{BUY_GUARANTEE_LINE}
 			</p>
@@ -624,7 +624,7 @@ export default async function ProductPage({
 				assets={isBundle ? [] : assets}
 				price={data.price}
 				compareAt={data.compareAt}
-				buy={buyButton(fullWidthDark)}
+				buy={buyButton(pillLight)}
 				smallPrint={underButton}
 			/>
 

@@ -182,7 +182,6 @@ export async function StoreFooter() {
 								</li>
 							),
 						)}
-						<li className="text-body ms-1 text-xs">Secure payment by Stripe</li>
 					</ul>
 				</div>
 			</div>
@@ -193,7 +192,10 @@ export async function StoreFooter() {
 					<p className="text-body">
 						© {new Date().getFullYear()} {SITE.name} · {FOOTER_LEGAL_LINE}
 					</p>
-					<p className="text-body">Secure checkout by Stripe{checkout.worldwideEnabled ? "" : " · US customers"}</p>
+					<p className="text-body">
+						Secure checkout by Stripe
+						{checkout.worldwideEnabled ? "" : " · US customers"}
+					</p>
 				</div>
 			</div>
 		</footer>

@@ -22,7 +22,8 @@ export const metadata: Metadata = {
 		? new URL(process.env.BETTER_AUTH_URL)
 		: undefined,
 	title: { default: SITE.name, template: `%s · ${SITE.name}` },
-	
+	// Nothing is public yet: keep search engines out until the store launches.
+	robots: { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
