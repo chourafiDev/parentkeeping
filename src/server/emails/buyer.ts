@@ -168,7 +168,15 @@ ${[SITE.name, p.footer.postalAddress].filter(Boolean).join("\n")}`,
 }
 
 /** Free download delivery (fallback until the email tool sends welcome email 1). */
-export function leadMagnetEmail(p: { magnet: LeadMagnet; pdfUrl: string; unsubscribeUrl: string; footer: EmailFooter; newsletter: boolean }) {
+export function leadMagnetEmail(p: {
+  magnet: LeadMagnet;
+  pdfUrl: string;
+  /** A4 version of the same file, when one exists. */
+  pdfA4Url?: string;
+  unsubscribeUrl: string;
+  footer: EmailFooter;
+  newsletter: boolean;
+}) {
   const e = p.magnet.email;
   return {
     subject: e.subject,
@@ -178,6 +186,7 @@ export function leadMagnetEmail(p: { magnet: LeadMagnet; pdfUrl: string; unsubsc
       body: `<h1 style="font-size:20px;margin:20px 0 8px">${escape(e.heading)}</h1>
 <p style="font-size:15px;line-height:1.6;margin:0">${escape(e.text)}</p>
 ${button(p.pdfUrl, e.button)}
+${p.pdfA4Url ? `<p style="font-size:13px;line-height:1.6;margin:0 0 20px"><a href="${escape(p.pdfA4Url)}" style="color:${SAGE}">Prefer A4? Download that version</a></p>` : ""}
 <p style="font-size:13px;line-height:1.6;margin:0;color:${MUTED}">${escape(e.legal)}</p>
 <p style="font-size:12px;line-height:1.6;margin:16px 0 0;color:${MUTED}">${p.newsletter ? "You'll also get our weekly caregiving emails. " : ""}<a href="${escape(p.unsubscribeUrl)}" style="color:${MUTED}">Unsubscribe</a></p>`,
     }),
@@ -185,7 +194,7 @@ ${button(p.pdfUrl, e.button)}
 
 ${e.text}
 ${p.pdfUrl}
-
+${p.pdfA4Url ? `A4 version: ${p.pdfA4Url}\n` : ""}
 ${e.legal}
 
 ${p.newsletter ? "You'll also get our weekly caregiving emails. " : ""}Unsubscribe: ${p.unsubscribeUrl}

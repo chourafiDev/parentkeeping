@@ -3,8 +3,9 @@
 export const FREE_LIST_SOURCE = "free-medication-list";
 export const FREE_LIST_PATH = "/pages/free-medication-list";
 
-/** Public, unlisted file URL (it's free): shown only on the thank-you page and in the email. */
+/** Public, unlisted file URLs (it's free): shown only on the thank-you page and in the email. */
 export const FREE_LIST_PDF = "/files/Parentkeeping-Free-Medication-List-and-Daily-Medication-Chart.pdf";
+export const FREE_LIST_PDF_A4 = "/files/Parentkeeping-Free-Medication-List-and-Daily-Medication-Chart-A4.pdf";
 
 // The real page copy (headline, subheads, "what's inside", article, FAQ) lives
 // in lib/lead-magnets.ts (FREE_LIST) — that's what the page actually renders.

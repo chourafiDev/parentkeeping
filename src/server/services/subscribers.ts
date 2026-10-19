@@ -107,6 +107,7 @@ export async function subscribeToLeadMagnet(input: SignupMeta & { magnet: LeadMa
       ...leadMagnetEmail({
         magnet: input.magnet,
         pdfUrl: `${siteUrl()}${input.magnet.pdf}`,
+        pdfA4Url: input.magnet.pdfA4 ? `${siteUrl()}${input.magnet.pdfA4}` : undefined,
         unsubscribeUrl: unsubscribeUrl(id),
         footer: await buyerFooter(),
         newsletter: marketingConsent,

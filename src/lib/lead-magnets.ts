@@ -1,7 +1,7 @@
 // Free downloads (email sign-up → PDF), word for word from the Phase 1 page
 // copy. Each has its own page, thank-you page, subscriber source and PDF.
 
-import { FREE_LIST_PATH, FREE_LIST_PDF, FREE_LIST_SOURCE } from "./free-list";
+import { FREE_LIST_PATH, FREE_LIST_PDF, FREE_LIST_PDF_A4, FREE_LIST_SOURCE } from "./free-list";
 import { GENERAL_INFO_LINE, MEDICATION_LEGAL_LINE } from "./legal";
 import type { FaqItem } from "./offer";
 import type { CopySection } from "./product-copy";
@@ -12,6 +12,8 @@ export type LeadMagnet = {
   path: string;
   /** Public, unlisted file (it's free): shown on the thank-you page and in the email. */
   pdf: string;
+  /** A4 version of the same file, when one exists (US Letter stays the default download). */
+  pdfA4?: string;
   seo: { title: string; description: string };
   h1: string;
   /** Headline test: the H1 keeps the keyword, the subhead carries the angle. */
@@ -38,6 +40,7 @@ export const FREE_LIST: LeadMagnet = {
   source: FREE_LIST_SOURCE,
   path: FREE_LIST_PATH,
   pdf: FREE_LIST_PDF,
+  pdfA4: FREE_LIST_PDF_A4,
   seo: {
     title: "Free Printable Medication List & Daily Medication Chart",
     description:

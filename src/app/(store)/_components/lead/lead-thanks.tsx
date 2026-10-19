@@ -19,6 +19,7 @@ import { container, eyebrow, media, pillDark } from "../ui";
  */
 export async function LeadThanksPage({ magnet }: { magnet: LeadMagnet }) {
 	const hasPdf = existsSync(path.join(process.cwd(), "public", magnet.pdf));
+	const hasA4 = !!magnet.pdfA4 && existsSync(path.join(process.cwd(), "public", magnet.pdfA4));
 	const [rows, founding] = await Promise.all([
 		db.select().from(products).where(inArray(products.slug, ["medical-binder", "family-care-system"])),
 		getFoundingPrice(),
@@ -34,10 +35,17 @@ export async function LeadThanksPage({ magnet }: { magnet: LeadMagnet }) {
 					<MailCheck className="text-primary size-9" strokeWidth={1.5} />
 					<h1 className="text-foreground text-[32px] leading-[1.1] font-semibold tracking-[-0.034em] md:text-[44px]">{magnet.thanks.h1}</h1>
 					{hasPdf ? (
-						<a href={magnet.pdf} download className={`${pillDark} gap-2`}>
-							<Download className="size-4" />
-							Download the PDF
-						</a>
+						<div className="grid justify-items-center gap-2">
+							<a href={magnet.pdf} download className={`${pillDark} gap-2`}>
+								<Download className="size-4" />
+								Download the PDF
+							</a>
+							{hasA4 && (
+								<a href={magnet.pdfA4} download className="text-body hover:text-foreground text-[13px] underline underline-offset-2">
+									Prefer A4? Download that version
+								</a>
+							)}
+						</div>
 					) : process.env.NODE_ENV !== "production" ? (
 						<p className="bg-destructive/10 text-destructive rounded-[10px] p-3 text-sm">
 							Dev note: the PDF isn&apos;t uploaded yet. Add it to public{magnet.pdf}.
