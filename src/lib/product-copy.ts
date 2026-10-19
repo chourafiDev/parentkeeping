@@ -257,24 +257,23 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
 
   "caregiver-agreement": {
     seo: {
-      title: "Family Caregiver Agreement Template (Fillable PDF + Doc)",
+      title: "Family Caregiver Agreement Template (Fillable PDF + Word)",
       description:
-        "A family caregiver agreement template to write down who does what and what's paid, then review with an elder-law attorney. Fillable PDF, $19.",
+        "A family caregiver agreement template to write down who does what and what's paid, then review with an elder-law attorney. Fillable PDF + Word, $19.",
     },
     h1: "Family Caregiver Agreement Template",
-    subhead:
-      "Write down who cares for Mom or Dad, what's paid and how, so nobody has to guess and nobody keeps score in silence. A template to start the conversation and take to your attorney.",
+    subhead: "Write down who cares for Mom or Dad, what's paid and how, so nobody has to guess and nobody keeps score in silence.",
     aboveButton: AGREEMENT_ABOVE_BUTTON,
     underButton: AGREEMENT_DISCLAIMER_SHORT,
     intro: [
-      "Most care arrangements start with “I'll just help out.” A year later one sibling is there four days a week, another sends money now and then, and nobody has said out loud what's fair.",
+      "Most care starts with “I'll just help out.” A year later one sibling is there four days a week and nobody has said out loud what's fair. This caregiver agreement template (also called a personal care agreement or caregiver contract) puts the arrangement on paper, step by step, and gets your family ready for one short meeting with an elder-law attorney.",
     ],
-    badges: ["Fillable PDF", "Editable doc for your attorney"],
+    badges: ["Fillable PDF", "US Letter & A4", "Editable Word doc"],
     facts: [
-      { icon: "format", text: "Fillable PDF plus an editable document your attorney can mark up" },
-      { icon: "print", text: "US Letter" },
+      { icon: "format", text: "Fillable PDF plus an editable Word document your attorney can mark up" },
+      { icon: "print", text: "Two files, US Letter and A4" },
       { icon: "download", text: "Instant download after checkout" },
-      { icon: "attorney", text: "Signature page with space for the attorney's review" },
+      { icon: "attorney", text: "Signature page with space for witnesses, a notary and the attorney's review" },
     ],
     // DRAFT, awaiting approval.
     firstMonth: {
@@ -308,7 +307,11 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       items: [
         { tag: "The care", title: ["The care", "to be provided"], text: "From rides and meals to medication pickups and bill paying, with the schedule and expected hours, including live-in arrangements." },
         { tag: "Payments", title: ["Paid", "or unpaid"], text: "The rate, and how and when payments are made." },
-        { tag: "Time log", title: ["A time and", "task log"], text: "A simple time and task log to keep with the agreement." },
+        {
+          tag: "Time & payment log",
+          title: ["Time, task", "and payment log"],
+          text: "The records that show what care was given and what was paid.",
+        },
         {
           tag: "Family guide",
           title: ["A plain-words", "guide"],
@@ -320,18 +323,15 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
     inside: {
       title: "What's inside the template",
       items: [
-        { name: "Who's involved", text: "The parent, the caregiver, and any siblings or agents signing." },
-        { name: "The care to be provided", text: "From rides and meals to medication pickups and bill paying." },
-        { name: "Schedule and expected hours", text: "Including live-in arrangements." },
-        { name: "Paid or unpaid", text: "The rate, and how and when payments are made." },
-        { name: "Time and task log", text: "A simple log to keep with the agreement." },
-        { name: "Backup care", text: "What happens when the caregiver is sick or away." },
-        { name: "Reviews and changes", text: "How and when the agreement is reviewed, changed or ended." },
-        { name: "Signature page", text: "With space for the attorney's review." },
+        { name: "Talk first", text: "Six questions to settle as a family before anyone writes a word." },
+        { name: "Questions for your elder-law attorney", text: "A tick list that makes the attorney meeting shorter and cheaper." },
         {
-          name: "A plain-words guide",
-          text: "Questions to settle as a family before your attorney meeting, so the billed hour goes further.",
+          name: "The agreement, in plain words with blanks",
+          text: "Who is involved and where the care happens; the care to be given, the schedule and the hours; live-in care and house rules; pay, and how to choose a fair rate; taxes and records; backup care when the caregiver is sick or away; emergencies and privacy; how the agreement changes or ends, and what to do if you disagree.",
         },
+        { name: "Signature page", text: "Space for witnesses, a notary and the attorney's review." },
+        { name: "Time and task log, and payment log", text: "The records that show what care was given and what was paid." },
+        { name: "“What we agreed”", text: "A one-page summary to send each sibling." },
       ],
     },
     sections: [
@@ -351,7 +351,9 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       },
       {
         title: "Formats",
-        paragraphs: ["Fillable PDF plus an editable document your attorney can mark up. US Letter."],
+        paragraphs: [
+          "Fillable PDF in US Letter and A4, plus an editable Word document your attorney can mark up. Fill it in on screen or print it.",
+        ],
         sample: {
           label: "Sample clause (shows the style)",
           text: "Services. [Caregiver] will provide the following care to [Parent]: transportation to medical appointments; picking up prescriptions; grocery shopping; preparing [number] meals per week. [Caregiver] will record hours and tasks on the attached log.",

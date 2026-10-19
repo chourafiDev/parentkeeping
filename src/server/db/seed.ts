@@ -11,9 +11,9 @@ import { users } from "@/server/db/schema";
 // Overridable so a teammate can pick their own dev login; same fixed
 // defaults otherwise so the printed credentials below stay accurate.
 const SEED_OWNER = {
-	name: process.env.SEED_OWNER_NAME,
-	email: process.env.SEED_OWNER_EMAIL,
-	password: process.env.SEED_OWNER_PASSWORD,
+	name: process.env.SEED_OWNER_NAME ?? "Dev Owner",
+	email: process.env.SEED_OWNER_EMAIL ?? "owner@parentkeeping.test",
+	password: process.env.SEED_OWNER_PASSWORD ?? "dev-password-123",
 };
 
 /**
@@ -34,7 +34,7 @@ async function seedOwner() {
 		return;
 	}
 
-	/* await auth.api.createUser({ body: { ...SEED_OWNER, role: "owner", data: {} } }); */
+	await auth.api.createUser({ body: { ...SEED_OWNER, role: "owner", data: {} } });
 	console.log(
 		`\nDev owner created. Sign in at /admin/login with:\n  ${SEED_OWNER.email}\n  ${SEED_OWNER.password}`,
 	);

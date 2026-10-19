@@ -93,7 +93,12 @@ export function PackagePicker({
 				<input type="hidden" name="addon" value={selected.addon} />
 			)}
 			<button type="submit" className={buttonClassName}>
-				{selected.cta} · {formatStorePrice(selected.price)}
+				{selected.cta} · {formatStorePrice(selected.price)}{" "}
+				{selected.compareAt && (
+					<span className="ml-2 text-white/50 line-through">
+						{formatStorePrice(selected.compareAt)}
+					</span>
+				)}
 			</button>
 		</form>
 	);

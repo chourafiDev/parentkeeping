@@ -134,7 +134,7 @@ export function ProductForm({
 							<MediaCard />
 							{assets}
 							<PricingCard />
-							<SeoCard host={host} pathPrefix="/products/" />
+							<SeoCard host={host} pathPrefix="/products/" storePath={storePath} />
 							{after}
 						</div>
 						<div className="flex flex-col gap-4 lg:sticky lg:top-20">

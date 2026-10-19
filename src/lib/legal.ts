@@ -29,7 +29,7 @@ export const EU_NEWSLETTER_CHECKBOX = "Send me Parentkeeping's weekly emails";
 /** Under every Buy button: this line, then BUY_GUARANTEE_LINE. */
 export const PRODUCT_DISCLAIMER_SHORT = "An organizing tool, not medical or legal advice. Always follow your parent's doctors and pharmacist.";
 /** The Agreement page drops the doctors line (its full legal line sits above the button). */
-export const AGREEMENT_DISCLAIMER_SHORT = "An organizing tool, not medical or legal advice.";
+export const AGREEMENT_DISCLAIMER_SHORT = "An organizing tool, not legal advice.";
 export const BUY_GUARANTEE_LINE = "14-day “if it doesn't help” guarantee.";
 
 /** Product legal lines (the System shows the first three near "What's inside"). */

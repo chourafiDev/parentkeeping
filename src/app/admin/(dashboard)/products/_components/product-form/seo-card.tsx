@@ -15,7 +15,7 @@ import { FormCard } from "../../../_components/shared/form-card";
 const stripHtml = (html: string) => html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 
 /** Shopify "Search engine listing": Google-style preview, edit title, description and URL handle. */
-export function SeoCard({ host, pathPrefix }: { host: string; pathPrefix: string }) {
+export function SeoCard({ host, pathPrefix, storePath }: { host: string; pathPrefix: string; storePath?: string | null }) {
 	const [editing, setEditing] = useState(false);
 	const { control, register, formState } = useFormContext<ProductInput>();
 	const [title, description, seoTitle, seoDescription, slug, price] = useWatch({
@@ -26,6 +26,10 @@ export function SeoCard({ host, pathPrefix }: { host: string; pathPrefix: string
 	const previewTitle = seoTitle || title;
 	const previewDescription = seoDescription || stripHtml(description).slice(0, 160);
 	const open = editing || !!(errors.seoTitle || errors.seoDescription || errors.slug);
+	// A few products have a public URL that differs from this id (see catalog.ts
+	// PRODUCT_PATHS): show the real one here so the preview never lies.
+	const previewPath = storePath ?? `${pathPrefix}${slug}`;
+	const remapped = !!storePath && storePath !== `${pathPrefix}${slug}`;
 
 	return (
 		<FormCard
@@ -42,8 +46,7 @@ export function SeoCard({ host, pathPrefix }: { host: string; pathPrefix: string
 					<p className="text-sm">Parentkeeping</p>
 					<p className="text-muted-foreground truncate text-xs">
 						{host}
-						{pathPrefix}
-						{slug}
+						{previewPath}
 					</p>
 					<p className="truncate text-lg text-[#1a0dab]">{previewTitle}</p>
 					<p className="text-muted-foreground line-clamp-2 text-sm">{previewDescription || "Add a description to see it here."}</p>
@@ -74,7 +77,10 @@ export function SeoCard({ host, pathPrefix }: { host: string; pathPrefix: string
 							</InputGroupAddon>
 							<InputGroupInput id="slug" placeholder="medical-binder" aria-invalid={!!errors.slug} {...register("slug")} />
 						</InputGroup>
-						<FieldDescription>Also the id the Stripe webhook uses to map payments back to this product.</FieldDescription>
+						<FieldDescription>
+							Also the id the Stripe webhook uses to map payments back to this product.
+							{remapped && ` This product's live URL is ${previewPath} — do not change this field to match it.`}
+						</FieldDescription>
 						<FieldError errors={[errors.slug]} />
 					</Field>
 				</div>

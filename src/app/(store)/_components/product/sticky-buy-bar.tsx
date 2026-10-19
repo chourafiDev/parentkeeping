@@ -9,9 +9,18 @@ import { container } from "../ui";
  * scrolled out of view above, so the button is always one tap away on long
  * product pages. Hides again when the main button (or the footer) is back.
  */
+
+type Image = {
+	url: string;
+	alt: string;
+	width: number | null;
+	height: number | null;
+};
+
 export function StickyBuyBar({
 	watchId,
 	title,
+	image,
 	price,
 	compareAt,
 	children,
@@ -19,6 +28,7 @@ export function StickyBuyBar({
 	/** id of the element holding the main Buy button. */
 	watchId: string;
 	title: string;
+	image: Image;
 	price: string;
 	compareAt: string | null;
 	/** The Buy button (a server-rendered form). */
@@ -35,7 +45,8 @@ export function StickyBuyBar({
 		const update = () => setShow(pastButton && !footerVisible);
 		const observer = new IntersectionObserver((entries) => {
 			for (const e of entries) {
-				if (e.target === target) pastButton = !e.isIntersecting && e.boundingClientRect.top < 0;
+				if (e.target === target)
+					pastButton = !e.isIntersecting && e.boundingClientRect.top < 0;
 				else footerVisible = e.isIntersecting;
 			}
 			update();
@@ -55,12 +66,23 @@ export function StickyBuyBar({
 			)}
 		>
 			<div className={`${container} flex items-center gap-4 py-3`}>
-				<div className="min-w-0 flex-1 max-sm:hidden">
-					<p className="text-foreground truncate text-[15px] font-semibold">{title}</p>
-					<p className="flex items-baseline gap-2 text-sm tabular-nums">
-						<span className="text-primary font-semibold">{price}</span>
-						{compareAt && <span className="text-body line-through">{compareAt}</span>}
-					</p>
+				<div className="min-w-0 flex-1 max-sm:hidden flex items-center gap-2">
+					<img
+						src={image.url}
+						alt={image.alt || title}
+						className="size-14 object-contain rounded-md"
+					/>
+					<div>
+						<p className="text-foreground truncate text-md font-semibold">
+							{title}
+						</p>
+						<p className="flex items-baseline gap-2 text-md tabular-nums">
+							<span className="text-primary font-semibold">{price}</span>
+							{compareAt && (
+								<span className="text-body line-through">{compareAt}</span>
+							)}
+						</p>
+					</div>
 				</div>
 				<div className="w-full sm:w-auto sm:min-w-[300px]">{children}</div>
 			</div>

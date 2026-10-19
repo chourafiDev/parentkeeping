@@ -193,7 +193,7 @@ export default async function ProductPage({
 		product.description && textOf(product.description)
 			? product.description
 			: null;
-	
+
 	const rating =
 		reviewData.average !== null && reviewData.count >= MIN_REVIEWS_FOR_SUMMARY
 			? { average: reviewData.average, count: reviewData.count }
@@ -727,6 +727,7 @@ export default async function ProductPage({
 				<StickyBuyBar
 					watchId="buy-box"
 					title={copy.h1}
+					image={data.images[0]}
 					price={formatStorePrice(data.price)}
 					compareAt={data.compareAt ? formatStorePrice(data.compareAt) : null}
 				>
