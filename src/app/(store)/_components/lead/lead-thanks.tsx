@@ -57,8 +57,9 @@ export async function LeadThanksPage({ magnet }: { magnet: LeadMagnet }) {
 								Want everything else in one place too?
 							</h2>
 							<p className="text-body text-[15px] leading-[1.714]">
-								The Medical Binder for an Elderly Parent picks up where this list stops: doctors, appointments, insurance, paperwork, a “Who does
-								what” page for siblings and a weekly Sunday check-in. {formatStorePrice(binder.price)}.
+								The Medical Binder for an Elderly Parent picks up where this list stops: 64 pages covering doctors, appointments, daily care,
+								hospital stays, insurance and paperwork, plus a “Who does what” page for siblings and a weekly Sunday check-in.{" "}
+								{formatStorePrice(binder.price)}.
 							</p>
 							<Link href={PRODUCT_PATHS[binder.slug]} className={`${pillDark} gap-2`}>
 								See the Medical Binder
@@ -66,7 +67,8 @@ export async function LeadThanksPage({ magnet }: { magnet: LeadMagnet }) {
 							</Link>
 							{system && (
 								<p className="text-body text-[14px] leading-relaxed">
-									Or get the binder plus a shared Google Sheet, the Caregiver Agreement and a Family Meeting Kit in the Family Care System,{" "}
+									Or get the binder plus a shared Google Sheet, the Family Caregiver Agreement and a Family Meeting Kit in the Family Care
+									System,{" "}
 									{systemFounding ? `${formatStorePrice(system.foundingPrice!)} founding price` : formatStorePrice(system.price)}.{" "}
 									<Link href={PRODUCT_PATHS[system.slug]} className="text-foreground hover:text-primary font-semibold underline underline-offset-2">
 										See the System
