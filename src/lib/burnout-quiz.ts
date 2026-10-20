@@ -4,6 +4,7 @@
 // the page or its results, "not a diagnosis" before question 1, 988 on every result.
 
 import { FREE_LIST_PATH } from "./free-list";
+import { EU_NEWSLETTER_CHECKBOX } from "./legal";
 import type { CopySection } from "./product-copy";
 
 export const QUIZ_PATH = "/pages/caregiver-burnout-quiz";
@@ -94,7 +95,7 @@ export const resultFor = (score: number) => QUIZ_RESULTS.find((r) => score >= r.
 export const QUIZ_EMAIL_BOX = {
   title: "Want a copy of your result and a short plan for your band?",
   button: "Email me my result",
-  checkbox: "Also send me Parentkeeping's weekly emails",
+  checkbox: EU_NEWSLETTER_CHECKBOX,
   smallPrint: "We store only your email. Your answers stay in your browser.",
 };
 

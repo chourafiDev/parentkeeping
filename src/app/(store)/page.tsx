@@ -2,15 +2,15 @@ import { and, eq, inArray, isNotNull } from "drizzle-orm";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { BUNDLE_SLUG, PRODUCT_PATHS, VARIANT_COOKIE } from "@/lib/catalog";
-import { canCheckout } from "@/lib/checkout-region";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { MARQUEE } from "@/lib/home";
-import { HOME_SEO, OFFER_SUBHEAD } from "@/lib/offer";
+import { HOME_SEO } from "@/lib/offer";
+import { PRODUCT_COPY } from "@/lib/product-copy";
 import { PREVIEWS_BY_PRODUCT } from "@/lib/page-previews";
 import { siteUrl } from "@/lib/site-url";
 import { MIN_REVIEWS_FOR_SUMMARY } from "@/lib/social-proof";
 import { db } from "@/server/db";
-import { files, productFiles, products } from "@/server/db/schema";
+import { files, productFiles, productImages, products } from "@/server/db/schema";
 import { getProductReviews } from "@/server/queries/reviews";
 import { getFoundingPrice, getSettings } from "@/server/queries/settings";
 import { getSocialProof } from "@/server/queries/social-proof";
@@ -30,30 +30,55 @@ import type { HomeData, HomeProduct } from "./_components/home/types";
 import { UsualWay } from "./_components/home/usual-way";
 import { PagePreviews } from "./_components/page-previews";
 import { ProblemTabs } from "./_components/problem-tabs";
-import {
-	jsonLdHtml,
-	productJsonLd,
-	visitorCountry,
-} from "./_components/product-data";
+import { jsonLdHtml, productJsonLd } from "./_components/product-data";
 
-export const metadata: Metadata = {
-	title: { absolute: HOME_SEO.title },
-	description: HOME_SEO.description,
-	alternates: { canonical: "/" },
-	openGraph: {
-		title: HOME_SEO.title,
+/** The System's main image is the home page's share image too (same content). */
+const SYSTEM_COPY = PRODUCT_COPY[BUNDLE_SLUG];
+
+export async function generateMetadata(): Promise<Metadata> {
+	const [main] = await db
+		.select({ url: productImages.url, alt: productImages.alt, width: productImages.width, height: productImages.height })
+		.from(productImages)
+		.innerJoin(products, eq(products.id, productImages.productId))
+		.where(eq(products.slug, BUNDLE_SLUG))
+		.orderBy(productImages.sortOrder)
+		.limit(1);
+	const images = main
+		? [
+				{
+					url: main.url,
+					alt: main.alt || SYSTEM_COPY.schemaName,
+					...(main.width && main.height && { width: main.width, height: main.height }),
+				},
+			]
+		: undefined;
+	return {
+		title: { absolute: HOME_SEO.title },
 		description: HOME_SEO.description,
-		url: "/",
-		type: "website",
-	},
-};
-// Prices, the founding window, the visitor's country and headline variant are per request.
+		alternates: { canonical: "/" },
+		openGraph: {
+			type: "website",
+			siteName: "Parentkeeping",
+			title: HOME_SEO.title,
+			description: HOME_SEO.description,
+			url: "/",
+			images,
+		},
+		twitter: {
+			card: main ? "summary_large_image" : "summary",
+			title: HOME_SEO.title,
+			description: HOME_SEO.description,
+			images: images?.map((i) => i.url),
+		},
+	};
+}
+// Prices, the founding window and headline variant are per request.
 export const dynamic = "force-dynamic";
 
 async function loadHome(
 	searchParams: Record<string, string | string[] | undefined>,
 ): Promise<HomeData> {
-	const [rows, founding, country, jar, { contact, checkout }, extras, proof] =
+	const [rows, founding, jar, { contact }, extras, proof] =
 		await Promise.all([
 			db
 				.select()
@@ -66,9 +91,8 @@ async function loadHome(
 					]),
 				),
 			getFoundingPrice(),
-			visitorCountry(searchParams.country),
 			cookies(),
-			getSettings("contact", "checkout"),
+			getSettings("contact"),
 			getPackageExtras(),
 			getSocialProof(),
 		]);
@@ -89,6 +113,18 @@ async function loadHome(
 				isNotNull(files.availableAt),
 			),
 		);
+	const images = await db
+		.select({ productId: productImages.productId, url: productImages.url })
+		.from(productImages)
+		.where(
+			inArray(
+				productImages.productId,
+				rows.map((r) => r.id),
+			),
+		)
+		.orderBy(productImages.sortOrder);
+	const mainImage = (productId: string) =>
+		images.find((i) => i.productId === productId)?.url ?? null;
 
 	const toHome = (slug: string): HomeProduct | null => {
 		const p = rows.find((r) => r.slug === slug);
@@ -105,6 +141,7 @@ async function loadHome(
 			sellable:
 				p.status === "active" &&
 				!!(foundingOn ? p.foundingPriceId : p.stripePriceId),
+			image: mainImage(p.id),
 		};
 	};
 	const system = toHome(BUNDLE_SLUG);
@@ -114,8 +151,6 @@ async function loadHome(
 	return {
 		variant:
 			jar.get(VARIANT_COOKIE)?.value === "fairness" ? "fairness" : "one_place",
-		canBuy: canCheckout(country, checkout.worldwideEnabled),
-		worldwideEnabled: checkout.worldwideEnabled,
 		system,
 		binder: toHome("medical-binder"),
 		agreement: toHome("caregiver-agreement"),
@@ -176,13 +211,15 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			title: "Free Printable Medication List & Daily Medication Chart",
 			href: FREE_LIST_PATH,
 			tab: "free",
+			image: "/images/home/shop-free-list.webp",
 		},
 	];
 	const jsonLd = productJsonLd({
-		title: data.system.title,
-		description: OFFER_SUBHEAD,
+		title: SYSTEM_COPY.schemaName ?? data.system.title,
+		description: SYSTEM_COPY.seo.description,
 		price: data.system.price,
 		url: `${siteUrl()}/`,
+		image: data.system.image,
 		inStock: data.system.sellable,
 		rating:
 			showReviews && systemReviews.average !== null
@@ -199,11 +236,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			<HomeHero data={data} />
 			<Marquee messages={MARQUEE} />
 			<PartsHighlights data={data} />
-			<ShopGrid
-				cards={cards}
-				canBuy={data.canBuy}
-				worldwideEnabled={data.worldwideEnabled}
-			/>
+			<ShopGrid cards={cards} />
 			<MomentBanner />
 			<ProblemTabs />
 			<HowItWorks />

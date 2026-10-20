@@ -45,7 +45,6 @@ export const storeRoutes = new Hono()
       const session = await createCheckoutSession({
         slug,
         addon,
-        country: c.req.header("x-vercel-ip-country") ?? null,
         variant: getCookie(c, VARIANT_COOKIE) ?? null,
       });
       return isForm ? c.redirect(session.url!, 303) : c.json({ url: session.url });

@@ -21,8 +21,6 @@ import {
 	PRODUCT_PATHS,
 	SLUG_BY_HANDLE,
 } from "@/lib/catalog";
-import { buyGateCopy, canCheckout } from "@/lib/checkout-region";
-import { FREE_LIST_PATH } from "@/lib/free-list";
 import { BUY_GUARANTEE_LINE } from "@/lib/legal";
 import { formatStorePrice } from "@/lib/money";
 import {
@@ -31,7 +29,6 @@ import {
 	ONE_PRICE_BADGE,
 	PRICE_ANCHOR_TITLE,
 	presaleNote,
-	worldwideFaqItem,
 } from "@/lib/offer";
 import {
 	DEFAULT_PACKAGE,
@@ -89,7 +86,6 @@ import { StickyBuyBar } from "../../_components/product/sticky-buy-bar";
 import {
 	jsonLdHtml,
 	productJsonLd,
-	visitorCountry,
 } from "../../_components/product-data";
 import { container, pillDark, pillLight, section } from "../../_components/ui";
 
@@ -153,15 +149,33 @@ export async function generateMetadata({
 	// The System's page repeats the home page: canonical to "/" so they don't compete.
 	const canonical =
 		data.product.slug === BUNDLE_SLUG ? "/" : PRODUCT_PATHS[data.product.slug];
+	const main = data.images[0];
+	const shareImages = main
+		? [
+				{
+					url: main.url,
+					alt: main.alt || data.copy.schemaName || data.copy.name || data.copy.h1,
+					...(main.width && main.height && { width: main.width, height: main.height }),
+				},
+			]
+		: undefined;
 	return {
 		title: { absolute: seo.title },
 		description: seo.description,
 		alternates: { canonical },
 		openGraph: {
+			type: "website",
+			siteName: "Parentkeeping",
 			title: seo.title,
 			description: seo.description,
 			url: canonical,
-			images: data.images[0] ? [{ url: data.images[0].url }] : undefined,
+			images: shareImages,
+		},
+		twitter: {
+			card: main ? "summary_large_image" : "summary",
+			title: seo.title,
+			description: seo.description,
+			images: shareImages?.map((i) => i.url),
 		},
 	};
 }
@@ -172,16 +186,15 @@ export default async function ProductPage({
 }: PageProps<"/products/[handle]">) {
 	const [data, query] = await Promise.all([load(params), searchParams]);
 	const isBundle = data.product.slug === BUNDLE_SLUG;
-	const [country, { contact, checkout }, extras, reviewData, proof] =
+	const [{ contact }, extras, reviewData, proof] =
 		await Promise.all([
-			visitorCountry(query.country),
-			getSettings("contact", "checkout"),
+			getSettings("contact"),
 			isBundle ? getPackageExtras() : null,
 			getProductReviews(data.product.slug),
 			getSocialProof(),
 		]);
 	const { product, images, assets, system, copy, pieces } = data;
-	const canBuy = canCheckout(country, checkout.worldwideEnabled);
+	const name = copy.name ?? copy.h1;
 	const discount = data.compareAt
 		? Math.round((1 - data.price / data.compareAt) * 100)
 		: 0;
@@ -210,19 +223,7 @@ export default async function ProductPage({
 	];
 
 	const buyButton = (className: string) =>
-		!canBuy ? (
-			<div className="bg-muted/70 grid gap-1 rounded-[10px] p-4 text-left text-sm">
-				<p className="text-foreground font-medium">
-					{buyGateCopy(checkout.worldwideEnabled).heading}
-				</p>
-				<Link
-					href={FREE_LIST_PATH}
-					className="text-primary font-semibold underline-offset-2 hover:underline"
-				>
-					{buyGateCopy(checkout.worldwideEnabled).cta}
-				</Link>
-			</div>
-		) : data.sellable ? (
+		data.sellable ? (
 			<form action="/api/checkout" method="post">
 				<input type="hidden" name="slug" value={product.slug} />
 				<button type="submit" className={className}>
@@ -341,7 +342,6 @@ export default async function ProductPage({
 	// Buy-box upgrade picker: Medical Binder and Caregiver Agreement only, and
 	// only once the System is itself sellable and actually costs more.
 	const showSystemUpgrade =
-		canBuy &&
 		data.sellable &&
 		!!system?.sellable &&
 		upgradeBy > 0 &&
@@ -377,11 +377,11 @@ export default async function ProductPage({
 				type="application/ld+json"
 				dangerouslySetInnerHTML={jsonLdHtml(
 					productJsonLd({
-						title: copy.schemaName ?? copy.h1,
-						description: copy.seo.description,
+						title: copy.schemaName ?? name,
+						description: seoOf(data).description,
 						price: data.price,
 						url,
-						image: images[0]?.url,
+						image: images.map((i) => i.url),
 						inStock: data.sellable,
 						rating,
 					}),
@@ -395,14 +395,14 @@ export default async function ProductPage({
 						Home
 					</Link>
 					<span className="mx-2">·</span>
-					<span className="text-foreground">{copy.h1}</span>
+					<span className="text-foreground">{name}</span>
 				</nav>
 
 				<div className="grid items-start gap-8 md:grid-cols-2 lg:gap-[60px]">
 					<div className="md:sticky md:top-[130px]">
 						<ProductGallery
 							images={images}
-							title={copy.h1}
+							title={name}
 							badges={copy.badges}
 							fallback={
 								<DocMockup
@@ -498,7 +498,7 @@ export default async function ProductPage({
 									{checkoutError}
 								</p>
 							)}
-							{extras && canBuy && data.sellable ? (
+							{extras && data.sellable ? (
 								<PackagePicker
 									options={packageOptions({
 										system: data,
@@ -514,7 +514,7 @@ export default async function ProductPage({
 									options={singleUpgradeOptions({
 										product: {
 											slug: product.slug,
-											title: SHORT_NAME[product.slug] ?? copy.h1,
+											title: SHORT_NAME[product.slug] ?? name,
 											price: data.price,
 											compareAt: data.compareAt,
 											presale,
@@ -527,7 +527,7 @@ export default async function ProductPage({
 							) : (
 								buyButton(fullWidthDark)
 							)}
-							{canBuy && data.sellable && (
+							{data.sellable && (
 								<p className="text-green flex items-center gap-1.5 text-[14px] font-medium">
 									<Zap className="size-4 shrink-0 fill-current" />
 									{presale
@@ -570,7 +570,8 @@ export default async function ProductPage({
 								)}
 							</ul>
 							<p className="text-body text-xs">
-								Secure payment by Stripe. Sales tax is calculated at checkout.
+								Secure payment by Stripe.{" "}
+							The price includes any sales tax or VAT.
 							</p>
 						</div>
 
@@ -578,9 +579,9 @@ export default async function ProductPage({
 
 						<div className="flex flex-wrap items-center gap-5">
 							{contact.supportEmail && (
-								<AskQuestionDialog productTitle={copy.h1} />
+								<AskQuestionDialog productTitle={name} />
 							)}
-							<ShareDialog title={copy.h1} />
+							<ShareDialog title={name} />
 						</div>
 					</div>
 				</div>
@@ -632,7 +633,7 @@ export default async function ProductPage({
 				<ProductCompare
 					eyebrowText="One price"
 					title={PRICE_ANCHOR_TITLE}
-					text={`The Medical Binder (${formatStorePrice(pieces["medical-binder"])}) and the Caregiver Agreement (${formatStorePrice(pieces["caregiver-agreement"])}) cost ${formatStorePrice(separately)} on their own. The System adds the Shared Family Care Sheet and the Family Meeting Kit, for ${formatStorePrice(data.compareAt ?? data.price)}.${data.compareAt ? ` Founding buyers pay ${formatStorePrice(data.price)}.` : ""}`}
+					text={`The Binder and the Agreement cost ${formatStorePrice(separately)} on their own. The System adds the Care Sheet and the Meeting Kit for ${formatStorePrice(data.compareAt ?? data.price)}${data.compareAt ? `, or ${formatStorePrice(data.price)} at the founding price` : ""}.`}
 					columns={["Family Care System", "Bought separately"]}
 					rows={[
 						...bundleRows,
@@ -653,9 +654,7 @@ export default async function ProductPage({
 
 			<ProductFaqBand
 				items={
-					isBundle
-						? [...copy.faq, worldwideFaqItem(checkout.worldwideEnabled)]
-						: copy.faq
+					copy.faq
 				}
 				supportEmail={contact.supportEmail}
 				legal={copy.legal}
@@ -667,7 +666,7 @@ export default async function ProductPage({
 					eyebrowText="Upgrade to the Family Care System"
 					title={copy.upgrade.title}
 					text={copy.upgrade.text}
-					columns={["Family Care System", SHORT_NAME[product.slug] ?? copy.h1]}
+					columns={["Family Care System", SHORT_NAME[product.slug] ?? name]}
 					rows={[
 						...singleRows,
 						{
@@ -723,10 +722,10 @@ export default async function ProductPage({
 				</ProductClosingBanner>
 			)}
 
-			{canBuy && data.sellable && (
+			{data.sellable && (
 				<StickyBuyBar
 					watchId="buy-box"
-					title={copy.h1}
+					title={name}
 					image={data.images[0]}
 					price={formatStorePrice(data.price)}
 					compareAt={data.compareAt ? formatStorePrice(data.compareAt) : null}

@@ -14,13 +14,11 @@ export function LaunchChecklist({
 	contact,
 	foundingEndsAt,
 	bump,
-	worldwideEnabled,
 }: {
 	services: { stripe: "live" | "test" | null; storage: boolean; email: boolean; emailFrom: string | null };
 	contact: StoreSettings["contact"];
 	foundingEndsAt: string | null;
 	bump: { enabled: boolean; fileStatus: "ready" | "presale" | "missing"; hasPrice: boolean } | null;
-	worldwideEnabled: boolean;
 }) {
 	const items: Item[] = [
 		{
@@ -50,13 +48,6 @@ export function LaunchChecklist({
 			detail: contact.postalAddress ? "In email footers, Contact and the store footer" : "Required in marketing emails",
 		},
 		{ label: "Phone number", state: contact.phone ? "done" : "todo", detail: contact.phone ?? "Shown in the store footer" },
-		{
-			label: "Worldwide checkout",
-			state: worldwideEnabled ? "warn" : "todo",
-			detail: worldwideEnabled
-				? "On — only safe once Stripe has approved Managed Payments for this account"
-				: "Off: US customers only. Turn on in Checkout once Stripe approves Managed Payments",
-		},
 		{
 			label: "Founding price date",
 			state: !foundingEndsAt ? "todo" : new Date(foundingEndsAt) > new Date() ? "done" : "warn",

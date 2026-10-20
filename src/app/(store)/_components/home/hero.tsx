@@ -1,5 +1,4 @@
 import { ShieldCheck } from "lucide-react";
-import { buyGateCopy } from "@/lib/checkout-region";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { PRODUCT_DISCLAIMER_SHORT } from "@/lib/legal";
 import { OFFER_HEADLINES, OFFER_SUBHEAD } from "@/lib/offer";
@@ -150,8 +149,6 @@ export function HomeHero({ data }: { data: HomeData }) {
 					<div className="flex flex-wrap gap-3">
 						<BuyForm
 							product={system}
-							canBuy={data.canBuy}
-							worldwideEnabled={data.worldwideEnabled}
 							className={pillLight}
 						/>
 
@@ -173,7 +170,6 @@ export function HomeHero({ data }: { data: HomeData }) {
 					{/* DISCLAIMERS */}
 					<div className="space-y-2 text-xs text-white/80">
 						<p>
-							{!data.canBuy && `${buyGateCopy(data.worldwideEnabled).heading} `}
 							{PRODUCT_DISCLAIMER_SHORT}
 						</p>
 

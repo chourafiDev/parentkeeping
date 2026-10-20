@@ -80,8 +80,8 @@ export default async function OrderPage({ params }: PageProps<"/admin/orders/[id
 
 			{order.status === "flagged_non_us" && (
 				<p className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
-					Billing country is {countryName(order.billingCountry)}, outside where Parentkeeping currently sells. It
-					should be refunded with a polite email automatically; check Settings → Checkout if it wasn&apos;t.
+					Billing country is {countryName(order.billingCountry)}. This order was blocked under the old US-only rule,
+					before the store sold worldwide. Check it was refunded in Stripe.
 				</p>
 			)}
 

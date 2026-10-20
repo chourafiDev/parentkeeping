@@ -6,7 +6,7 @@ import { settings } from "@/server/db/schema";
 // Key/value settings with typed defaults (rows are seeded by pnpm db:seed).
 export type StoreSettings = {
   pricing: { foundingEndsAt: string | null };
-  checkout: { bumpEnabled: boolean; worldwideEnabled: boolean };
+  checkout: { bumpEnabled: boolean };
   contact: { supportEmail: string | null; privacyEmail: string | null; postalAddress: string | null; phone: string | null };
   /** Owner's switches for the computed numbers (each also needs enough data, see lib/social-proof). */
   proof: { showFamilies: boolean; showRefundRate: boolean };
@@ -14,7 +14,7 @@ export type StoreSettings = {
 
 const DEFAULTS: StoreSettings = {
   pricing: { foundingEndsAt: null },
-  checkout: { bumpEnabled: false, worldwideEnabled: false },
+  checkout: { bumpEnabled: false },
   contact: { supportEmail: null, privacyEmail: null, postalAddress: null, phone: null },
   proof: { showFamilies: false, showRefundRate: false },
 };

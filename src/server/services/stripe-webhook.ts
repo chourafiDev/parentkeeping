@@ -3,15 +3,9 @@ import { and, eq, inArray, isNull, or } from "drizzle-orm";
 import type Stripe from "stripe";
 import { BUMP_SLUG, BUNDLE_SLUG } from "@/lib/catalog";
 import { formatPrice } from "@/lib/money";
-import { siteUrl } from "@/lib/site-url";
-import { canCheckout } from "@/lib/checkout-region";
 import { db } from "@/server/db";
 import { downloadTokens, orderEvents, orderItems, orders, products, stripeEvents } from "@/server/db/schema";
-import { nonUsRefundEmail } from "@/server/emails/buyer";
-import { buyerFooter } from "@/server/emails/buyer-footer";
-import { sendEmail } from "@/server/lib/email";
 import { getStripe } from "@/server/lib/stripe";
-import { getSettings } from "@/server/queries/settings";
 import { sendOrderEmail } from "./orders";
 
 // Stripe is the source of truth for money: orders are only written here,
@@ -53,10 +47,6 @@ async function recordPaidSession(sessionId: string) {
 
   const mainSlug = session.metadata?.slug;
   const country = session.customer_details?.address?.country ?? null;
-  // Same rule the checkout page used to decide whether to show the Buy
-  // button, checked again now the buyer's real billing country is known.
-  const { checkout } = await getSettings("checkout");
-  const flagged = !canCheckout(country, checkout.worldwideEnabled);
   const paymentIntentId = idOf(session.payment_intent);
 
   // Map Stripe line items to our products before writing anything.
@@ -93,7 +83,7 @@ async function recordPaidSession(sessionId: string) {
         tosConsent: session.consent?.terms_of_service ?? null,
         consentAt: session.consent?.terms_of_service ? new Date() : null,
         testVariant: session.metadata?.test_variant || null,
-        status: flagged ? "flagged_non_us" : "paid",
+        status: "paid",
         paidAt: new Date(session.created * 1000),
       })
       .onConflictDoNothing({ target: orders.stripeSessionId })
@@ -112,61 +102,10 @@ async function recordPaidSession(sessionId: string) {
     // Already recorded (retry or duplicate): finish whatever a failed attempt left undone.
     const [existing] = await db.select().from(orders).where(eq(orders.stripeSessionId, session.id));
     if (existing?.status === "paid" && !existing.confirmationSentAt) await confirm(existing.id);
-    if (existing?.status === "flagged_non_us" && !existing.refundedAt) await refundNonUs(existing.id);
     return;
   }
 
-  if (!flagged) {
-    await confirm(created.id);
-    return;
-  }
-
-  await refundNonUs(created.id);
-}
-
-/**
- * Non-US billing country: refund in full with a polite email. Runs again on
- * Stripe's retry if it failed (the order exists by then, without refundedAt).
- */
-async function refundNonUs(orderId: string) {
-  const stripe = getStripe()!;
-  const [order] = await db.select().from(orders).where(eq(orders.id, orderId));
-  if (!order || order.status !== "flagged_non_us" || order.refundedAt) return;
-
-  const [flaggedBefore] = await db
-    .select({ id: orderEvents.id })
-    .from(orderEvents)
-    .where(and(eq(orderEvents.orderId, orderId), eq(orderEvents.type, "flagged_non_us")));
-  if (!flaggedBefore) {
-    await db.insert(orderEvents).values({
-      orderId,
-      type: "flagged_non_us",
-      message: `Billing country ${order.billingCountry ?? "unknown"} is outside where Parentkeeping currently sells`,
-    });
-  }
-  if (!order.stripePaymentIntentId) return;
-
-  // Throws if Stripe refuses: the webhook answers 500 and Stripe retries later.
-  await stripe.refunds.create(
-    { payment_intent: order.stripePaymentIntentId, reason: "requested_by_customer", metadata: { orderId, cause: "non_us" } },
-    { idempotencyKey: `refund-${orderId}` },
-  );
-  const amount = formatPrice(order.amountTotal);
-  await db.update(orders).set({ amountRefunded: order.amountTotal, refundedAt: new Date() }).where(eq(orders.id, orderId));
-  await db.insert(orderEvents).values({ orderId, type: "refunded", message: `Refunded ${amount} automatically (non-US)` });
-  try {
-    await sendEmail({
-      to: { email: order.email, name: order.name ?? undefined },
-      ...nonUsRefundEmail({
-        orderNumber: order.orderNumber,
-        amount,
-        freeListUrl: `${siteUrl()}/pages/free-medication-list`,
-        footer: await buyerFooter(),
-      }),
-    });
-  } catch (err) {
-    console.error("Non-US refund email failed", err);
-  }
+  await confirm(created.id);
 }
 
 /** charge.refunded → mark the order (refunds from the Stripe dashboard too). */

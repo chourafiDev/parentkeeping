@@ -1,8 +1,12 @@
 "use client";
 
-import { ImagePlus, Loader, X } from "lucide-react";
+import { Check, ImagePlus, Loader, X } from "lucide-react";
 import { useRef, useState } from "react";
-import { useFieldArray, useFormContext } from "react-hook-form";
+import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { IMAGE_ACCEPT, uploadImage } from "@/lib/upload";
 import { cn } from "@/lib/utils";
@@ -13,8 +17,10 @@ const MAX_IMAGES = 20;
 
 /** Shopify "Media": gallery of images, first one is the main image. Drop to upload. */
 export function MediaCard() {
-	const { control } = useFormContext<ProductInput>();
+	const { control, register } = useFormContext<ProductInput>();
 	const { fields, append, remove, move } = useFieldArray({ control, name: "images", keyName: "_id" });
+	const images = useWatch({ control, name: "images" });
+	const [altIndex, setAltIndex] = useState<number | null>(null);
 	const [uploading, setUploading] = useState(0);
 	const [dragging, setDragging] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -90,6 +96,18 @@ export function MediaCard() {
 								<img src={image.url} alt="" className="size-full object-cover" />
 								<button
 									type="button"
+									onClick={() => setAltIndex(index)}
+									aria-label={images?.[index]?.alt ? "Edit alt text" : "Add alt text"}
+									className={cn(
+										"bg-background/90 absolute start-1.5 top-1.5 flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium shadow-sm transition-opacity",
+										images?.[index]?.alt ? "opacity-0 group-hover:opacity-100 focus-visible:opacity-100" : "text-destructive",
+									)}
+								>
+									{images?.[index]?.alt && <Check className="size-3" />}
+									Alt
+								</button>
+								<button
+									type="button"
 									aria-label="Remove image"
 									onClick={() => remove(index)}
 									className="bg-background/90 absolute end-1.5 top-1.5 rounded-md p-1 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
@@ -113,6 +131,30 @@ export function MediaCard() {
 					</div>
 				)}
 			</div>
+			<Dialog open={altIndex !== null} onOpenChange={(open) => !open && setAltIndex(null)}>
+				<DialogContent className="sm:max-w-2xl">
+					<DialogHeader>
+						<DialogTitle>Alt text</DialogTitle>
+						<DialogDescription>Describes the image for screen readers and search engines.</DialogDescription>
+					</DialogHeader>
+					{altIndex !== null && fields[altIndex] && (
+						<div className="grid grid-cols-[96px_1fr] items-start gap-4">
+							{/* eslint-disable-next-line @next/next/no-img-element */}
+							<img src={fields[altIndex].url} alt="" className="bg-muted aspect-square w-full rounded-md border object-cover" />
+							<Field>
+								<FieldLabel htmlFor="image-alt">Alt text</FieldLabel>
+								<Textarea id="image-alt" rows={4} maxLength={255} autoFocus {...register(`images.${altIndex}.alt`)} />
+								<FieldDescription>Say what the image shows, in plain words. Under 125 characters reads best.</FieldDescription>
+							</Field>
+						</div>
+					)}
+					<DialogFooter>
+						<Button type="button" onClick={() => setAltIndex(null)}>
+							Done
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</FormCard>
 	);
 }

@@ -55,7 +55,21 @@ const devStorageEnabled = () => !r2() && process.env.NODE_ENV !== "production";
 /** Storage is usable (R2, or the dev fallback). */
 export const isStorageConfigured = () => !!r2() || devStorageEnabled();
 
-const keyFor = (folder: string, ext: string) => `${folder}/${new Date().getUTCFullYear()}/${randomUUID()}.${ext}`;
+/** "Family Care System (1).JPG" → "family-care-system-1"; empty when nothing usable is left. */
+const fileSlug = (name: string) =>
+  name
+    .replace(/\.[^.]+$/, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .slice(0, 80)
+    .replace(/^-+|-+$/g, "");
+
+// A readable name (when given) keeps image URLs descriptive for search; the random part keeps keys unique.
+const keyFor = (folder: string, ext: string, name?: string) => {
+  const slug = name ? fileSlug(name) : "";
+  const id = slug ? `${slug}-${randomUUID().slice(0, 8)}` : randomUUID();
+  return `${folder}/${new Date().getUTCFullYear()}/${id}.${ext}`;
+};
 
 // ── Dev fallback: HMAC-signed URLs to /api/dev-storage ─────────────────────
 
@@ -102,8 +116,8 @@ export async function presignAssetUpload(contentType: AssetType, size: number) {
 }
 
 /** Presigned PUT for a product image (public bucket). */
-export async function presignImageUpload(contentType: ImageType, size: number) {
-  const key = keyFor("products", IMAGE_TYPES[contentType]);
+export async function presignImageUpload(contentType: ImageType, size: number, fileName?: string) {
+  const key = keyFor("products", IMAGE_TYPES[contentType], fileName);
   const c = r2();
   if (!c) {
     if (!devStorageEnabled()) throw new Error("File storage (R2) is not configured");

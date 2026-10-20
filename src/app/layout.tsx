@@ -5,6 +5,7 @@ import { QueryProvider } from "@/components/query-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SITE } from "@/lib/site";
+import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const instrumentSans = Instrument_Sans({
@@ -18,9 +19,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	metadataBase: process.env.BETTER_AUTH_URL
-		? new URL(process.env.BETTER_AUTH_URL)
-		: undefined,
+	// Same source as JSON-LD and emails (NEXT_PUBLIC_SITE_URL first), so canonical
+	// and og:url never pick up an auth URL that points at localhost.
+	metadataBase: new URL(siteUrl()),
 	title: { default: SITE.name, template: `%s · ${SITE.name}` },
 	// Nothing is public yet: keep search engines out until the store launches.
 	robots: { index: false, follow: false },

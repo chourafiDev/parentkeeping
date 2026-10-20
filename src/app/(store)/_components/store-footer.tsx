@@ -37,8 +37,8 @@ const linkClass = "text-body hover:text-foreground transition-colors";
 
 /** Glozin footer: help, shop, policies, newsletter (= the free list sign-up). */
 export async function StoreFooter() {
-	const [{ contact, checkout }, country] = await Promise.all([
-		getSettings("contact", "checkout"),
+	const [{ contact }, country] = await Promise.all([
+		getSettings("contact"),
 		headers().then((h) => h.get("x-vercel-ip-country")),
 	]);
 	const optIn = needsOptIn(country);
@@ -194,7 +194,6 @@ export async function StoreFooter() {
 					</p>
 					<p className="text-body">
 						Secure checkout by Stripe
-						{checkout.worldwideEnabled ? "" : " · US customers"}
 					</p>
 				</div>
 			</div>

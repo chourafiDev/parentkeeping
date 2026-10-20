@@ -12,14 +12,12 @@ export type HomeProduct = {
 	presale: boolean;
 	/** Can be bought right now (active + Stripe price). */
 	sellable: boolean;
+	/** Main product image (first in the gallery), when one's been uploaded. */
+	image: string | null;
 };
 
 export type HomeData = {
 	variant: "fairness" | "one_place";
-	/** Can this visitor's country check out right now? */
-	canBuy: boolean;
-	/** Settings → Checkout → Sell worldwide. */
-	worldwideEnabled: boolean;
 	system: HomeProduct;
 	binder: HomeProduct | null;
 	agreement: HomeProduct | null;

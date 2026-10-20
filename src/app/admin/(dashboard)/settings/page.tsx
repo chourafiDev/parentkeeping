@@ -56,7 +56,7 @@ export default async function SettingsPage() {
 				readOnly={!hasPermission(user.role, { settings: ["update"] })}
 				defaultValues={{
 					pricing: { foundingEndsOn: pricing.foundingEndsAt ? storeDate(new Date(pricing.foundingEndsAt)) : null },
-					checkout: { bumpEnabled: checkout.bumpEnabled, worldwideEnabled: checkout.worldwideEnabled },
+					checkout: { bumpEnabled: checkout.bumpEnabled },
 					contact: {
 						supportEmail: contact.supportEmail ?? "",
 						privacyEmail: contact.privacyEmail ?? "",
@@ -73,7 +73,6 @@ export default async function SettingsPage() {
 				contact={contact}
 				foundingEndsAt={pricing.foundingEndsAt}
 				bump={bump ? { enabled: checkout.bumpEnabled, fileStatus: bump.fileStatus, hasPrice: !!bump.stripePriceId } : null}
-				worldwideEnabled={checkout.worldwideEnabled}
 			/>
 		</div>
 	);

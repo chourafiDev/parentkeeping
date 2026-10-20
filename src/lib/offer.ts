@@ -39,29 +39,29 @@ export const PARTS_TITLE = "Four parts that work together";
 export const OFFER_PARTS = [
   {
     name: "Medical Binder for an Elderly Parent",
-    what: "Medications, doctors, appointments, insurance and paperwork in one place, plus a “Who does what” page and a weekly Sunday check-in page. Anyone can pick it up and find the answer.",
-    format: "Fillable PDF + printable",
+    what: "Medications, doctors, appointments, hospital stays, insurance and paperwork, plus a “Who does what” page and a weekly Sunday check-in.",
+    format: "64 pages, 9 sections · Fillable PDF or print",
     pillar: "One place",
     fileLabel: "Medical Binder",
   },
   {
     name: "Shared Family Care Sheet",
-    what: "One Google Sheet with three tabs: a medication tracker, a job board (who does what, by when) and a cost tracker that shows each sibling's share. Everyone sees the same page.",
-    format: "Google Sheets, your own copy",
+    what: "A dashboard, job board, weekly rota, care-hours log and a cost tracker that shows each sibling's share and who owes whom. Every sibling sees the same sheet, on a computer or phone.",
+    format: "16 tabs · Google Sheets, your own copy",
     pillar: "Shared fairly · No new app",
     fileLabel: "Shared Family Care Sheet",
   },
   {
     name: "Family Caregiver Agreement Template",
-    what: "Writes down who provides care, whether anyone is paid, and how. A template to start the conversation and take to your attorney.",
-    format: "Fillable PDF + editable doc",
+    what: "Writes down who gives care, whether anyone is paid and how, with time and payment logs. A template to take to an elder-law attorney.",
+    format: "13 pages · PDF + Word",
     pillar: "Shared fairly",
     fileLabel: "Family Caregiver Agreement",
   },
   {
     name: "Family Meeting Kit",
-    what: "A one-page agenda and a plain-words script for the first sibling conversation: what needs doing, who takes which job, how costs split.",
-    format: "PDF",
+    what: "A 45-minute agenda and calm words for the first sibling conversation, so it ends with names on jobs.",
+    format: "8 pages · PDF",
     pillar: "Shared fairly",
     fileLabel: "Family Meeting Kit",
   },
@@ -69,7 +69,23 @@ export const OFFER_PARTS = [
 
 /** Shown while some parts are on pre-sale. */
 export const presaleNote = (deliveryDate: string) =>
-  `The Medical Binder and Family Meeting Kit download right away. The Shared Family Care Sheet and the Agreement arrive by ${deliveryDate}. If we miss that date, you can have a full refund.`;
+  `The Medical Binder and Family Meeting Kit download right away. The Care Sheet and the Agreement arrive by ${deliveryDate}. If we miss that date, you can have a full refund.`;
+
+/** The System page's "How it works": the order a family actually does it in. */
+export const SYSTEM_STEPS = [
+  {
+    title: "Meet using the agenda",
+    text: "The Family Meeting Kit's 45-minute agenda and calm words get you through the first sibling conversation, so it ends with names on jobs.",
+  },
+  {
+    title: "Write it all down in the binder",
+    text: "Medications, doctors, appointments, insurance and paperwork go in the Medical Binder. Fill it in on screen or print it.",
+  },
+  {
+    title: "Share the jobs and costs in the sheet",
+    text: "Make your own copy of the Care Sheet and share it. The job board, weekly rota and cost tracker show who does what and who owes whom.",
+  },
+] as const;
 
 export const SHARING_TITLE = "Sharing takes about 30 seconds. Nobody installs anything.";
 
@@ -82,8 +98,10 @@ export const SHARING_STEPS = [
   },
 ] as const;
 
-export const ONLY_CHILD_NOTE =
-  "Only child, or siblings far away? The job board works the same way with a friend, a neighbor or paid help.";
+export const ONLY_CHILD_NOTE = "Only child, or siblings far away? It works the same with a partner, a friend or paid help.";
+
+/** The System's formats line (the tax half is per request: see the buy box). */
+export const SYSTEM_FORMATS = "Every PDF comes in US Letter and A4. The Care Sheet is your own Google Sheets copy.";
 
 /** Price anchor. Prices come from the catalog so the sentence never drifts. */
 export const PRICE_ANCHOR_TITLE = "Less than buying the pieces";
@@ -121,27 +139,14 @@ export const OFFER_FAQ: FaqItem[] = [
     a: "Only the people you share it with. You fill in the binder on paper or your own device, and the sheet lives in your own Google account. We never receive what you write.",
   },
   {
+    q: "I'm not in the US. Can I buy it?",
+    a: "Yes. Every PDF comes in US Letter and A4, and the price includes any sales tax or VAT. The Caregiver Agreement is written for US families; outside the US, use it as a conversation guide and ask a local lawyer what applies.",
+  },
+  {
     q: "When do the pre-sale parts arrive?",
     a: "By the date shown on the page. We'll email you the moment each part is ready. If we miss the date, ask for a full refund.",
   },
 ];
-
-/**
- * "I'm not in the US. Can I buy it?" — the one FAQ answer that depends on
- * Settings → Checkout → Sell worldwide, so it's computed per request rather
- * than baked into OFFER_FAQ. Appended wherever OFFER_FAQ is shown.
- */
-export const worldwideFaqItem = (worldwideEnabled: boolean): FaqItem =>
-  worldwideEnabled
-    ? {
-        q: "I'm not in the US. Can I buy it?",
-        a: "Yes. The System sells worldwide, in your own currency, with sales tax or VAT already included in the price. A handful of countries aren't supported yet by our payment processor; checkout will tell you if yours is one of them.",
-      }
-    : {
-        q: "I'm not in the US. Can I buy it?",
-        a: "Not yet, but we're working on it. Join the free Medication List and we'll let you know the moment it opens in your country.",
-        link: { label: "Get the free Medication List", href: "/pages/free-medication-list" },
-      };
 
 /** Strips at the end of the home page. */
 export const DOWNSELL_STRIP = {

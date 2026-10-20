@@ -57,7 +57,7 @@ type ImageType = "image/jpeg" | "image/png" | "image/webp" | "image/avif";
 /** Product cover image → public storage. */
 export async function uploadImage(file: File) {
 	const res = await api.api.admin.products.images.presign.$post({
-		json: { contentType: file.type as ImageType, size: file.size },
+		json: { contentType: file.type as ImageType, size: file.size, fileName: file.name },
 	});
 	const body = await res.json();
 	if (!res.ok || !("uploadUrl" in body)) throw new Error("error" in body ? body.error : "Upload failed");

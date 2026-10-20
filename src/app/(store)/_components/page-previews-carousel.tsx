@@ -63,14 +63,14 @@ export function PagePreviewsCarousel({ groups }: { groups: Group[] }) {
 							className="basis-[78%] pl-4 sm:basis-1/2 lg:basis-1/4"
 						>
 							<div className="grid content-start gap-3">
-								<div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-[10px] bg-[#f5f5f5]">
+								<div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-[10px] bg-[#f5f5f5]">
 									{page.image ? (
 										<Image
 											src={page.image}
-											alt={`${group.label}: ${page.name}`}
+											alt={`${group.product}: ${page.name} section`}
 											fill
-											sizes="(min-width: 1024px) 25vw, 80vw"
-											className="object-contain p-4"
+											sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 80vw"
+											className="object-cover"
 										/>
 									) : (
 										<span className="w-[62%]">

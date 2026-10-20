@@ -15,8 +15,6 @@ export const settingsInputSchema = z.object({
   }),
   checkout: z.object({
     bumpEnabled: z.boolean(),
-    /** Opens paid checkout worldwide via Stripe Managed Payments. Off = US only. */
-    worldwideEnabled: z.boolean(),
   }),
   contact: z.object({
     supportEmail: optionalEmail,

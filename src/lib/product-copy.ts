@@ -1,11 +1,11 @@
 // Product page copy, word for word from the Phase 1 page copy (one tab per
 // product). Buy-box prices come from the catalog; the few prices inside the
 // SEO text (metas, the bump line) must be changed here if a price changes.
-// Page counts ("[X] pages") are left out until the files are final.
+// Page counts are in only where the file is final (the System's four parts are).
 
 import { AGREEMENT_ABOVE_BUTTON, AGREEMENT_DISCLAIMER_SHORT, AGREEMENT_LEGAL_LINE, BINDER_LEGAL_LINE, EMERGENCY_LEGAL_LINE, PRODUCT_DISCLAIMER_SHORT, SHEET_LEGAL_LINE } from "./legal";
 import { FREE_LIST_PATH } from "./free-list";
-import { type FaqItem, OFFER_FAQ, OFFER_MOMENT, OFFER_PARTS, OFFER_SUBHEAD, ONLY_CHILD_NOTE, PARTS_TITLE, SHARING_STEPS, SHARING_TITLE } from "./offer";
+import { type FaqItem, OFFER_FAQ, OFFER_HEADLINES, OFFER_MOMENT, OFFER_PARTS, ONLY_CHILD_NOTE, PARTS_TITLE, SYSTEM_FORMATS, SYSTEM_STEPS } from "./offer";
 
 export type CopySection = {
   title: string;
@@ -29,6 +29,8 @@ export type ProductCopy = {
   seo: { title: string; description: string };
   /** Product structured data name, when it differs from the H1. */
   schemaName?: string;
+  /** Short product name (breadcrumb, sticky bar, dialogs) when the H1 is a headline. */
+  name?: string;
   h1: string;
   subhead: string;
   /** Required line above the Buy button. */
@@ -73,25 +75,30 @@ const SYSTEM_PART_TITLES: [string, string][] = [
 export const PRODUCT_COPY: Record<string, ProductCopy> = {
   "family-care-system": {
     seo: {
-      title: "Family Care System: Parent Care Binder + Shared Sheet",
+      title: "Family Care System for an Aging Parent | Parentkeeping",
       description:
-        "One binder and one shared Google Sheet for Mom or Dad's medications, doctors, jobs and costs. Split fairly between siblings. No app. One price.",
+        "A medical binder, a shared Google Sheet, a caregiver agreement and a family meeting kit, so Mom or Dad's care is in one place and shared fairly.",
     },
-    h1: "Family Care System",
-    subhead: OFFER_SUBHEAD,
+    schemaName: "Parentkeeping Family Care System",
+    name: "Family Care System",
+    h1: OFFER_HEADLINES.fairness,
+    subhead:
+      "Everything about Mom or Dad's care in one place, and the work and costs shared fairly between siblings, so it doesn't all fall on you.",
     underButton: PRODUCT_DISCLAIMER_SHORT,
     inside: {
       // DRAFT heading (the zig-zag above already uses "Four parts that work together").
       title: "Everything in the download",
       items: OFFER_PARTS.map((p) => ({ name: p.name, text: p.what, meta: p.format })),
     },
-    intro: OFFER_MOMENT.paragraphs,
-    badges: ["Printable binder", "Shared Google Sheet", "No app"],
+    intro: [
+      "You know every pill, every doctor and every refill date. Nobody asked you to; it just happened, one phone call at a time. The Family Care System gives that job one place to live and a way to share it. Set it up in a weekend, with no new app and no subscription.",
+    ],
+    // No badges: image 1 carries its own part chips, and overlaid ones would cover its title.
     facts: [
       { icon: "download", text: "Instant download after checkout" },
-      { icon: "format", text: "A printable binder and a Google Sheet. Nothing to install." },
+      { icon: "print", text: "Every PDF in US Letter and A4: fill it in on screen or print it" },
+      { icon: "format", text: "The Care Sheet is your own Google Sheets copy. Nothing to install." },
       { icon: "family", text: "Covers relatives who help care for the same parent" },
-      { icon: "guarantee", text: "14-day “if it doesn't help” guarantee" },
     ],
     // DRAFT, awaiting approval. No time estimates beyond the docs' own (the 10-minute Sunday check-in).
     firstMonth: {
@@ -104,7 +111,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
         { when: "Week 4", title: "It runs on a Sunday check-in", text: "A 10-minute weekly review: what changed, what's coming up, who's paid what. Nobody has to keep score in their head." },
       ],
     },
-    steps: { title: SHARING_TITLE, items: SHARING_STEPS, note: ONLY_CHILD_NOTE },
+    steps: { title: "Set it up in a weekend", items: SYSTEM_STEPS, note: ONLY_CHILD_NOTE },
     highlights: {
       title: PARTS_TITLE,
       items: OFFER_PARTS.map((p, i) => ({
@@ -115,7 +122,10 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       })),
     },
     parts: OFFER_PARTS.map((p) => p.fileLabel),
-    sections: [],
+    sections: [
+      { title: OFFER_MOMENT.title, paragraphs: OFFER_MOMENT.paragraphs },
+      { title: "Formats", paragraphs: [SYSTEM_FORMATS] },
+    ],
     faq: OFFER_FAQ,
     legal: [
       { label: "Medical Binder", text: BINDER_LEGAL_LINE },
@@ -140,36 +150,15 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
     inside: {
       title: "What's inside",
       items: [
-        {
-          name: "Parent at a Glance",
-          text: "About Mom or Dad, emergency contacts, family and helpers, daily routines, and an “About me” page for new aides and hospital staff.",
-        },
+        { name: "Parent at a Glance", text: "About Mom or Dad, emergency contacts, family and helpers, daily routines, and an \"About me\" page for new aides and hospital staff." },
         { name: "Health History", text: "Conditions, surgeries and hospital stays, allergies, vaccinations, equipment and supplies." },
-        {
-          name: "Care Team",
-          text: "Doctors and specialists with phone numbers, patient portals and what each one handles, plus pharmacy and other services.",
-        },
-        {
-          name: "Medications & Refills",
-          text: "Prescription and over-the-counter lists, a daily medication chart, a changes log, a refill tracker and fold-over wallet cards. A medication binder the pharmacist can review in two minutes.",
-        },
-        {
-          name: "Appointments & Visits",
-          text: "Month at a glance, an appointment log with “who's driving”, visit prep and notes, tests and referrals.",
-        },
-        {
-          name: "Daily Care",
-          text: "Weekly care schedule, daily care log with a handover note, meals and sleep, health readings, symptoms, falls and incidents.",
-        },
+        { name: "Care Team", text: "Doctors and specialists with phone numbers, patient portals and what each one handles, plus pharmacy and other services." },
+        { name: "Medications & Refills", text: "Prescription and over-the-counter lists, a daily medication chart, a changes log, a refill tracker and fold-over wallet cards. Bring it to appointments for the pharmacist to review." },
+        { name: "Appointments & Visits", text: "Month at a glance, an appointment log with \"who's driving\", visit prep and notes, tests and referrals." },
+        { name: "Daily Care", text: "Weekly care schedule, daily care log with a handover note, meals and sleep, health readings, symptoms, falls and incidents." },
         { name: "Hospital Stay", text: "A hospital bag checklist, stay notes and the questions to ask before discharge." },
-        {
-          name: "Insurance, Costs & Paperwork",
-          text: "Medicare and other plans, insurance call log, bills, medical expenses, mileage, and where important documents are kept (power of attorney, advance directive, will), without storing the originals.",
-        },
-        {
-          name: "Sharing the Care",
-          text: "A “Who does what” page that names who handles refills, rides, bills and calls, a 10-minute Sunday check-in, a family update log and a backup plan. Plus notes pages, printable tab labels and a spine label.",
-        },
+        { name: "Insurance, Costs & Paperwork", text: "Medicare and other plans, an insurance call log, bills, medical expenses, mileage, and where important documents are kept (power of attorney, advance directive, will), without storing the originals." },
+        { name: "Sharing the Care", text: "A \"Who does what\" page that names who handles refills, rides, bills and calls, a 10-minute Sunday check-in, a family update log and a backup plan. Plus notes pages, printable tab labels and a spine label." },
       ],
     },
     badges: ["Fillable PDF", "US Letter & A4", "No app"],

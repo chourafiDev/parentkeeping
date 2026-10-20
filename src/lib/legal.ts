@@ -2,22 +2,9 @@
 // Store-page lines are word for word from the Phase 1 page copy (which takes
 // them from the Legal doc). Checkout/email consent lines are still placeholders.
 
-/**
- * Stripe's required terms checkbox at checkout (markdown link allowed).
- * Carries the EU/UK immediate-download consent (Consumer Rights Directive /
- * Consumer Contracts Regulations: a digital download's 14-day right to
- * cancel ends only with this express, unticked-by-default consent) — shown
- * to every buyer, everywhere, since it does no harm outside the EU/UK.
- */
-export const checkoutConsentText = (termsUrl: string) =>
-  `I agree to the [Terms of Service](${termsUrl}). I want my download straight away, and I understand that once it starts I lose my legal 14-day right to cancel. (Parentkeeping's own 14-day guarantee still applies.)`;
-
 /** Line in the order confirmation email recording that consent. */
 export const ORDER_CONSENT_LINE =
   "You asked for immediate access to your digital download and confirmed that you lose your statutory right to cancel once the download begins. Our 14-day Parentkeeping guarantee still applies.";
-
-/** Next to the Pay button (Stripe custom_text.submit), from the spec. */
-export const CHECKOUT_SUBMIT_TEXT = "14-day “if it doesn't help” guarantee. An organizing tool, not medical or legal advice.";
 
 /** Under a free-download button, everyone outside the EU/UK. */
 export const signupNotice = (what: string) => `We'll email you ${what}, then our weekly caregiving emails. Unsubscribe anytime.`;

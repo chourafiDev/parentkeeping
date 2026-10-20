@@ -17,7 +17,7 @@ import { files, products } from "./catalog";
 
 // paid           = checkout.session.completed received and verified
 // refunded       = charge.refunded (full refund); the download token is expired
-// flagged_non_us = billing country isn't US: refunded with a polite email
+// flagged_non_us = historical only: orders blocked under the old US-only rule (nothing sets it now)
 export const orderStatus = pgEnum("order_status", ["paid", "refunded", "flagged_non_us"]);
 
 // Copied from Stripe webhooks only — never written from the browser.

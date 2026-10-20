@@ -10,10 +10,15 @@ import { GuaranteeCard } from "../product/buy-details";
 import { PackagePicker } from "../product/package-picker";
 import { container, pillDark, section, sectionSubtitle, sectionTitle } from "../ui";
 import { BuyForm } from "./buy-form";
-import { DocMockup, type DocKind } from "./doc-mockup";
 import { deliveryDate, type HomeData } from "./types";
 
-const KINDS: DocKind[] = ["binder", "sheet", "agreement", "meeting"];
+/** Same order as OFFER_PARTS. Square, on the cards' own #f5f5f5, so they fill the box edge to edge. */
+const PART_IMAGES = [
+	{ src: "/images/home/parts/card-medical-binder.webp", alt: "Medical Binder for an Elderly Parent, cover and an appointments page" },
+	{ src: "/images/home/parts/card-shared-family-care-sheet.png", alt: "Shared Family Care Sheet in Google Sheets, dashboard and fair-share tabs" },
+	{ src: "/images/home/parts/card-caregiver-agreement.webp", alt: "Family Caregiver Agreement Template, cover and agreement page" },
+	{ src: "/images/home/parts/card-family-meeting-kit.webp", alt: "Family Meeting Kit, cover and agenda page" },
+] as const;
 
 /** Glozin "Bundle and Save" → the spec's price anchor ("Less than buying the pieces"). */
 export function Bundle({ data }: { data: HomeData }) {
@@ -28,20 +33,22 @@ export function Bundle({ data }: { data: HomeData }) {
 			<div className="mb-8 grid gap-2 text-center md:mb-10">
 				<h2 className={sectionTitle}>{PRICE_ANCHOR_TITLE}</h2>
 				<p className={`${sectionSubtitle} mx-auto max-w-[720px]`}>
-					{binder && agreement
-						? `The Medical Binder (${formatStorePrice(binder.price)}) and the Caregiver Agreement (${formatStorePrice(agreement.price)}) cost ${formatStorePrice(separately)} on their own. `
-						: ""}
-					The System adds the Shared Family Care Sheet and the Family Meeting Kit, for {formatStorePrice(regular)}.
-					{system.compareAt ? ` Founding buyers pay ${formatStorePrice(system.price)}.` : ""}
+					{binder && agreement ? `The Binder and the Agreement cost ${formatStorePrice(separately)} on their own. ` : ""}
+					The System adds the Care Sheet and the Meeting Kit for {formatStorePrice(regular)}
+					{system.compareAt ? `, or ${formatStorePrice(system.price)} at the founding price` : ""}.
 				</p>
 			</div>
 			<ul className="grid grid-cols-2 gap-4 md:gap-[30px] lg:grid-cols-4">
 				{OFFER_PARTS.map((part, i) => (
 					<li key={part.name} className="grid content-start gap-3">
 						<div className="relative aspect-square overflow-hidden rounded-[10px] bg-[#f5f5f5]">
-							<span className="absolute inset-0 flex items-center justify-center px-[24%] py-[14%]">
-								<DocMockup kind={KINDS[i]} title={part.name} />
-							</span>
+							<Image
+								src={PART_IMAGES[i].src}
+								alt={PART_IMAGES[i].alt}
+								fill
+								sizes="(min-width: 1024px) 25vw, 50vw"
+								className="object-cover"
+							/>
 						</div>
 						<p className="text-foreground text-[15px] leading-snug font-medium">{part.name}</p>
 						<p className="text-body text-sm">{separate[i] !== null ? `${formatStorePrice(separate[i])} on its own` : "Only in the System"}</p>
@@ -86,7 +93,7 @@ export function Bundle({ data }: { data: HomeData }) {
 						)}
 					</p>
 					{data.proof.families && <p className="text-primary -mt-1 text-[13px] font-medium">Bought by {data.proof.families} families</p>}
-					{data.canBuy && system.sellable ? (
+					{system.sellable ? (
 						<PackagePicker
 							options={packageOptions({
 								system,
@@ -98,9 +105,9 @@ export function Bundle({ data }: { data: HomeData }) {
 							buttonClassName={`${pillDark} w-full`}
 						/>
 					) : (
-						<BuyForm product={system} canBuy={data.canBuy} worldwideEnabled={data.worldwideEnabled} className={`${pillDark} w-full`} />
+						<BuyForm product={system} className={`${pillDark} w-full`} />
 					)}
-					{data.canBuy && system.sellable && (
+					{system.sellable && (
 						<p className="text-green flex items-center gap-1.5 text-[14px] font-medium">
 							<Zap className="size-4 shrink-0 fill-current" />
 							{delivery ? "Pre-order: each file downloads the moment it's ready" : "Instant download, ready the moment you pay"}

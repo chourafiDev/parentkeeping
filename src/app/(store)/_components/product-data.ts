@@ -14,7 +14,8 @@ export function productJsonLd(p: {
 	/** Price charged now, in cents. */
 	price: number;
 	url: string;
-	image?: string | null;
+	/** Main image first (Google may show any of them). */
+	image?: string | string[] | null;
 	inStock: boolean;
 	/** Published verified-buyer reviews (only passed once there are enough to summarize). */
 	rating?: { average: number; count: number } | null;
@@ -24,7 +25,7 @@ export function productJsonLd(p: {
 		"@type": "Product",
 		name: p.title,
 		description: p.description,
-		...(p.image && { image: p.image }),
+		...(p.image?.length && { image: p.image }),
 		brand: { "@type": "Brand", name: "Parentkeeping" },
 		...(p.rating && {
 			aggregateRating: { "@type": "AggregateRating", ratingValue: p.rating.average.toFixed(1), reviewCount: p.rating.count, bestRating: 5, worstRating: 1 },

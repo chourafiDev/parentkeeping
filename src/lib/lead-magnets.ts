@@ -2,7 +2,7 @@
 // copy. Each has its own page, thank-you page, subscriber source and PDF.
 
 import { FREE_LIST_PATH, FREE_LIST_PDF, FREE_LIST_PDF_A4, FREE_LIST_SOURCE } from "./free-list";
-import { GENERAL_INFO_LINE, MEDICATION_LEGAL_LINE } from "./legal";
+import { GENERAL_INFO_LINE, MEDICATION_LEGAL_LINE, QUIZ_RESULT_FOOTER } from "./legal";
 import type { FaqItem } from "./offer";
 import type { CopySection } from "./product-copy";
 
@@ -141,55 +141,83 @@ export const FREE_LIST: LeadMagnet = {
 };
 
 const CHECKLISTS_SUBHEAD =
-  "A caregiver daily checklist template, plus the aging-parent checklists that get the big conversations started. Four printable pages, free.";
+  "Four printable checklists for the family caring for Mom or Dad: the daily routine, the big questions, the papers to find, and you.";
 
 export const CHECKLISTS: LeadMagnet = {
   source: "caregiver-checklists",
   path: "/pages/caregiver-checklists",
   pdf: "/files/Parentkeeping-Free-Caregiver-Checklists.pdf",
+  pdfA4: "/files/Parentkeeping-Free-Caregiver-Checklists-A4.pdf",
   seo: {
     title: "Free Printable Caregiver Checklists (Daily + Aging Parents)",
-    description: "Free printable caregiver daily checklist template, plus aging-parent checklists: questions to ask, finances and documents. PDF by email.",
+    description:
+      "Free caregiver checklists: a daily checklist, 30 questions to ask aging parents, a finances & documents list and a self-care check. Fillable PDF.",
   },
   h1: "Free Printable Caregiver Checklists",
   subheads: { one_place: CHECKLISTS_SUBHEAD, fairness: CHECKLISTS_SUBHEAD },
+  intro:
+    "Made for adult children helping an aging parent. Print what you need or type straight into the PDF, then share a section with each sibling. 7 pages, fillable PDF, in US Letter and A4.",
   button: "Send me the checklists",
   noticeWhat: "the checklists",
   inside: {
-    title: "What's inside",
+    title: "What's inside the free PDF",
     items: [
       {
         title: "Caregiver Daily Checklist",
-        text: "A free printable caregiver daily checklist for an elderly parent, morning to night, so whoever's on duty knows what's done.",
+        text: "Morning, midday, afternoon and evening tick boxes with a note for each, mood and sleep, anything to mention to the doctor, and a handover note for tomorrow's helper.",
       },
       {
-        title: "Questions to Ask Aging Parents",
-        text: "30 questions about health, money, home and wishes, grouped so you can cover one area per visit.",
+        title: "30 Questions to Ask Aging Parents",
+        text: "Six questions each on health, daily life, money, home, and wishes & documents, with space to write the answers down.",
       },
-      { title: "Aging Parents Finances & Documents Checklist", text: "The accounts, bills and papers to locate before you need them." },
-      { title: "Caregiver Self-Care Checklist", text: "A weekly check on you, because the person doing the caring counts too." },
+      {
+        title: "Finances & Documents Checklist",
+        text: "14 papers to find, from the will to the Medicare card, each with a “found it” box and where it's kept. Never passwords or account numbers.",
+      },
+      {
+        title: "Caregiver Self-Care Checklist",
+        text: "A daily grid for the week, four weekly checks and a “people I can call” list, because the person doing the caring counts too.",
+      },
     ],
   },
   previews: [
     { file: "checklists-page-1", title: "Caregiver Daily Checklist" },
-    { file: "checklists-page-2", title: "Questions to Ask Aging Parents" },
+    { file: "checklists-page-2", title: "30 Questions to Ask Aging Parents" },
+    { file: "checklists-page-3", title: "Finances & Documents Checklist" },
+    { file: "checklists-page-4", title: "Caregiver Self-Care Checklist" },
   ],
   article: [
     {
       title: "How to use a caregiver daily checklist",
       paragraphs: [
-        "Print a week of pages and keep them with the medication chart. Each person who helps ticks what they did and adds a note. At the end of the week you can see what's happening without a single phone call, and you'll spot changes, like skipped meals or poor sleep, early enough to mention to the doctor.",
+        "Print a week of copies and keep them with the medication chart. Whoever is on duty ticks what's done and writes one line for the next helper. At the end of the week you can see how things are going without a single phone call, and you'll spot changes, like skipped meals or poor sleep, early enough to mention to the doctor.",
+        "The medicine lines only say “as listed on the medication chart”. The checklist never suggests what to give or when; that stays with your parent's doctors and pharmacist.",
       ],
+      link: { label: "Need a medication chart? Get our free Medication List & Daily Medication Chart.", href: FREE_LIST_PATH },
     },
     {
       title: "Questions to ask aging parents, and when",
       paragraphs: [
-        "Don't try to cover everything in one sitting. Pick one area per visit: health and doctors first, then money, then the home, then wishes. Ask open questions, listen more than you talk, and write down the answers while you have them.",
+        "Don't try to cover everything in one sitting. Pick one area per visit: health first, then daily life, money, home and wishes. Listen more than you talk, and write the answers down while you have them.",
       ],
       link: {
         label: "Our post on 8 things not to say to your aging parents covers how to phrase the hard ones.",
         href: "/blogs/guides/things-not-to-say-to-aging-parents",
       },
+    },
+    {
+      title: "Which documents to find first",
+      paragraphs: [
+        "The finances and documents checklist covers the 14 papers families most often need in a hurry: bank and card accounts, bills, Social Security and pension, Medicare and insurance cards, tax returns, the will, any trust, both powers of attorney, the advance directive, the deed or lease, the car title, an online accounts list and the safe deposit box.",
+        "Write down where each one is kept, not what's in it. Never put passwords, PINs or account numbers on the page. Keep originals somewhere safe and copies in the binder.",
+      ],
+    },
+    {
+      title: "A caregiver self-care checklist that takes two minutes",
+      paragraphs: [
+        "Tick four things each day: sleep, real meals, moving, and a few minutes that were just yours. Once a week, check that you talked to a friend about something else, kept your own appointments, asked for help with one thing and said no to one thing.",
+        QUIZ_RESULT_FOOTER,
+      ],
     },
     {
       title: "A caring for aging parents checklist for siblings",
@@ -200,9 +228,20 @@ export const CHECKLISTS: LeadMagnet = {
     },
   ],
   faq: [
-    { q: "Are the checklists really free?", a: "Yes. Enter your email and they arrive in a minute." },
-    { q: "Can I edit them?", a: "They're fillable PDFs. Type in them or print them blank." },
-    { q: "Is there a questions to ask aging parents checklist PDF?", a: "Yes, it's one of the four checklists in the download." },
+    {
+      q: "Are the checklists really free?",
+      a: "Yes. Enter your email and the PDF arrives in a minute. You'll also get our weekly emails, and you can unsubscribe anytime.",
+    },
+    {
+      q: "Can I fill them in on my computer?",
+      a: "Yes. It's a fillable PDF. Type in it with any PDF reader, including free Adobe Acrobat Reader, or print the pages blank and write by hand.",
+    },
+    { q: "What paper size is it?", a: "You get both US Letter (8.5 × 11 in) and A4." },
+    {
+      q: "Can my siblings use them?",
+      a: "Yes. Print as many copies as you need and share them with relatives who help care for the same parent. Please don't resell or repost the file.",
+    },
+    { q: "Is there a questions to ask aging parents checklist PDF?", a: "Yes. The 30 questions are one of the four checklists in the download." },
   ],
   legal: GENERAL_INFO_LINE,
   closingTitle: "Get the free checklists",
@@ -214,7 +253,7 @@ export const CHECKLISTS: LeadMagnet = {
     subject: "Your free Caregiver Checklists",
     preheader: "Four printable checklists: daily care, questions to ask, finances and documents, and you.",
     heading: "Your checklists are ready",
-    text: "Your printable Caregiver Checklists are ready: the daily checklist, questions to ask aging parents, the finances and documents checklist, and a weekly self-care check.",
+    text: "Your printable Caregiver Checklists are ready: the daily checklist, 30 questions to ask aging parents, the finances and documents checklist, and a weekly self-care check.",
     button: "Download the PDF",
     legal: GENERAL_INFO_LINE,
   },

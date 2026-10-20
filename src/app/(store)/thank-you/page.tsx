@@ -69,13 +69,9 @@ export default async function ThankYouPage({ searchParams }: PageProps<"/thank-y
 		return (
 			<StoreCard>
 			<div className="text-center">
-				<h1 className="text-2xl font-semibold tracking-tight">
-					{order.refundedAt ? "Your order was refunded" : "Your order will be refunded"}
-				</h1>
+				<h1 className="text-2xl font-semibold tracking-tight">This order was refunded</h1>
 				<p className="text-muted-foreground mt-2">
-					{order.refundedAt
-						? "We can't sell our paid products to your billing country right now, so we've refunded the full amount. We sent you an email with the details and a free list that works anywhere."
-						: "We can't sell our paid products to your billing country right now, so we're refunding the full amount. You'll get an email once it's done, with a free list that works anywhere."}
+					If you didn&apos;t expect that, reply to your receipt email and a person will sort it out.
 				</p>
 						</div>
 		</StoreCard>

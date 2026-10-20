@@ -1,4 +1,4 @@
-import { OFFER_FAQ, worldwideFaqItem } from "@/lib/offer";
+import { OFFER_FAQ } from "@/lib/offer";
 import { formatStoreDay } from "@/lib/store-time";
 import { FaqList } from "../faq-list";
 import { container, section, sectionTitle } from "../ui";
@@ -10,12 +10,11 @@ export function Faq({ data }: { data: HomeData }) {
 	const base = delivery
 		? OFFER_FAQ.map((item) => ({ ...item, a: item.a.replace("By the date shown on the page.", `By ${formatStoreDay(delivery)}.`) }))
 		: OFFER_FAQ;
-	const items = [...base, worldwideFaqItem(data.worldwideEnabled)];
 	return (
 		<section className={`${container} ${section}`}>
 			<div className="mx-auto grid max-w-[860px] gap-8">
 				<h2 className={`${sectionTitle} text-center`}>Questions</h2>
-				<FaqList items={items} />
+				<FaqList items={base} />
 			</div>
 		</section>
 	);

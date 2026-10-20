@@ -41,12 +41,13 @@ export const productRoutes = new Hono<AuthEnv>()
       z.object({
         contentType: z.enum(imageTypes, { error: "Use a JPG, PNG, WEBP or AVIF image" }),
         size: z.number().int().positive().max(MAX_IMAGE_BYTES, "Image is too large (10 MB max)"),
+        fileName: z.string().max(255).optional(),
       }),
     ),
     async (c) => {
       if (!isStorageConfigured()) return c.json({ error: "File storage (R2) is not configured" }, 503);
-      const { contentType, size } = c.req.valid("json");
-      return c.json(await presignImageUpload(contentType, size));
+      const { contentType, size, fileName } = c.req.valid("json");
+      return c.json(await presignImageUpload(contentType, size, fileName));
     },
   )
   // "Add files": attach uploaded files to this product (Shopify Digital Products).
