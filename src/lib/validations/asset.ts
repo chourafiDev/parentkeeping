@@ -26,4 +26,6 @@ export const updateAssetSchema = z.object({
   file: uploadedFileSchema.optional(),
   // null = released (no date). Undefined = unchanged.
   availableAt: z.iso.date().nullable().optional(),
+  /** Name buyers see on their downloads page and in emails. */
+  label: z.string().trim().min(1, "Give the file a name").max(120, "120 characters maximum").optional(),
 });

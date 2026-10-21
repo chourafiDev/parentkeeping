@@ -10,6 +10,7 @@ import {
 	FileArchive,
 	FileText,
 	Loader,
+	Pencil,
 	PlusCircle,
 	RefreshCw,
 	Rocket,
@@ -147,6 +148,7 @@ export function AssetsCard({
 	const [adding, setAdding] = useState(false);
 	const [pending, setPending] = useState<Pending | null>(null);
 	const [dating, setDating] = useState<ProductAsset | null>(null);
+	const [renaming, setRenaming] = useState<ProductAsset | null>(null);
 	const [replacing, setReplacing] = useState<{ asset: ProductAsset; progress: number } | null>(null);
 	const replaceInput = useRef<HTMLInputElement>(null);
 	const replaceTarget = useRef<ProductAsset | null>(null);
@@ -208,7 +210,10 @@ export function AssetsCard({
 							<li key={a.id} className="flex items-start gap-3 p-3">
 								<Icon className={cn("mt-0.5 size-5 shrink-0", status === "missing" ? "text-destructive" : "text-muted-foreground")} />
 								<div className="grid min-w-0 flex-1 gap-0.5">
-									<span className="text-sm font-medium [overflow-wrap:anywhere]">{a.fileName ?? a.label}</span>
+									<span className="text-sm font-medium [overflow-wrap:anywhere]">{a.label}</span>
+									{a.fileName && a.fileName !== a.label && (
+										<span className="text-muted-foreground text-xs [overflow-wrap:anywhere]">{a.fileName}</span>
+									)}
 									<span className="text-muted-foreground text-xs">
 										{busy
 											? `Uploading new version… ${replacing.progress}%`
@@ -258,6 +263,10 @@ export function AssetsCard({
 										<DropdownMenuContent align="end" className="w-56">
 											{canUpdate && (
 												<>
+													<DropdownMenuItem onSelect={() => setRenaming(a)}>
+														<Pencil />
+														Rename for buyers…
+													</DropdownMenuItem>
 													<DropdownMenuItem
 														onSelect={() => {
 															replaceTarget.current = a;
@@ -330,6 +339,15 @@ export function AssetsCard({
 				}
 			/>
 
+			<RenameDialog
+				asset={renaming}
+				onClose={() => setRenaming(null)}
+				onSave={(label) =>
+					renaming
+						? call(api.api.admin.assets[":id"].$patch({ param: { id: renaming.id }, json: { label } }), "Name saved")
+						: Promise.resolve(true)
+				}
+			/>
 			<ConfirmDialog
 				open={pending?.type === "release"}
 				onOpenChange={(o) => !o && setPending(null)}
@@ -375,6 +393,71 @@ export function AssetsCard({
 				}
 			/>
 		</div>
+	);
+}
+
+/** The name buyers see on their downloads page and in emails (the download's file name stays as uploaded). */
+function RenameDialog({
+	asset,
+	onClose,
+	onSave,
+}: {
+	asset: ProductAsset | null;
+	onClose: () => void;
+	onSave: (label: string) => Promise<boolean>;
+}) {
+	const [label, setLabel] = useState("");
+	const [saving, setSaving] = useState(false);
+	const [lastId, setLastId] = useState<string | null>(null);
+	if ((asset?.id ?? null) !== lastId) {
+		setLastId(asset?.id ?? null);
+		setLabel(asset?.label ?? "");
+	}
+	const value = label.trim();
+
+	return (
+		<Dialog open={!!asset} onOpenChange={(o) => !o && onClose()}>
+			<DialogContent>
+				<form
+					className="grid gap-4"
+					onSubmit={async (e) => {
+						e.preventDefault();
+						if (!value || saving) return;
+						setSaving(true);
+						const ok = await onSave(value);
+						setSaving(false);
+						if (ok) onClose();
+					}}
+				>
+					<DialogHeader>
+						<DialogTitle>Rename for buyers</DialogTitle>
+						<DialogDescription>
+							Shown on the buyer&apos;s downloads page and in order emails. The file they download keeps its name
+							{asset?.fileName ? ` (${asset.fileName})` : ""}.
+						</DialogDescription>
+					</DialogHeader>
+					<Input
+						aria-label="Name buyers see"
+						value={label}
+						maxLength={120}
+						autoFocus
+						onChange={(e) => setLabel(e.target.value)}
+						placeholder="Medical Binder for an Elderly Parent (US Letter and A4 PDFs)"
+					/>
+					<DialogFooter>
+						<DialogClose asChild>
+							<Button type="button" variant="outline">
+								Cancel
+							</Button>
+						</DialogClose>
+						<Button type="submit" disabled={!value || value === asset?.label || saving}>
+							{saving && <Loader className="animate-spin" />}
+							Save
+						</Button>
+					</DialogFooter>
+				</form>
+			</DialogContent>
+		</Dialog>
 	);
 }
 

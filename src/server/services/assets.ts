@@ -67,7 +67,8 @@ export async function updateAsset(id: string, input: UpdateAssetInput) {
   if (input.file) {
     Object.assign(set, {
       kind: "file",
-      label: input.file.fileName,
+      // A label someone set by hand survives a new upload; a default one follows the file name.
+      label: before.label === before.fileName ? input.file.fileName : before.label,
       storageKey: input.file.storageKey,
       fileName: input.file.fileName,
       contentType: input.file.contentType,
@@ -76,6 +77,7 @@ export async function updateAsset(id: string, input: UpdateAssetInput) {
       uploadedAt: new Date(),
     });
   }
+  if (input.label !== undefined) set.label = input.label;
   if (input.availableAt !== undefined) set.availableAt = input.availableAt ? day(input.availableAt) : null;
   if (Object.keys(set).length === 0) return { id };
   await db.update(files).set(set).where(eq(files.id, id));
