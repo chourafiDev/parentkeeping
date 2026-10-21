@@ -123,12 +123,15 @@ export function Bundle({ data }: { data: HomeData }) {
 					<div className="bg-background mt-2 rounded-[10px]">
 						<GuaranteeCard supportEmail={data.supportEmail} refundRate={data.proof.refundRate} />
 					</div>
-					<ul className="flex flex-wrap items-center gap-1.5" aria-label="Accepted cards">
+					<ul className="flex flex-wrap items-center gap-1.5" aria-label="Accepted payment methods">
 						{["visa", "mastercard", "amex", "discover", "paypal"].map((card) => (
 							<li key={card} className="rounded-[4px] border bg-white p-0.5">
 								<Image src={`/images/cards/${card}.png`} alt={card} width={35} height={20} />
 							</li>
 						))}
+						<li>
+							<Image src="/images/cards/google-pay.png" alt="Google Pay" width={48} height={26} />
+						</li>
 						<li className="text-body ms-1 text-xs">Secure payment by Stripe</li>
 					</ul>
 				</div>

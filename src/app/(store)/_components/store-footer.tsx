@@ -168,7 +168,7 @@ export async function StoreFooter() {
 					</div>
 					<ul
 						className="flex flex-wrap items-center gap-1.5"
-						aria-label="Accepted cards"
+						aria-label="Accepted payment methods"
 					>
 						{["visa", "mastercard", "amex", "discover", "paypal"].map(
 							(card) => (
@@ -182,6 +182,9 @@ export async function StoreFooter() {
 								</li>
 							),
 						)}
+						<li>
+							<Image src="/images/cards/google-pay.png" alt="Google Pay" width={48} height={26} />
+						</li>
 					</ul>
 				</div>
 			</div>

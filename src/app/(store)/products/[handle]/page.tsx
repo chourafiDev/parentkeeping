@@ -83,10 +83,7 @@ import {
 import { ShareDialog } from "../../_components/product/share-dialog";
 import { ProductSteps } from "../../_components/product/steps";
 import { StickyBuyBar } from "../../_components/product/sticky-buy-bar";
-import {
-	jsonLdHtml,
-	productJsonLd,
-} from "../../_components/product-data";
+import { jsonLdHtml, productJsonLd } from "../../_components/product-data";
 import { container, pillDark, pillLight, section } from "../../_components/ui";
 
 export const dynamic = "force-dynamic";
@@ -154,8 +151,10 @@ export async function generateMetadata({
 		? [
 				{
 					url: main.url,
-					alt: main.alt || data.copy.schemaName || data.copy.name || data.copy.h1,
-					...(main.width && main.height && { width: main.width, height: main.height }),
+					alt:
+						main.alt || data.copy.schemaName || data.copy.name || data.copy.h1,
+					...(main.width &&
+						main.height && { width: main.width, height: main.height }),
 				},
 			]
 		: undefined;
@@ -186,13 +185,12 @@ export default async function ProductPage({
 }: PageProps<"/products/[handle]">) {
 	const [data, query] = await Promise.all([load(params), searchParams]);
 	const isBundle = data.product.slug === BUNDLE_SLUG;
-	const [{ contact }, extras, reviewData, proof] =
-		await Promise.all([
-			getSettings("contact"),
-			isBundle ? getPackageExtras() : null,
-			getProductReviews(data.product.slug),
-			getSocialProof(),
-		]);
+	const [{ contact }, extras, reviewData, proof] = await Promise.all([
+		getSettings("contact"),
+		isBundle ? getPackageExtras() : null,
+		getProductReviews(data.product.slug),
+		getSocialProof(),
+	]);
 	const { product, images, assets, system, copy, pieces } = data;
 	const name = copy.name ?? copy.h1;
 	const discount = data.compareAt
@@ -551,27 +549,33 @@ export default async function ProductPage({
 							</p>
 							<ul
 								className="flex flex-wrap justify-center gap-1.5"
-								aria-label="Accepted cards"
+								aria-label="Accepted payment methods"
 							>
-								{["visa", "mastercard", "amex", "discover", "paypal"].map(
-									(card) => (
-										<li
-											key={card}
-											className="rounded-[4px] border bg-white p-0.5 text-[11px] font-bold tracking-wide text-[#1a1f36]"
-										>
-											<Image
-												src={`/images/cards/${card}.png`}
-												alt={card}
-												width={35}
-												height={20}
-											/>
-										</li>
-									),
-								)}
+								{[
+									"visa",
+									"mastercard",
+									"amex",
+									"discover",
+									"google-pay",
+									"paypal",
+								].map((card) => (
+									<li
+										key={card}
+										className="rounded-[4px] border bg-white p-0.5 text-[11px] font-bold tracking-wide text-[#1a1f36]"
+									>
+										<Image
+											src={`/images/cards/${card}.png`}
+											alt={card}
+											width={35}
+											height={20}
+											className="object-cover bg-center"
+										/>
+									</li>
+								))}
 							</ul>
 							<p className="text-body text-xs">
-								Secure payment by Stripe.{" "}
-							The price includes any sales tax or VAT.
+								Secure payment by Stripe. The price includes any sales tax or
+								VAT.
 							</p>
 						</div>
 
@@ -653,9 +657,7 @@ export default async function ProductPage({
 			)}
 
 			<ProductFaqBand
-				items={
-					copy.faq
-				}
+				items={copy.faq}
 				supportEmail={contact.supportEmail}
 				legal={copy.legal}
 			/>
