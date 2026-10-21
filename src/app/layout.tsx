@@ -23,8 +23,6 @@ export const metadata: Metadata = {
 	// and og:url never pick up an auth URL that points at localhost.
 	metadataBase: new URL(siteUrl()),
 	title: { default: SITE.name, template: `%s · ${SITE.name}` },
-	// Nothing is public yet: keep search engines out until the store launches.
-	robots: { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
