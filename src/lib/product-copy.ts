@@ -100,15 +100,31 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       { icon: "format", text: "The Care Sheet is your own Google Sheets copy. Nothing to install." },
       { icon: "family", text: "Covers relatives who help care for the same parent" },
     ],
-    // DRAFT, awaiting approval. No time estimates beyond the docs' own (the 10-minute Sunday check-in).
+    // Same order as "Set it up in a weekend": meet, write it down, share. Facts from the What's Inside cards.
     firstMonth: {
       title: "Your first month",
-      text: "You don't have to do it all in one sitting. This is what the first weeks usually look like.",
+      text: "You don't have to do it all at once. This is what the first weeks usually look like.",
       items: [
-        { when: "Day 1", title: "Start with the medications", text: "Download, open the Medical Binder and fill in the medications page first. It's the one you'll reach for most." },
-        { when: "First weekend", title: "Finish the binder, share the sheet", text: "Add doctors, appointments and insurance. Make your copy of the Google Sheet and share the link with your siblings." },
-        { when: "Week 1", title: "Hold the first family meeting", text: "Use the Family Meeting Kit. Each person leaves with named jobs and dates on the job board." },
-        { when: "Week 4", title: "It runs on a Sunday check-in", text: "A 10-minute weekly review: what changed, what's coming up, who's paid what. Nobody has to keep score in their head." },
+        {
+          when: "Day 1",
+          title: "Send the invite",
+          text: "Pick a time for the first family conversation. The Family Meeting Kit has a short invite you can copy and send.",
+        },
+        {
+          when: "First weekend",
+          title: "Hold the first meeting",
+          text: "Follow the 45-minute agenda. Every job gets a name, how often and a backup before anyone leaves.",
+        },
+        {
+          when: "Week 1",
+          title: "Write it down and share it",
+          text: "Fill in the Medical Binder, starting with the medications page. Make your copy of the Care Sheet and share it with everyone who helps.",
+        },
+        {
+          when: "Week 4",
+          title: "It runs on a Sunday check-in",
+          text: "A 10-minute weekly review: what changed, what's coming up, who's paid what. Nobody has to keep score in their head.",
+        },
       ],
     },
     steps: { title: "Set it up in a weekend", items: SYSTEM_STEPS, note: ONLY_CHILD_NOTE },

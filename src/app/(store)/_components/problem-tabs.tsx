@@ -13,7 +13,7 @@ export function ProblemTabs() {
 
 	return (
 		<section className={`${container} ${section}`}>
-			<div className="mx-auto mb-8 grid max-w-[760px] gap-3 text-center md:mb-10">
+			<div className="mx-auto mb-8 grid max-w-[800px] gap-3 text-center md:mb-10">
 				<p className={`${eyebrow} text-primary`}>Why it feels this heavy</p>
 				<h2 className={sectionTitle}>{PROBLEM_TITLE}</h2>
 				<p className={sectionSubtitle}>{PROBLEM_SUBTITLE}</p>

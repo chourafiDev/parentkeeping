@@ -3,7 +3,7 @@ import Image from "next/image";
 import { AGREEMENT_LEGAL_LINE, BINDER_LEGAL_LINE, BUY_GUARANTEE_LINE, PRODUCT_DISCLAIMER_SHORT, SHEET_LEGAL_LINE } from "@/lib/legal";
 import { formatStorePrice } from "@/lib/money";
 import { DEFAULT_PACKAGE, packageOptions } from "@/lib/packages";
-import { OFFER_PARTS, PRICE_ANCHOR_TITLE, presaleNote } from "@/lib/offer";
+import { OFFER_PARTS, PRICE_ANCHOR_TITLE, presaleNote, SYSTEM_FORMATS } from "@/lib/offer";
 import { formatStoreDay } from "@/lib/store-time";
 import { cn } from "@/lib/utils";
 import { GuaranteeCard } from "../product/buy-details";
@@ -64,22 +64,13 @@ export function Bundle({ data }: { data: HomeData }) {
 				<div className="grid content-start gap-4">
 					<p className="text-foreground text-[24px] leading-tight font-semibold tracking-[-0.03em]">Family Care System · all four parts</p>
 					<ul className="grid gap-2.5">
-						{OFFER_PARTS.map((part) => (
-							<li key={part.name} className="text-foreground flex items-start gap-3 text-[15px]">
+						{[SYSTEM_FORMATS, "One purchase covers relatives caring for the same parent.", "Nothing to install. No subscription."].map((line) => (
+							<li key={line} className="text-foreground flex items-start gap-3 text-[15px]">
 								<Check className="text-primary mt-0.5 size-4 shrink-0" strokeWidth={2.25} />
-								<span>
-									<span className="font-medium">{part.name}</span>
-									<span className="text-body"> · {part.format}</span>
-								</span>
+								<span>{line}</span>
 							</li>
 						))}
 					</ul>
-					<p className="text-body text-[14px]">
-						{binder && agreement
-							? `Binder ${formatStorePrice(binder.price)} + Agreement ${formatStorePrice(agreement.price)} = ${formatStorePrice(separately)} separately. `
-							: ""}
-						The Sheet and Meeting Kit come only with the System. One purchase covers relatives caring for the same parent.
-					</p>
 				</div>
 
 				<div className="grid content-start gap-3">

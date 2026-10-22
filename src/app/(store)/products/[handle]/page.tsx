@@ -452,12 +452,7 @@ export default async function ProductPage({
 									</span>
 								)}
 							</p>
-							<RatingSummary
-								/* count={reviewData.count}
-								average={reviewData.average} */
-								count={996}
-								average={4.6}
-							/>
+							{/* <RatingSummary count={996} average={4.6} /> */}
 							<p className="text-primary text-[13px] font-medium">
 								{ONE_PRICE_BADGE}
 								{/* {proof.families && ` · Bought by ${proof.families} families`} */}
@@ -593,7 +588,7 @@ export default async function ProductPage({
 			</div>
 
 			{/* {reviews.length > 0 && ( */}
-			<ProductReviews />
+			{/* <ProductReviews /> */}
 			{/* )} */}
 
 			{isBundle && <ProblemTabs />}
@@ -658,7 +653,11 @@ export default async function ProductPage({
 			)}
 
 			<ProductFaqBand
-				items={presale ? copy.faq : copy.faq.filter((item) => item.q !== PRESALE_FAQ_QUESTION)}
+				items={
+					presale
+						? copy.faq
+						: copy.faq.filter((item) => item.q !== PRESALE_FAQ_QUESTION)
+				}
 				supportEmail={contact.supportEmail}
 				legal={copy.legal}
 			/>
