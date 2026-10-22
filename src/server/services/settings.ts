@@ -1,5 +1,6 @@
 import "server-only";
 import { sql } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { endOfStoreDay } from "@/lib/store-time";
 import type { SettingsInput } from "@/lib/validations/settings";
 import { db } from "@/server/db";
@@ -25,4 +26,6 @@ export async function saveSettings(input: SettingsInput) {
     .insert(settings)
     .values(Object.entries(values).map(([key, value]) => ({ key, value })))
     .onConflictDoUpdate({ target: settings.key, set: { value: sql`excluded.value`, updatedAt: new Date() } });
+  // Cached pages show these (contact details, founding banner): rebuild them now.
+  revalidatePath("/", "layout");
 }

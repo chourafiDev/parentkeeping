@@ -1,17 +1,15 @@
 import { Mail, MapPin, Phone } from "lucide-react";
+import { OptInFields } from "./lead/opt-in-fields";
 import { TurnstileWidget } from "./turnstile-widget";
-import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import {
-	EU_NEWSLETTER_CHECKBOX,
 	FOOTER_LEGAL_LINE,
 	SIGNUP_NOTICE,
 } from "@/lib/legal";
 import { SITE } from "@/lib/site";
 import { getSettings } from "@/server/queries/settings";
-import { needsOptIn } from "@/server/services/subscribers";
 import { container, pillDark } from "./ui";
 
 const SHOP = [
@@ -38,11 +36,7 @@ const linkClass = "text-body hover:text-foreground transition-colors";
 
 /** Glozin footer: help, shop, policies, newsletter (= the free list sign-up). */
 export async function StoreFooter() {
-	const [{ contact }, country] = await Promise.all([
-		getSettings("contact"),
-		headers().then((h) => h.get("x-vercel-ip-country")),
-	]);
-	const optIn = needsOptIn(country);
+	const { contact } = await getSettings("contact");
 
 	return (
 		<footer className="mt-auto border-t">
@@ -136,16 +130,6 @@ export async function StoreFooter() {
 									Sign Up
 								</button>
 							</div>
-							{optIn && (
-								<label className="flex items-start gap-2.5 text-sm">
-									<input
-										type="checkbox"
-										name="newsletter"
-										className="accent-primary mt-0.5 size-4"
-									/>
-									<span>{EU_NEWSLETTER_CHECKBOX}</span>
-								</label>
-							)}
 							<input
 								type="text"
 								name="website"
@@ -155,17 +139,18 @@ export async function StoreFooter() {
 								className="hidden"
 							/>
 							<TurnstileWidget />
-							<p className="text-body text-xs">
-								{optIn
-									? "Weekly emails only if you tick the box."
-									: SIGNUP_NOTICE}{" "}
+							<OptInFields
+								noticeClassName="text-body text-xs"
+								notice={SIGNUP_NOTICE}
+								euNotice="Weekly emails only if you tick the box."
+							>
 								<Link
 									href="/policies/privacy-policy"
 									className="text-foreground font-semibold"
 								>
 									Privacy Policy
 								</Link>
-							</p>
+							</OptInFields>
 						</form>
 					</div>
 					<ul

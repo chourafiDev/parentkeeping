@@ -16,7 +16,6 @@ export const metadata: Metadata = {
 	alternates: { canonical: PATH },
 	openGraph: { title: TITLE, description: DESCRIPTION, url: PATH, images: [DEFAULT_SHARE_IMAGE] },
 };
-export const dynamic = "force-dynamic";
 
 export default async function ContactPage() {
 	const { contact } = await getSettings("contact");

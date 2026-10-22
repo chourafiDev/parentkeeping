@@ -2,6 +2,7 @@ import { EU_NEWSLETTER_CHECKBOX, signupNotice } from "@/lib/legal";
 import type { LeadMagnet } from "@/lib/lead-magnets";
 import { cn } from "@/lib/utils";
 import { TurnstileWidget } from "../turnstile-widget";
+import { OptInFields } from "./opt-in-fields";
 import { pillBrand, pillDark } from "../ui";
 
 /**
@@ -18,7 +19,8 @@ export function LeadForm({
 	stacked = false,
 }: {
 	magnet: LeadMagnet;
-	optIn: boolean;
+	/** Server-known (lead pages). Leave out inside the shared layout (popup): decided in the browser. */
+	optIn?: boolean;
 	devCountry?: string;
 	id: string;
 	/** "dark" sits on the deep closing banner. */
@@ -51,7 +53,7 @@ export function LeadForm({
 					{magnet.button}
 				</button>
 			</div>
-			{optIn && (
+			{optIn === true && (
 				<label className={cn("flex items-start gap-2.5 text-sm", dark ? "text-white/85" : "text-foreground")}>
 					{/* Unticked by default: the file comes either way. */}
 					<input type="checkbox" name="newsletter" className="accent-primary mt-0.5 size-4" />
@@ -62,14 +64,27 @@ export function LeadForm({
 			<input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
 			{devCountry && <input type="hidden" name="country" value={devCountry} />}
 			<TurnstileWidget />
-			<p className={cn("text-xs leading-relaxed", dark ? "text-white/70" : "text-body")}>
-				{optIn
-					? `We'll email you ${magnet.noticeWhat}. Weekly emails only if you tick the box; unsubscribe anytime.`
-					: signupNotice(magnet.noticeWhat)}{" "}
-				<a href="/policies/privacy-policy" className="underline underline-offset-2">
-					Privacy Policy
-				</a>
-			</p>
+			{optIn === undefined ? (
+				<OptInFields
+					dark={dark}
+					noticeClassName={cn("text-xs leading-relaxed", dark ? "text-white/70" : "text-body")}
+					notice={signupNotice(magnet.noticeWhat)}
+					euNotice={`We'll email you ${magnet.noticeWhat}. Weekly emails only if you tick the box; unsubscribe anytime.`}
+				>
+					<a href="/policies/privacy-policy" className="underline underline-offset-2">
+						Privacy Policy
+					</a>
+				</OptInFields>
+			) : (
+				<p className={cn("text-xs leading-relaxed", dark ? "text-white/70" : "text-body")}>
+					{optIn
+						? `We'll email you ${magnet.noticeWhat}. Weekly emails only if you tick the box; unsubscribe anytime.`
+						: signupNotice(magnet.noticeWhat)}{" "}
+					<a href="/policies/privacy-policy" className="underline underline-offset-2">
+						Privacy Policy
+					</a>
+				</p>
+			)}
 		</form>
 	);
 }
