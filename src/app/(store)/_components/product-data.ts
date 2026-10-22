@@ -7,6 +7,9 @@ export async function visitorCountry(devParam: unknown) {
 	return (await headers()).get("x-vercel-ip-country");
 }
 
+/** Main English-speaking markets for Google's merchant listings (the store sells worldwide). */
+const LISTING_COUNTRIES = ["US", "CA", "GB", "IE", "AU", "NZ"];
+
 /** schema.org Product (name, price, USD, availability) for search engines. */
 export function productJsonLd(p: {
 	title: string;
@@ -36,6 +39,25 @@ export function productJsonLd(p: {
 			priceCurrency: "USD",
 			price: (p.price / 100).toFixed(2),
 			availability: p.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+			// Digital download: free, delivered instantly (not "doesNotShip", which means unavailable).
+			shippingDetails: {
+				"@type": "OfferShippingDetails",
+				shippingRate: { "@type": "MonetaryAmount", value: 0, currency: "USD" },
+				shippingDestination: LISTING_COUNTRIES.map((addressCountry) => ({ "@type": "DefinedRegion", addressCountry })),
+				deliveryTime: {
+					"@type": "ShippingDeliveryTime",
+					handlingTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 0, unitCode: "DAY" },
+					transitTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 0, unitCode: "DAY" },
+				},
+			},
+			// The 14-day "if it doesn't help" guarantee: refund by email, nothing to send back.
+			hasMerchantReturnPolicy: {
+				"@type": "MerchantReturnPolicy",
+				applicableCountry: LISTING_COUNTRIES,
+				returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+				merchantReturnDays: 14,
+				returnFees: "https://schema.org/FreeReturn",
+			},
 		},
 	};
 }
