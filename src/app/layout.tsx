@@ -23,6 +23,8 @@ export const metadata: Metadata = {
 	// and og:url never pick up an auth URL that points at localhost.
 	metadataBase: new URL(siteUrl()),
 	title: { default: SITE.name, template: `%s · ${SITE.name}` },
+	// Pages that set their own openGraph image get a large card on X instead of a thumbnail.
+	twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

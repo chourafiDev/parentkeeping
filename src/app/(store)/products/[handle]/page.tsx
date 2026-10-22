@@ -27,6 +27,7 @@ import {
 	OFFER_HEADLINES,
 	OFFER_PARTS,
 	ONE_PRICE_BADGE,
+	PRESALE_FAQ_QUESTION,
 	PRICE_ANCHOR_TITLE,
 	presaleNote,
 } from "@/lib/offer";
@@ -657,7 +658,7 @@ export default async function ProductPage({
 			)}
 
 			<ProductFaqBand
-				items={copy.faq}
+				items={presale ? copy.faq : copy.faq.filter((item) => item.q !== PRESALE_FAQ_QUESTION)}
 				supportEmail={contact.supportEmail}
 				legal={copy.legal}
 			/>

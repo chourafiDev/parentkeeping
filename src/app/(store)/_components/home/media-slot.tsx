@@ -33,7 +33,9 @@ export function MediaSlot({
 			alt={alt}
 			fill
 			sizes={sizes}
-			priority={priority}
+			// Next 16: `preload` replaces the deprecated `priority` (the hero is the LCP image).
+			preload={priority}
+			fetchPriority={priority ? "high" : undefined}
 			className={cn("-z-10 object-cover", className)}
 		/>
 	);

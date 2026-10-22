@@ -93,7 +93,7 @@ export async function StoreHeader() {
 						href="/"
 						className="text-foreground text-[26px] leading-none font-semibold tracking-[-0.04em]"
 					>
-						<Image src="/logo.svg" alt={SITE.name} width={130} height={80} />
+						<Image src="/logo.svg" alt={SITE.name} width={130} height={80} loading="eager" />
 					</Link>
 
 					<div className="flex justify-end">

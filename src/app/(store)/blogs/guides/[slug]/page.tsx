@@ -1,5 +1,8 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { ChevronLeft, ChevronRight, Mail } from "lucide-react";
 import type { Metadata } from "next";
+import { DEFAULT_SHARE_IMAGE } from "@/lib/share-image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BLOG, BLOG_PATH, formatPostDate, getPost, type Post, POSTS, postPath } from "@/lib/blog";
@@ -34,6 +37,11 @@ export async function generateMetadata({ params }: PageProps<"/blogs/guides/[slu
 			url,
 			publishedTime: post.publishedAt,
 			...(post.updatedAt && { modifiedTime: post.updatedAt }),
+			images: [
+				existsSync(path.join(process.cwd(), "public/images/blog", `${post.slug}.png`))
+					? { url: `/images/blog/${post.slug}.png`, alt: post.seo.title }
+					: DEFAULT_SHARE_IMAGE,
+			],
 		},
 	};
 }

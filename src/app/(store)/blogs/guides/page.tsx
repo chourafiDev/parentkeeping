@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DEFAULT_SHARE_IMAGE } from "@/lib/share-image";
 import Link from "next/link";
 import { BLOG, BLOG_PATH, POSTS } from "@/lib/blog";
 import { PostCard } from "../../_components/blog/post-card";
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
 	title: { absolute: BLOG.seo.title },
 	description: BLOG.seo.description,
 	alternates: { canonical: BLOG_PATH },
-	openGraph: { title: BLOG.seo.title, description: BLOG.seo.description, url: BLOG_PATH },
+	openGraph: { title: BLOG.seo.title, description: BLOG.seo.description, url: BLOG_PATH, images: [DEFAULT_SHARE_IMAGE] },
 };
 
 /** Blog index in Glozin's blog grid. */

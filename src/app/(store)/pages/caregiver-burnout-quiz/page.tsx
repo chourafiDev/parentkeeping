@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DEFAULT_SHARE_IMAGE } from "@/lib/share-image";
 import Link from "next/link";
 import { QUIZ_ARTICLE, QUIZ_INTRO, QUIZ_LINKS, QUIZ_PATH, QUIZ_SEO } from "@/lib/burnout-quiz";
 import { GENERAL_INFO_LINE } from "@/lib/legal";
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 	title: { absolute: QUIZ_SEO.title },
 	description: QUIZ_SEO.description,
 	alternates: { canonical: QUIZ_PATH },
-	openGraph: { title: QUIZ_SEO.title, description: QUIZ_SEO.description, url: QUIZ_PATH },
+	openGraph: { title: QUIZ_SEO.title, description: QUIZ_SEO.description, url: QUIZ_PATH, images: [DEFAULT_SHARE_IMAGE] },
 };
 
 /**

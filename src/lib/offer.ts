@@ -111,6 +111,9 @@ export const GUARANTEE_TITLE = "If it doesn't help, you get your money back";
 export const guaranteeText = (email: string | null) =>
   `Use it for 14 days. If it doesn't help your family, email ${email ?? "us"} and we'll refund you. No forms, no hard feelings.`;
 
+/** Shown only while some part is on pre-sale (filtered out otherwise). */
+export const PRESALE_FAQ_QUESTION = "When do the pre-sale parts arrive?";
+
 export type FaqItem = { q: string; a: string; link?: { label: string; href: string } };
 
 export const OFFER_FAQ: FaqItem[] = [
@@ -143,7 +146,7 @@ export const OFFER_FAQ: FaqItem[] = [
     a: "Yes. Every PDF comes in US Letter and A4, and the price includes any sales tax or VAT. The Caregiver Agreement is written for US families; outside the US, use it as a conversation guide and ask a local lawyer what applies.",
   },
   {
-    q: "When do the pre-sale parts arrive?",
+    q: PRESALE_FAQ_QUESTION,
     a: "By the date shown on the page. We'll email you the moment each part is ready. If we miss the date, ask for a full refund.",
   },
 ];

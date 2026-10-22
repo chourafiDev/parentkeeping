@@ -6,7 +6,7 @@ export const metadata: Metadata = {
 	title: { absolute: FREE_LIST.seo.title },
 	description: FREE_LIST.seo.description,
 	alternates: { canonical: FREE_LIST.path },
-	openGraph: { title: FREE_LIST.seo.title, description: FREE_LIST.seo.description, url: FREE_LIST.path },
+	openGraph: { title: FREE_LIST.seo.title, description: FREE_LIST.seo.description, url: FREE_LIST.path, images: [{ url: "/images/home/shop-free-list.webp", alt: "Free Medication List and Daily Medication Chart, printable PDF" }] },
 };
 // The visitor's country (EU/UK box) and headline variant are per request.
 export const dynamic = "force-dynamic";

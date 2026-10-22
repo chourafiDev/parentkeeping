@@ -1,5 +1,6 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import type { Metadata } from "next";
+import { DEFAULT_SHARE_IMAGE } from "@/lib/share-image";
 import Link from "next/link";
 import { getSettings } from "@/server/queries/settings";
 import { container, eyebrow } from "../../_components/ui";
@@ -10,10 +11,10 @@ const TITLE = "Contact";
 const DESCRIPTION = "Email us and a person will answer, usually within one business day. Ask a question before you buy, or get help with an order.";
 
 export const metadata: Metadata = {
-	title: { absolute: TITLE },
+	title: TITLE,
 	description: DESCRIPTION,
 	alternates: { canonical: PATH },
-	openGraph: { title: TITLE, description: DESCRIPTION, url: PATH },
+	openGraph: { title: TITLE, description: DESCRIPTION, url: PATH, images: [DEFAULT_SHARE_IMAGE] },
 };
 export const dynamic = "force-dynamic";
 
