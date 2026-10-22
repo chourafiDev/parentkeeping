@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 type Turnstile = {
-	render: (el: HTMLElement, options: { sitekey: string; size?: "normal" | "compact" | "flexible" }) => string;
+	render: (el: HTMLElement, options: { sitekey: string; size?: "normal" | "compact" | "flexible"; theme?: "light" | "dark" | "auto" }) => string;
 	remove: (widgetId: string) => void;
 };
 
@@ -47,7 +47,8 @@ export function TurnstileWidget() {
 		loadTurnstile()
 			.then(() => {
 				if (!cancelled && ref.current && window.turnstile) {
-					widgetId = window.turnstile.render(ref.current, { sitekey: siteKey, size: "flexible" });
+					// The store is light-only: "auto" would draw a black box for dark-mode visitors.
+					widgetId = window.turnstile.render(ref.current, { sitekey: siteKey, size: "flexible", theme: "light" });
 				}
 			})
 			.catch(() => {});
