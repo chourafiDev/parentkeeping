@@ -1,7 +1,7 @@
-import Script from "next/script";
 import { EU_NEWSLETTER_CHECKBOX, signupNotice } from "@/lib/legal";
 import type { LeadMagnet } from "@/lib/lead-magnets";
 import { cn } from "@/lib/utils";
+import { TurnstileWidget } from "../turnstile-widget";
 import { pillBrand, pillDark } from "../ui";
 
 /**
@@ -26,7 +26,6 @@ export function LeadForm({
 	/** Email above the button at every width (narrow spots like the popup). */
 	stacked?: boolean;
 }) {
-	const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 	const dark = tone === "dark";
 	return (
 		<form action="/api/subscribe" method="post" className="grid gap-3">
@@ -62,12 +61,7 @@ export function LeadForm({
 			{/* Honeypot: hidden from people, filled by bots. */}
 			<input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
 			{devCountry && <input type="hidden" name="country" value={devCountry} />}
-			{siteKey && (
-				<>
-					<Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
-					<div className="cf-turnstile" data-sitekey={siteKey} data-size="flexible" />
-				</>
-			)}
+			<TurnstileWidget />
 			<p className={cn("text-xs leading-relaxed", dark ? "text-white/70" : "text-body")}>
 				{optIn
 					? `We'll email you ${magnet.noticeWhat}. Weekly emails only if you tick the box; unsubscribe anytime.`

@@ -32,7 +32,8 @@ export type LeadMagnet = {
   /** Small print at the end of the page. */
   legal: string;
   closingTitle: string;
-  thanks: { h1: string; line: string };
+  /** `next`: the thank-you page's System pitch, worded like the PDF's last page. */
+  thanks: { h1: string; line: string; next: { title: string; text: string } };
   email: { subject: string; preheader: string; heading: string; text: string; button: string; legal: string };
 };
 
@@ -129,6 +130,10 @@ export const FREE_LIST: LeadMagnet = {
   thanks: {
     h1: "Your medication list is ready",
     line: "We've also emailed it to you. Check your spam folder if it isn't there in five minutes.",
+    next: {
+      title: "The medication list is one page. Your parent's care is a whole system.",
+      text: "Doctors, appointments, insurance, paperwork, who is doing what and who is paying. Most of it lives in one person's head, and that person is usually you.",
+    },
   },
   email: {
     subject: "Your free Medication List & Daily Medication Chart",
@@ -248,6 +253,10 @@ export const CHECKLISTS: LeadMagnet = {
   thanks: {
     h1: "Your checklists are ready",
     line: "We've also emailed them to you. Check your spam folder if they aren't there in five minutes.",
+    next: {
+      title: "The checklists are the start. Sharing the work is the next step.",
+      text: "These pages help you see what needs doing. The Family Care System gives it one place to live, and a way to share the work, and the costs, fairly between siblings.",
+    },
   },
   email: {
     subject: "Your free Caregiver Checklists",

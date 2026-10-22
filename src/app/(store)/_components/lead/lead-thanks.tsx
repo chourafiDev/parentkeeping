@@ -1,28 +1,43 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { inArray } from "drizzle-orm";
-import { ArrowRight, Download, MailCheck } from "lucide-react";
+import { asc, eq, inArray } from "drizzle-orm";
+import { ArrowRight, Check, Download, MailCheck } from "lucide-react";
 import Link from "next/link";
 import { PRODUCT_PATHS } from "@/lib/catalog";
 import { BUY_GUARANTEE_LINE } from "@/lib/legal";
 import type { LeadMagnet } from "@/lib/lead-magnets";
 import { formatStorePrice } from "@/lib/money";
 import { db } from "@/server/db";
-import { products } from "@/server/db/schema";
+import { productImages, products } from "@/server/db/schema";
 import { getFoundingPrice } from "@/server/queries/settings";
 import { DocMockup } from "../home/doc-mockup";
 import { container, eyebrow, media, pillDark } from "../ui";
 
+/** The four parts in the same short lines as the free PDFs' last page. */
+const SYSTEM_PARTS = [
+	{ name: "Medical Binder for an Elderly Parent", text: "64 pages for medications, doctors, appointments, insurance and paperwork." },
+	{ name: "Shared Family Care Sheet", text: "One Google Sheet with a job board, a rota and a cost tracker showing each sibling's share." },
+	{ name: "Family Meeting Kit", text: "An agenda and what to say for the first sibling conversation." },
+	{ name: "Family Caregiver Agreement Template", text: "To write down paid or unpaid care, then take to an elder-law attorney." },
+];
+
 /**
- * Free download thank-you page: the PDF, then the $19 Medical Binder first
- * and the Family Care System as the bigger option (SEO plan).
+ * Free download thank-you page: the PDF, then the Family Care System (matching
+ * the free PDFs' last page), with the $19 Medical Binder as the smaller option.
  */
 export async function LeadThanksPage({ magnet }: { magnet: LeadMagnet }) {
 	const hasPdf = existsSync(path.join(process.cwd(), "public", magnet.pdf));
 	const hasA4 = !!magnet.pdfA4 && existsSync(path.join(process.cwd(), "public", magnet.pdfA4));
-	const [rows, founding] = await Promise.all([
+	const [rows, founding, [systemImage]] = await Promise.all([
 		db.select().from(products).where(inArray(products.slug, ["medical-binder", "family-care-system"])),
 		getFoundingPrice(),
+		db
+			.select({ url: productImages.url, alt: productImages.alt })
+			.from(productImages)
+			.innerJoin(products, eq(products.id, productImages.productId))
+			.where(eq(products.slug, "family-care-system"))
+			.orderBy(asc(productImages.sortOrder))
+			.limit(1),
 	]);
 	const binder = rows.find((p) => p.slug === "medical-binder" && p.status === "active");
 	const system = rows.find((p) => p.slug === "family-care-system" && p.status === "active");
@@ -54,36 +69,52 @@ export async function LeadThanksPage({ magnet }: { magnet: LeadMagnet }) {
 					<p className="text-body max-w-[460px] text-[15px] leading-[1.714]">{magnet.thanks.line}</p>
 				</section>
 
-				{binder && (
+				{system && (
 					<section className="grid items-center gap-8 md:grid-cols-2 lg:gap-[60px]">
-						<div className={`${media} bg-[#f5f5f5] px-[18%] py-12`}>
-							<DocMockup kind="binder" title="Medical Binder for an Elderly Parent" tilt={-4} />
+						<div className={`${media} aspect-square bg-[#f5f5f5]`}>
+							{systemImage ? (
+								// eslint-disable-next-line @next/next/no-img-element
+								<img src={systemImage.url} alt={systemImage.alt || "The Parentkeeping Family Care System"} className="size-full object-cover" />
+							) : (
+								<span className="flex size-full items-center justify-center px-[18%] py-12">
+									<DocMockup kind="bundle" title="Family Care System" tilt={-4} />
+								</span>
+							)}
 						</div>
 						<div className="grid justify-items-start gap-4">
-							<p className={`${eyebrow} text-primary`}>Next step</p>
-							<h2 className="text-foreground text-[28px] leading-tight font-semibold tracking-[-0.034em] md:text-[35px]">
-								Want everything else in one place too?
-							</h2>
-							<p className="text-body text-[15px] leading-[1.714]">
-								The Medical Binder for an Elderly Parent picks up where this list stops: 64 pages covering doctors, appointments, daily care,
-								hospital stays, insurance and paperwork, plus a “Who does what” page for siblings and a weekly Sunday check-in.{" "}
-								{formatStorePrice(binder.price)}.
+							<p className={`${eyebrow} text-primary`}>What comes next</p>
+							<h2 className="text-foreground text-[28px] leading-tight font-semibold tracking-[-0.034em] md:text-[35px]">{magnet.thanks.next.title}</h2>
+							<p className="text-body text-[15px] leading-[1.714]">{magnet.thanks.next.text}</p>
+							<ul className="grid gap-2.5">
+								{SYSTEM_PARTS.map((part) => (
+									<li key={part.name} className="flex items-start gap-3 text-[15px]">
+										<Check className="text-primary mt-1 size-4 shrink-0" strokeWidth={2.25} />
+										<span>
+											<span className="text-foreground font-medium">{part.name}.</span> <span className="text-body">{part.text}</span>
+										</span>
+									</li>
+								))}
+							</ul>
+							<p className="flex flex-wrap items-baseline gap-x-2.5 tabular-nums">
+								<span className="text-primary text-[26px] font-bold">{formatStorePrice(systemFounding ? system.foundingPrice! : system.price)}</span>
+								{systemFounding && <span className="text-body text-[16px] line-through">{formatStorePrice(system.price)}</span>}
+								<span className="text-foreground text-[14px] font-medium">
+									{systemFounding ? "founding price · " : ""}one price, no subscription
+								</span>
 							</p>
-							<Link href={PRODUCT_PATHS[binder.slug]} className={`${pillDark} gap-2`}>
-								See the Medical Binder
+							<Link href={PRODUCT_PATHS[system.slug]} className={`${pillDark} gap-2`}>
+								See the Family Care System
 								<ArrowRight className="size-4" />
 							</Link>
-							{system && (
+							<p className="text-body text-xs">{BUY_GUARANTEE_LINE}</p>
+							{binder && (
 								<p className="text-body text-[14px] leading-relaxed">
-									Or get the binder plus a shared Google Sheet, the Family Caregiver Agreement and a Family Meeting Kit in the Family Care
-									System,{" "}
-									{systemFounding ? `${formatStorePrice(system.foundingPrice!)} founding price` : formatStorePrice(system.price)}.{" "}
-									<Link href={PRODUCT_PATHS[system.slug]} className="text-foreground hover:text-primary font-semibold underline underline-offset-2">
-										See the System
+									Just need the binder? The Medical Binder for an Elderly Parent is {formatStorePrice(binder.price)} on its own.{" "}
+									<Link href={PRODUCT_PATHS[binder.slug]} className="text-foreground hover:text-primary font-semibold underline underline-offset-2">
+										See the Medical Binder
 									</Link>
 								</p>
 							)}
-							<p className="text-body text-xs">{BUY_GUARANTEE_LINE}</p>
 						</div>
 					</section>
 				)}

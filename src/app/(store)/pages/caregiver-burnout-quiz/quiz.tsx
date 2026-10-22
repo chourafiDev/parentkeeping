@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, Check, RotateCcw } from "lucide-react";
+import { TurnstileWidget } from "../../_components/turnstile-widget";
 import Link from "next/link";
 import { useState } from "react";
 import { QUIZ_EMAIL_BOX, QUIZ_INTRO, QUIZ_QUESTIONS, QUIZ_SCALE, QUIZ_SOURCE, resultFor } from "@/lib/burnout-quiz";
@@ -157,6 +158,7 @@ function EmailBox() {
 				<span>{QUIZ_EMAIL_BOX.checkbox}</span>
 			</label>
 			<input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
+			<TurnstileWidget />
 			{error && (
 				<p role="alert" className="text-destructive text-sm">
 					{error}

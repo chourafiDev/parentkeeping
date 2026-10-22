@@ -1,4 +1,5 @@
 import { Mail, MapPin, Phone } from "lucide-react";
+import { TurnstileWidget } from "./turnstile-widget";
 import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
@@ -153,6 +154,7 @@ export async function StoreFooter() {
 								aria-hidden
 								className="hidden"
 							/>
+							<TurnstileWidget />
 							<p className="text-body text-xs">
 								{optIn
 									? "Weekly emails only if you tick the box."
