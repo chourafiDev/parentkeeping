@@ -184,7 +184,6 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       { icon: "download", text: "Instant download after checkout. Print as many copies as your family needs." },
       { icon: "family", text: "Covers relatives caring for the same parent" },
     ],
-    // DRAFT, awaiting approval.
     firstMonth: {
       title: "Your first month",
       text: "You don't have to fill it in all at once. This is what the first weeks usually look like.",
@@ -280,29 +279,31 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       { icon: "download", text: "Instant download after checkout" },
       { icon: "attorney", text: "Signature page with space for witnesses, a notary and the attorney's review" },
     ],
-    // DRAFT, awaiting approval.
+    // From the What's Inside cards (Talk First, the attorney tick list, the 17 sections, Signatures, Logs, What We Agreed).
     firstMonth: {
       title: "From first talk to a signed agreement",
       text: "Go at your family's pace. Nobody signs anything until an attorney has reviewed it.",
       items: [
-        { when: "Day 1", title: "Read the plain-words guide", text: "See which questions the agreement asks: who provides care, the schedule, and whether it's paid." },
-        { when: "Week 1", title: "Talk it through as a family", text: "Settle the questions together first, so the attorney's billed hour goes further." },
-        { when: "Week 2", title: "Fill in the template", text: "Who's involved, the care to be provided, the hours, and if it's paid, the rate and how payments are made." },
-        { when: "Before signing", title: "Attorney review", text: "An elder-law attorney in your parent's state reviews and adjusts it before anyone signs or any payment is made." },
+        { when: "Week 1", title: "Talk first", text: "Settle the six questions as a family: what care is needed, how many hours, what it's worth, who decides, and what happens when health changes." },
+        { when: "Week 2", title: "Fill it in and book the attorney", text: "Fill in the 17 short sections, then book an elder-law attorney. Bring the 14-question tick list so the meeting is shorter." },
+        { when: "Before signing", title: "Attorney review, then signatures", text: "An elder-law attorney where your parent lives reviews it before anyone signs or any payment is made. Then sign, with space for witnesses and a notary." },
+        { when: "From then on", title: "Keep the records", text: "Log hours, tasks and payments, and send each sibling the one-page “What We Agreed” summary." },
       ],
     },
     steps: {
-      // DRAFT heading and step titles; texts follow the doc's wording.
       title: "From the kitchen table to a signed agreement",
       items: [
         {
-          title: "Talk it through as a family",
-          text: "Use the plain-words guide to settle the questions as a family before your attorney meeting, so the billed hour goes further.",
+          title: "Talk first",
+          text: "Settle the six questions as a family: what care is needed, how many hours, what it's worth, who decides, and what happens when health changes.",
         },
-        { title: "Fill in the template", text: "Who's involved, the care to be provided, the schedule and hours, and whether it's paid, the rate and how payments are made." },
         {
-          title: "Have an attorney review it",
-          text: "Have an elder-law attorney in your parent's state review and adjust it before anyone signs or any payment is made.",
+          title: "Fill in the agreement",
+          text: "17 short sections in plain words with blanks: who is involved, the care and hours, pay and a fair rate, backup care, and how it changes or ends.",
+        },
+        {
+          title: "Take it to an elder-law attorney",
+          text: "Bring the 14-question tick list, and have an attorney where your parent lives review it before anyone signs or any payment is made.",
         },
       ],
     },
@@ -318,9 +319,9 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
           text: "The records that show what care was given and what was paid.",
         },
         {
-          tag: "Family guide",
-          title: ["A plain-words", "guide"],
-          text: "Questions to settle as a family before your attorney meeting, so the billed hour goes further.",
+          tag: "Talk first",
+          title: ["Before you sign,", "talk first"],
+          text: "Six questions to settle as a family first, plus a 14-question tick list for your elder-law attorney, so the meeting is shorter.",
         },
       ],
     },

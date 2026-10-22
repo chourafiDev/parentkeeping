@@ -33,7 +33,7 @@ export const SOUND_FAMILIAR = [
 ] as const;
 
 /**
- * "Parentkeeping vs. the usual way" (home). DRAFT copy, awaiting approval.
+ * "Parentkeeping vs. the usual way" (home). Approved copy.
  * No competitor names; the app column describes caregiving apps in general,
  * so every "no" must hold for that category as a whole.
  */
@@ -53,7 +53,7 @@ export const USUAL_WAY: { label: string; cells: [UsualWayCell, UsualWayCell, Usu
     cells: [{ mark: "yes" }, { mark: "no" }, { mark: "some", text: "Some apps" }],
   },
   {
-    label: "Nothing to install, no new accounts",
+    label: "Nothing to install, no new app to learn",
     cells: [{ mark: "yes" }, { mark: "yes" }, { mark: "no", text: "Everyone needs the app" }],
   },
   {

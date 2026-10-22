@@ -1,6 +1,6 @@
-// "The problem" tabs (home and the System's page). DRAFT copy, awaiting
-// approval. Every number is quoted from its source as written; re-check
-// against the source before changing a figure, and keep the source line.
+// "The problem" tabs (home and the System's page). Approved; every figure was
+// checked against its source (Oct 2026). Re-check the source before changing a
+// figure, and keep the source line.
 
 export type StatSource = { label: string; href: string };
 
