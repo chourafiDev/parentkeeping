@@ -144,9 +144,7 @@ export async function generateMetadata({
 }: PageProps<"/products/[handle]">): Promise<Metadata> {
 	const data = await load(params);
 	const seo = seoOf(data);
-	// The System's page repeats the home page: canonical to "/" so they don't compete.
-	const canonical =
-		data.product.slug === BUNDLE_SLUG ? "/" : PRODUCT_PATHS[data.product.slug];
+	const canonical = PRODUCT_PATHS[data.product.slug];
 	const main = data.images[0];
 	const shareImages = main
 		? [

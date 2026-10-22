@@ -17,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	const rows = await db.select({ id: products.id, slug: products.slug, status: products.status }).from(products);
 	const live = await Promise.all(
 		rows.map(async (p) => {
-			if (p.status !== "active" || !PRODUCT_PATHS[p.slug] || p.slug === "family-care-system") return null;
+			if (p.status !== "active" || !PRODUCT_PATHS[p.slug]) return null;
 			// The Emergency Binder page exists only once it has files.
 			if (p.slug === BUMP_SLUG) {
 				const [file] = await db.select({ id: productFiles.fileId }).from(productFiles).where(eq(productFiles.productId, p.id)).limit(1);
