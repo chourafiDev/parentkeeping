@@ -412,43 +412,34 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       "In an emergency, the questions come fast. What medications does she take? Any allergies? Who's her doctor? Is there an advance directive? Which hospital?",
       "If the answers live in your head, or in a drawer at Mom's house, the person standing there may not have them. This 18-page binder puts them on paper anyone can hand over, with a one-page summary for the paramedics and a sheet for the fridge.",
     ],
-    // Word for word from the finished file's pages (18 pages, US Letter and A4).
+    // Word for word from the product brief ("What's inside").
     inside: {
       title: "What's inside",
       items: [
-        {
-          name: "Emergency Summary",
-          text: "Everything a paramedic or ER nurse asks first, on one page: conditions, allergies, key medications, devices, wishes and who to call.",
-        },
-        { name: "Fridge Sheet", text: "The key facts in a clear sleeve on the front of the fridge, where emergency crews may know to look." },
-        { name: "Emergency Contacts", text: "Family, neighbors who can help and who has a key, doctors, pharmacy and home care, in the order to call them." },
-        { name: "Medication List", text: "Prescriptions, over-the-counter medicines, vitamins, inhalers, drops and patches, copied exactly from the labels." },
-        {
-          name: "Conditions, Allergies & Devices",
-          text: "Health conditions, allergies and reactions, surgeries and recent hospital stays, and devices like hearing aids or a pacemaker.",
-        },
-        { name: "Insurance", text: "Each plan and its member services number, with space to tape copies of the cards." },
-        {
-          name: "Legal Documents Locator",
-          text: "Where the advance directive, POLST or DNR, powers of attorney and will are kept, who has copies, and who can speak for Mom or Dad.",
-        },
-        { name: "Hospital & Care Preferences", text: "Preferred hospital, language, faith, diet, what calms them and what matters most to them, in their own words." },
-        { name: "The House & Pets", text: "Keys, alarm, shut-offs, pets and mail, for whoever looks after things. Where codes are kept, never the codes." },
-        {
-          name: "Grab-and-Go Checklist",
-          text: "Papers, glasses, hearing aids, the pill bottles and what to do before you lock up, for whoever gets there first.",
-        },
-        { name: "The First 24 Hours & Hospital Stay Log", text: "A phone tree, what to do once they're safe, and a log of what the doctors said." },
-        { name: "Wallet Cards & Door Labels", text: "Fold-over cards for Mom or Dad's wallet and yours, and labels that tell crews to look on the fridge." },
-        { name: "The Conversation & Review Log", text: "Words for bringing it up with Mom or Dad, and a log to keep it current every few months." },
+        { name: "Emergency Summary", text: "one page to hand to the paramedics or ER, with conditions, allergies, key medications, devices, memory or hearing needs, wishes and who to call" },
+        { name: "Fridge Sheet", text: "the key facts for the front of the fridge, where emergency crews often look, with a big box for your local emergency number" },
+        { name: "Emergency Contacts", text: "family, neighbors with a key, doctors and pharmacy" },
+        { name: "Medication List", text: "copied straight from the labels, with space for pharmacist reviews" },
+        { name: "Conditions, Allergies & Devices", text: "the details behind the summary page" },
+        { name: "Insurance", text: "plans, phone numbers and boxes to tape copies of the cards" },
+        { name: "Legal Documents Locator", text: "where the advance directive, POLST/DNR and powers of attorney are kept, and who has copies" },
+        { name: "Hospital & Care Preferences", text: "preferred hospital, language, faith, and what calms them" },
+        { name: "The House & Pets", text: "keys, pets and shut-offs. It records where codes are kept, never the codes" },
+        { name: "Grab-and-Go Checklist", text: "for whoever gets there first" },
+        { name: "The First 24 Hours", text: "what to do, plus a family phone tree" },
+        { name: "Hospital Stay Log", text: "what the doctors said, written down while you're there" },
+        { name: "2 Wallet Cards and 2 Door Labels", text: "\"Medical information is on the fridge\"" },
+        { name: "How to Bring This Up with Mom or Dad", text: "words that work, and what to do if they say no" },
+        { name: "Review & Update Log", text: "when to update it, and who has the latest copy" },
       ],
     },
     // No badges: kept consistent with the other products.
+    // From the brief's "What you get" and "Why families choose it".
     facts: [
-      { icon: "format", text: "Fillable PDF: type on screen, or print it and fill it in by hand" },
+      { icon: "format", text: "Fillable: type on screen, or print and write by hand" },
       { icon: "print", text: "18 pages, in US Letter and A4" },
-      { icon: "download", text: "Instant download after checkout" },
-      { icon: "family", text: "Tell every sibling and the nearest neighbor where it's kept" },
+      { icon: "download", text: "Instant download, nothing is shipped" },
+      { icon: "family", text: "Print as many copies as your family needs" },
     ],
     // From the file's own "How to Use This Binder" page.
     firstMonth: {
@@ -470,25 +461,50 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       ],
     },
     highlights: {
-      // Heading from the doc's FAQ ("built to be handed to a stranger").
+      // Heading from the doc's FAQ ("built to be handed to a stranger"); texts from the brief.
       title: "Built to be handed to a stranger",
       items: [
         {
           tag: "Summary",
-          title: ["One page", "for the paramedic"],
-          text: "Name, date of birth, conditions, allergies and medications, ready to hand to a paramedic.",
+          title: ["One page", "for the paramedics"],
+          text: "Conditions, allergies, key medications, devices, memory or hearing needs, wishes and who to call, ready to hand to the paramedics or ER.",
+        },
+        {
+          tag: "Fridge sheet",
+          title: ["The key facts,", "on the fridge"],
+          text: "Where emergency crews often look, with a big box for your local emergency number.",
         },
         {
           tag: "Documents",
           title: ["Where the", "originals are"],
-          text: "Where the originals of the advance directive, POLST or DNR form and power of attorney are kept, and who has copies.",
+          text: "Where the advance directive, POLST/DNR and powers of attorney are kept, and who has copies.",
         },
-        { tag: "Grab and go", title: ["For the person", "who arrives first"], text: "What to take to the hospital, for the person who arrives first." },
-        { tag: "Fridge sheet", title: ["The key facts,", "on the fridge"], text: "A single page for the refrigerator door, so the key facts are easy to find." },
+        { tag: "Grab and go", title: ["For whoever", "gets there first"], text: "The checklist for the hospital bag, then the first 24 hours and a family phone tree." },
       ],
     },
     parts: [],
-    sections: [],
+    sections: [
+      {
+        title: "Why families choose it",
+        bullets: [
+          { text: "Set it up in one afternoon, together with your parent" },
+          { text: "Fillable: type on screen, or print and write by hand" },
+          { text: "Works anywhere: write in your local emergency number (911, 112, 999, 000…)" },
+          { text: "No passwords, PINs or account numbers. It records where things are kept, not the secrets themselves" },
+          { text: "Matches the Parentkeeping Medical Binder and Family Care System" },
+        ],
+      },
+      {
+        title: "What you get",
+        bullets: [
+          { text: "Emergency Binder, 18 pages, fillable PDF, US Letter" },
+          { text: "The same binder in A4" },
+          { text: "Instant download, nothing is shipped" },
+          { text: "Print as many copies as your family needs" },
+        ],
+        after: ["Works with the free Adobe Acrobat Reader on a computer, tablet or phone."],
+      },
+    ],
     faq: [
       {
         q: "What's the difference between this and the Medical Binder?",
@@ -508,7 +524,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
         link: { label: "Get it free", href: FREE_LIST_PATH },
       },
     ],
-    legal: [{ text: EMERGENCY_LEGAL_LINE }],
+    legal: [{ label: "Please note", text: EMERGENCY_LEGAL_LINE }],
     upgrade: {
       title: "Ready for the worst day. Now for every other day.",
       text: "Once Mom or Dad is home again, the work starts: appointments, medicines, bills, and deciding who does what. The Family Care System keeps it in one place and shares it fairly between siblings.",
