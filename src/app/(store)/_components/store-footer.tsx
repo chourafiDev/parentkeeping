@@ -170,21 +170,23 @@ export async function StoreFooter() {
 						className="flex flex-wrap items-center gap-1.5"
 						aria-label="Accepted payment methods"
 					>
-						{["visa", "mastercard", "amex", "discover", "paypal"].map(
-							(card) => (
-								<li key={card} className="rounded-[4px] border bg-white p-0.5">
-									<Image
-										src={`/images/cards/${card}.png`}
-										alt={card}
-										width={35}
-										height={20}
-									/>
-								</li>
-							),
-						)}
-						<li>
-							<Image src="/images/cards/google-pay.png" alt="Google Pay" width={48} height={26} />
-						</li>
+						{[
+							"visa",
+							"mastercard",
+							"amex",
+							"discover",
+							"google-pay",
+							"paypal",
+						].map((card) => (
+							<li key={card} className="rounded-[4px] border bg-white p-0.5">
+								<Image
+									src={`/images/cards/${card}.png`}
+									alt={card}
+									width={35}
+									height={20}
+								/>
+							</li>
+						))}
 					</ul>
 				</div>
 			</div>
@@ -195,9 +197,7 @@ export async function StoreFooter() {
 					<p className="text-body">
 						© {new Date().getFullYear()} {SITE.name} · {FOOTER_LEGAL_LINE}
 					</p>
-					<p className="text-body">
-						Secure checkout by Stripe
-					</p>
+					<p className="text-body">Secure checkout by Stripe</p>
 				</div>
 			</div>
 		</footer>
