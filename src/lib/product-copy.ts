@@ -401,63 +401,72 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
   // The only page allowed to use crisis framing.
   "emergency-binder": {
     seo: {
-      title: "Emergency Binder for an Aging Parent (Printable PDF)",
+      title: "Emergency Binder for an Aging Parent (Fillable PDF)",
       description:
-        "An emergency binder for an aging parent: the one-page facts, contacts, medications and documents a paramedic or ER asks for. Printable PDF, $15.",
+        "An emergency binder for an aging parent: a one-page summary for paramedics, a fridge sheet, contacts, medications, documents and wallet cards. $15.",
     },
     h1: "Emergency Binder for an Aging Parent",
     subhead: "When the call comes, everything the paramedics, the ER and your siblings will ask for is in one binder by the door.",
     underButton: PRODUCT_DISCLAIMER_SHORT,
     intro: [
       "In an emergency, the questions come fast. What medications does she take? Any allergies? Who's her doctor? Is there an advance directive? Which hospital?",
-      "If the answers live in your head, or in a drawer at Mom's house, the person standing there may not have them. This binder puts them on a few pages anyone can hand over.",
+      "If the answers live in your head, or in a drawer at Mom's house, the person standing there may not have them. This 18-page binder puts them on paper anyone can hand over, with a one-page summary for the paramedics and a sheet for the fridge.",
     ],
+    // Word for word from the finished file's pages (18 pages, US Letter and A4).
     inside: {
       title: "What's inside",
       items: [
         {
-          name: "One-page emergency summary",
-          text: "Name, date of birth, conditions, allergies and medications, ready to hand to a paramedic.",
+          name: "Emergency Summary",
+          text: "Everything a paramedic or ER nurse asks first, on one page: conditions, allergies, key medications, devices, wishes and who to call.",
         },
-        { name: "Emergency contacts", text: "Family, neighbors with a key, doctors, pharmacy." },
-        { name: "Medication list", text: "Blank, to copy from your parent's current list exactly as prescribed." },
-        { name: "Insurance", text: "Where to tape copies of the Medicare and supplemental cards." },
+        { name: "Fridge Sheet", text: "The key facts in a clear sleeve on the front of the fridge, where emergency crews may know to look." },
+        { name: "Emergency Contacts", text: "Family, neighbors who can help and who has a key, doctors, pharmacy and home care, in the order to call them." },
+        { name: "Medication List", text: "Prescriptions, over-the-counter medicines, vitamins, inhalers, drops and patches, copied exactly from the labels." },
         {
-          name: "Legal documents locator",
-          text: "Where the originals of the advance directive, POLST or DNR form and power of attorney are kept, and who has copies.",
+          name: "Conditions, Allergies & Devices",
+          text: "Health conditions, allergies and reactions, surgeries and recent hospital stays, and devices like hearing aids or a pacemaker.",
         },
-        { name: "Hospital and care preferences", text: "Preferred hospital, faith or language needs, hearing aids and glasses." },
-        { name: "Home page", text: "Pets, keys, alarm codes location, who to call to check the house." },
-        { name: "Grab-and-go checklist", text: "What to take to the hospital, for the person who arrives first." },
-        { name: "Fridge sheet", text: "A single page for the refrigerator door, so the key facts are easy to find." },
-        { name: "Emergency binder checklist", text: "How to set it up in an afternoon and when to update it." },
+        { name: "Insurance", text: "Each plan and its member services number, with space to tape copies of the cards." },
+        {
+          name: "Legal Documents Locator",
+          text: "Where the advance directive, POLST or DNR, powers of attorney and will are kept, who has copies, and who can speak for Mom or Dad.",
+        },
+        { name: "Hospital & Care Preferences", text: "Preferred hospital, language, faith, diet, what calms them and what matters most to them, in their own words." },
+        { name: "The House & Pets", text: "Keys, alarm, shut-offs, pets and mail, for whoever looks after things. Where codes are kept, never the codes." },
+        {
+          name: "Grab-and-Go Checklist",
+          text: "Papers, glasses, hearing aids, the pill bottles and what to do before you lock up, for whoever gets there first.",
+        },
+        { name: "The First 24 Hours & Hospital Stay Log", text: "A phone tree, what to do once they're safe, and a log of what the doctors said." },
+        { name: "Wallet Cards & Door Labels", text: "Fold-over cards for Mom or Dad's wallet and yours, and labels that tell crews to look on the fridge." },
+        { name: "The Conversation & Review Log", text: "Words for bringing it up with Mom or Dad, and a log to keep it current every few months." },
       ],
     },
-    badges: ["Printable PDF", "Fillable on screen"],
+    // No badges: kept consistent with the other products.
     facts: [
-      { icon: "format", text: "Printable PDF, fillable on screen" },
-      { icon: "print", text: "US Letter" },
-      { icon: "download", text: "Instant download" },
-      { icon: "family", text: "Give each sibling a copy or a photo of the summary page" },
+      { icon: "format", text: "Fillable PDF: type on screen, or print it and fill it in by hand" },
+      { icon: "print", text: "18 pages, in US Letter and A4" },
+      { icon: "download", text: "Instant download after checkout" },
+      { icon: "family", text: "Tell every sibling and the nearest neighbor where it's kept" },
     ],
-    // DRAFT, awaiting approval. "In an afternoon" is the doc's own setup checklist.
+    // From the file's own "How to Use This Binder" page.
     firstMonth: {
       title: "Ready in an afternoon",
-      text: "Set it up once, then keep it current. This is how most families do it.",
+      text: "Set it up once. Then it waits by the door until the day you need it.",
       items: [
-        { when: "Start here", title: "Fill in the summary page", text: "Name, date of birth, conditions, allergies and medications, ready to hand to a paramedic." },
-        { when: "Same afternoon", title: "Finish the rest", text: "Contacts, the home page with keys and pets, and the grab-and-go checklist. Print the fridge sheet." },
-        { when: "That week", title: "Put it where it's needed", text: "By the front door or with the fridge sheet. Give each sibling a copy or a photo of the summary page." },
-        { when: "Ongoing", title: "Update when anything changes", text: "A new medication or a new doctor means a quick update now, not a scramble later." },
+        { when: "Start here", title: "Sit down together", text: "Fill it in with Mom or Dad, not about them. Copy medicines straight from the labels, with the insurance cards and legal papers on the table." },
+        { when: "Same afternoon", title: "Put the fridge sheet up", text: "Slip it into a clear sleeve on the front of the fridge, and stick the door label inside the front door." },
+        { when: "That week", title: "Tell everyone where it is", text: "Keep the binder by the front door or in a kitchen drawer, tell every sibling and the nearest neighbor, and put a wallet card in Mom or Dad's wallet." },
+        { when: "Every few months", title: "Keep it current", text: "And after every hospital stay, medication change or new doctor. Update the fridge sheet and wallet cards too." },
       ],
     },
     steps: {
-      title: "Where to keep it",
+      title: "Set it up once, then it waits by the door",
       items: [
-        // DRAFT step titles; the texts are the doc's own sentences.
-        { title: "Fill in the summary page", text: "Name, date of birth, conditions, allergies and medications, ready to hand to a paramedic." },
-        { title: "Keep it by the front door", text: "Keep the binder by the front door or with the fridge sheet, and give each sibling a copy or a photo of the summary page." },
-        { title: "Keep it current", text: "Update it whenever a medication or doctor changes." },
+        { title: "Fill it in together", text: "Sit down with Mom or Dad and copy medicines straight from the labels. Start with the easy pages if the subject is hard." },
+        { title: "Put it where crews look", text: "The fridge sheet on the fridge, the door label inside the front door, the binder by the door, a wallet card in the wallet." },
+        { title: "When the call comes", text: "Call your local emergency number first. Then hand the crew the summary page, grab the bag using the checklist, and start the phone tree." },
       ],
     },
     highlights: {
@@ -490,6 +499,10 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
         a: "No. It tells people where those documents are. Store the originals safely and keep copies in the binder.",
       },
       {
+        q: "Can I use it outside the US?",
+        a: "Yes. It comes in US Letter and A4 and lists the emergency numbers for the US and Canada, the EU, the UK and Australia. Ask your parent's doctor which advance directive or DNR form applies where they live.",
+      },
+      {
         q: "Are there free emergency binder printables?",
         a: "Our free Medication List & Daily Medication Chart includes two wallet cards.",
         link: { label: "Get it free", href: FREE_LIST_PATH },
@@ -498,7 +511,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
     legal: [{ text: EMERGENCY_LEGAL_LINE }],
     upgrade: {
       title: "Ready for the worst day. Now for every other day.",
-      text: "The Family Care System keeps the everyday care in one place and shares the jobs and costs fairly between siblings. Add the Emergency Binder at checkout for $15.",
+      text: "Once Mom or Dad is home again, the work starts: appointments, medicines, bills, and deciding who does what. The Family Care System keeps it in one place and shares it fairly between siblings.",
       cta: "See the Family Care System",
       href: SYSTEM_PATH,
       priceLine: false,

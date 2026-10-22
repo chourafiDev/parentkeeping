@@ -28,7 +28,8 @@ export function StickyBuyBar({
 	/** id of the element holding the main Buy button. */
 	watchId: string;
 	title: string;
-	image: Image;
+	/** First gallery image; a product can have none yet (the bar shows no thumbnail). */
+	image?: Image;
 	price: string;
 	compareAt: string | null;
 	/** The Buy button (a server-rendered form). */
@@ -67,11 +68,13 @@ export function StickyBuyBar({
 		>
 			<div className={`${container} flex items-center gap-4 py-3`}>
 				<div className="min-w-0 flex-1 max-sm:hidden flex items-center gap-2">
-					<img
-						src={image.url}
-						alt={image.alt || title}
-						className="size-14 object-contain rounded-md"
-					/>
+					{image && (
+						<img
+							src={image.url}
+							alt={image.alt || title}
+							className="size-14 object-contain rounded-md"
+						/>
+					)}
 					<div>
 						<p className="text-foreground truncate text-md font-semibold">
 							{title}

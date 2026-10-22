@@ -9,6 +9,9 @@ import { productFiles, products } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 
 /** Indexable store pages. The System's product URL canonicals to "/", so it's left out. */
+// Products appear once their files are uploaded (the Emergency Binder), so refresh hourly.
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	const base = siteUrl();
 	const rows = await db.select({ id: products.id, slug: products.slug, status: products.status }).from(products);
