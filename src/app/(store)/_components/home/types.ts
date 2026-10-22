@@ -21,6 +21,8 @@ export type HomeData = {
 	system: HomeProduct;
 	binder: HomeProduct | null;
 	agreement: HomeProduct | null;
+	/** Only once its page is live (it has files and a price), like the System's add-on. */
+	emergencyBinder: HomeProduct | null;
 	foundingEndsAt: Date | null;
 	/** "Arrives by" date per part file label prefix. */
 	presaleDates: { label: string; availableAt: Date }[];

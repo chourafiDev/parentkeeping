@@ -1,7 +1,7 @@
 import { and, eq, inArray, isNotNull } from "drizzle-orm";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { BUNDLE_SLUG, PRODUCT_PATHS, VARIANT_COOKIE } from "@/lib/catalog";
+import { BUMP_SLUG, BUNDLE_SLUG, PRODUCT_PATHS, VARIANT_COOKIE } from "@/lib/catalog";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { MARQUEE } from "@/lib/home";
 import { HOME_SEO } from "@/lib/offer";
@@ -88,6 +88,7 @@ async function loadHome(
 						BUNDLE_SLUG,
 						"medical-binder",
 						"caregiver-agreement",
+						BUMP_SLUG,
 					]),
 				),
 			getFoundingPrice(),
@@ -154,6 +155,7 @@ async function loadHome(
 		system,
 		binder: toHome("medical-binder"),
 		agreement: toHome("caregiver-agreement"),
+		emergencyBinder: extras.emergency ? toHome(BUMP_SLUG) : null,
 		foundingEndsAt: system.compareAt !== null ? founding.endsAt : null,
 		presaleDates: presale.map((f) => ({
 			label: f.label,
@@ -201,6 +203,17 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 						kind: "agreement" as const,
 						title: data.agreement.title,
 						href: data.agreement.href,
+						tab: "single" as const,
+					},
+				]
+			: []),
+		...(data.emergencyBinder
+			? [
+					{
+						product: data.emergencyBinder,
+						kind: "binder" as const,
+						title: data.emergencyBinder.title,
+						href: data.emergencyBinder.href,
 						tab: "single" as const,
 					},
 				]

@@ -59,7 +59,13 @@ export function ShopGrid({ cards }: { cards: ShopCard[] }) {
 					</button>
 				))}
 			</div>
-			<ul className="grid grid-cols-2 gap-x-4 gap-y-8 md:gap-x-[30px] lg:grid-cols-4">
+			<ul
+				className={cn(
+					"grid grid-cols-2 gap-x-4 gap-y-8 md:gap-x-[30px]",
+					// Five cards (once the Emergency Binder is live) fit one row only on wide screens.
+					cards.length > 4 ? "md:grid-cols-3 xl:grid-cols-5" : "lg:grid-cols-4",
+				)}
+			>
 				{shown.map((card) => {
 					const p = card.product;
 					const discount = p?.compareAt
