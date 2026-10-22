@@ -115,14 +115,11 @@ export function Bundle({ data }: { data: HomeData }) {
 						<GuaranteeCard supportEmail={data.supportEmail} refundRate={data.proof.refundRate} />
 					</div>
 					<ul className="flex flex-wrap items-center gap-1.5" aria-label="Accepted payment methods">
-						{["visa", "mastercard", "amex", "discover", "paypal"].map((card) => (
+						{["visa", "mastercard", "amex", "discover", "google-pay", "apple-pay"].map((card) => (
 							<li key={card} className="rounded-[4px] border bg-white p-0.5">
 								<Image src={`/images/cards/${card}.png`} alt={card} width={35} height={20} />
 							</li>
 						))}
-						<li>
-							<Image src="/images/cards/google-pay.png" alt="Google Pay" width={48} height={26} />
-						</li>
 						<li className="text-body ms-1 text-xs">Secure payment by Stripe</li>
 					</ul>
 				</div>

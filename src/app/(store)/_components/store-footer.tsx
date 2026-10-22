@@ -176,7 +176,7 @@ export async function StoreFooter() {
 							"amex",
 							"discover",
 							"google-pay",
-							"paypal",
+							"apple-pay",
 						].map((card) => (
 							<li key={card} className="rounded-[4px] border bg-white p-0.5">
 								<Image

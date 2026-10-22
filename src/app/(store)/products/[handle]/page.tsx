@@ -553,7 +553,7 @@ export default async function ProductPage({
 									"amex",
 									"discover",
 									"google-pay",
-									"paypal",
+									"apple-pay",
 								].map((card) => (
 									<li
 										key={card}

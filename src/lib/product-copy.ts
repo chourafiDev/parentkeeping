@@ -177,7 +177,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
         { name: "Sharing the Care", text: "A \"Who does what\" page that names who handles refills, rides, bills and calls, a 10-minute Sunday check-in, a family update log and a backup plan. Plus notes pages, printable tab labels and a spine label." },
       ],
     },
-    badges: ["Fillable PDF", "US Letter & A4", "No app"],
+    // No badges: image 1 carries its own chips, and overlaid ones would cover its title.
     facts: [
       { icon: "format", text: "Fillable PDF: type on screen, save it, print fresh copies anytime, or print it blank and fill in by hand" },
       { icon: "print", text: "Two files, US Letter and A4, with a clickable contents page to jump to any section" },
@@ -273,7 +273,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
     intro: [
       "Most care starts with “I'll just help out.” A year later one sibling is there four days a week and nobody has said out loud what's fair. This caregiver agreement template (also called a personal care agreement or caregiver contract) puts the arrangement on paper, step by step, and gets your family ready for one short meeting with an elder-law attorney.",
     ],
-    badges: ["Fillable PDF", "US Letter & A4", "Editable Word doc"],
+    // No badges: image 1 carries its own chips, and overlaid ones would cover its title.
     facts: [
       { icon: "format", text: "Fillable PDF plus an editable Word document your attorney can mark up" },
       { icon: "print", text: "Two files, US Letter and A4" },
