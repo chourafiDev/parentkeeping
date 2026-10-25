@@ -1,29 +1,63 @@
 import { Check, ShieldCheck, Zap } from "lucide-react";
 import Image from "next/image";
-import { AGREEMENT_LEGAL_LINE, BINDER_LEGAL_LINE, BUY_GUARANTEE_LINE, PRODUCT_DISCLAIMER_SHORT, SHEET_LEGAL_LINE } from "@/lib/legal";
+import {
+	AGREEMENT_LEGAL_LINE,
+	BINDER_LEGAL_LINE,
+	BUY_GUARANTEE_LINE,
+	PRODUCT_DISCLAIMER_SHORT,
+	SHEET_LEGAL_LINE,
+} from "@/lib/legal";
 import { formatStorePrice } from "@/lib/money";
+import {
+	OFFER_PARTS,
+	PRICE_ANCHOR_TITLE,
+	presaleNote,
+	SYSTEM_FORMATS,
+} from "@/lib/offer";
 import { DEFAULT_PACKAGE, packageOptions } from "@/lib/packages";
-import { OFFER_PARTS, PRICE_ANCHOR_TITLE, presaleNote, SYSTEM_FORMATS } from "@/lib/offer";
 import { formatStoreDay } from "@/lib/store-time";
 import { cn } from "@/lib/utils";
 import { GuaranteeCard } from "../product/buy-details";
 import { PackagePicker } from "../product/package-picker";
-import { container, pillDark, section, sectionSubtitle, sectionTitle } from "../ui";
+import {
+	container,
+	pillDark,
+	section,
+	sectionSubtitle,
+	sectionTitle,
+} from "../ui";
 import { BuyForm } from "./buy-form";
 import { deliveryDate, type HomeData } from "./types";
 
 /** Same order as OFFER_PARTS. Square, on the cards' own #f5f5f5, so they fill the box edge to edge. */
 const PART_IMAGES = [
-	{ src: "/images/home/parts/card-medical-binder.webp", alt: "Medical Binder for an Elderly Parent, cover and an appointments page" },
-	{ src: "/images/home/parts/card-shared-family-care-sheet.png", alt: "Shared Family Care Sheet in Google Sheets, dashboard and fair-share tabs" },
-	{ src: "/images/home/parts/card-caregiver-agreement.webp", alt: "Family Caregiver Agreement Template, cover and agreement page" },
-	{ src: "/images/home/parts/card-family-meeting-kit.webp", alt: "Family Meeting Kit, cover and agenda page" },
+	{
+		src: "/images/home/parts/card-medical-binder.webp",
+		alt: "Medical Binder for an Elderly Parent, cover and an appointments page",
+	},
+	{
+		src: "/images/home/parts/card-shared-family-care-sheet.png",
+		alt: "Shared Family Care Sheet in Google Sheets, dashboard and fair-share tabs",
+	},
+	{
+		src: "/images/home/parts/card-caregiver-agreement.webp",
+		alt: "Family Caregiver Agreement Template, cover and agreement page",
+	},
+	{
+		src: "/images/home/parts/card-family-meeting-kit.webp",
+		alt: "Family Meeting Kit, cover and agenda page",
+	},
 ] as const;
 
 /** Glozin "Bundle and Save" → the spec's price anchor ("Less than buying the pieces"). */
 export function Bundle({ data }: { data: HomeData }) {
 	const { system, binder, agreement } = data;
-	const separate = [binder?.compareAt ?? binder?.price ?? null, null, agreement?.compareAt ?? agreement?.price ?? null, null];
+	const separate = [
+		binder?.compareAt ?? binder?.price ?? null,
+		null,
+		agreement?.compareAt ?? agreement?.price ?? null,
+		null,
+	];
 	const separately = (binder?.price ?? 0) + (agreement?.price ?? 0);
 	const regular = system.compareAt ?? system.price;
 	const delivery = deliveryDate(data);
@@ -33,9 +67,15 @@ export function Bundle({ data }: { data: HomeData }) {
 			<div className="mb-8 grid gap-2 text-center md:mb-10">
 				<h2 className={sectionTitle}>{PRICE_ANCHOR_TITLE}</h2>
 				<p className={`${sectionSubtitle} mx-auto max-w-[720px]`}>
-					{binder && agreement ? `The Binder and the Agreement cost ${formatStorePrice(separately)} on their own. ` : ""}
-					The System adds the Care Sheet and the Meeting Kit for {formatStorePrice(regular)}
-					{system.compareAt ? `, or ${formatStorePrice(system.price)} at the founding price` : ""}.
+					{binder && agreement
+						? `The Binder and the Agreement cost ${formatStorePrice(separately)} on their own. `
+						: ""}
+					The System adds the Care Sheet and the Meeting Kit for{" "}
+					{formatStorePrice(regular)}
+					{system.compareAt
+						? `, or ${formatStorePrice(system.price)} at the founding price`
+						: ""}
+					.
 				</p>
 			</div>
 			<ul className="grid grid-cols-2 gap-4 md:gap-[30px] lg:grid-cols-4">
@@ -50,8 +90,14 @@ export function Bundle({ data }: { data: HomeData }) {
 								className="object-cover"
 							/>
 						</div>
-						<p className="text-foreground text-[15px] leading-snug font-medium">{part.name}</p>
-						<p className="text-body text-sm">{separate[i] !== null ? `${formatStorePrice(separate[i])} on its own` : "Only in the System"}</p>
+						<p className="text-foreground text-[15px] leading-snug font-medium">
+							{part.name}
+						</p>
+						<p className="text-body text-sm">
+							{separate[i] !== null
+								? `${formatStorePrice(separate[i])} on its own`
+								: "Only in the System"}
+						</p>
 						<p className="border-foreground text-foreground flex h-11 items-center justify-center gap-2 rounded-full border text-[15px] font-semibold">
 							<Check className="size-4" /> Included
 						</p>
@@ -62,11 +108,48 @@ export function Bundle({ data }: { data: HomeData }) {
 			{/* Buy box: everything needed to decide, right where the price is. */}
 			<div className="mt-10 grid gap-8 rounded-[10px] bg-[#f5f5f5] p-6 md:grid-cols-2 md:p-10 lg:gap-[60px]">
 				<div className="grid content-start gap-4">
-					<p className="text-foreground text-[24px] leading-tight font-semibold tracking-[-0.03em]">Family Care System · all four parts</p>
+					{/* The System's cover fills the column; the kitchen-table photo until one is uploaded. */}
+					{/* The cover at its own shape, never cropped; the photo is 4:3 like its box. */}
+					<div
+						className={cn(
+							"relative overflow-hidden rounded-[10px] bg-white",
+							!system.image && "aspect-[4/3]",
+						)}
+					>
+						{system.image ? (
+							// eslint-disable-next-line @next/next/no-img-element
+							<img
+								src={system.image}
+								alt="Family Care System: all four parts"
+								className="block h-auto w-full"
+							/>
+						) : (
+							<Image
+								src="/images/home/promo-system.png"
+								alt="A daughter and her mother going through the care plan at the kitchen table"
+								fill
+								sizes="(min-width: 768px) 45vw, 100vw"
+								className="object-cover"
+							/>
+						)}
+					</div>
+					<p className="text-foreground text-[24px] leading-tight font-semibold tracking-[-0.03em]">
+						Family Care System · all four parts
+					</p>
 					<ul className="grid gap-2.5">
-						{[SYSTEM_FORMATS, "One purchase covers relatives caring for the same parent.", "Nothing to install. No subscription."].map((line) => (
-							<li key={line} className="text-foreground flex items-start gap-3 text-[15px]">
-								<Check className="text-primary mt-0.5 size-4 shrink-0" strokeWidth={2.25} />
+						{[
+							SYSTEM_FORMATS,
+							"One purchase covers relatives caring for the same parent.",
+							"Nothing to install. No subscription.",
+						].map((line) => (
+							<li
+								key={line}
+								className="text-foreground flex items-start gap-3 text-[15px]"
+							>
+								<Check
+									className="text-primary mt-0.5 size-4 shrink-0"
+									strokeWidth={2.25}
+								/>
 								<span>{line}</span>
 							</li>
 						))}
@@ -75,15 +158,30 @@ export function Bundle({ data }: { data: HomeData }) {
 
 				<div className="grid content-start gap-3">
 					<p className="flex items-baseline gap-2.5 tabular-nums">
-						<span className={cn("text-primary text-[34px] font-bold tracking-tight", system.compareAt && "text-primary")}>
+						<span
+							className={cn(
+								"text-primary text-[34px] font-bold tracking-tight",
+								system.compareAt && "text-primary",
+							)}
+						>
 							{formatStorePrice(system.price)}
 						</span>
-						{system.compareAt && <span className="text-body text-lg line-through">{formatStorePrice(system.compareAt)}</span>}
+						{system.compareAt && (
+							<span className="text-body text-lg line-through">
+								{formatStorePrice(system.compareAt)}
+							</span>
+						)}
 						{data.foundingEndsAt && (
-							<span className="text-foreground text-[14px] font-medium">founding price until {formatStoreDay(data.foundingEndsAt)}</span>
+							<span className="text-foreground text-[14px] font-medium">
+								founding price until {formatStoreDay(data.foundingEndsAt)}
+							</span>
 						)}
 					</p>
-					{data.proof.families && <p className="text-primary -mt-1 text-[13px] font-medium">Bought by {data.proof.families} families</p>}
+					{data.proof.families && (
+						<p className="text-primary -mt-1 text-[13px] font-medium">
+							Bought by {data.proof.families} families
+						</p>
+					)}
 					{system.sellable ? (
 						<PackagePicker
 							options={packageOptions({
@@ -101,7 +199,9 @@ export function Bundle({ data }: { data: HomeData }) {
 					{system.sellable && (
 						<p className="text-green flex items-center gap-1.5 text-[14px] font-medium">
 							<Zap className="size-4 shrink-0 fill-current" />
-							{delivery ? "Pre-order: each file downloads the moment it's ready" : "Instant download, ready the moment you pay"}
+							{delivery
+								? "Pre-order: each file downloads the moment it's ready"
+								: "Instant download, ready the moment you pay"}
 						</p>
 					)}
 					<div className="text-body grid gap-1 text-xs">
@@ -112,22 +212,41 @@ export function Bundle({ data }: { data: HomeData }) {
 						</p>
 					</div>
 					<div className="bg-background mt-2 rounded-[10px]">
-						<GuaranteeCard supportEmail={data.supportEmail} refundRate={data.proof.refundRate} />
+						<GuaranteeCard
+							supportEmail={data.supportEmail}
+							refundRate={data.proof.refundRate}
+						/>
 					</div>
-					<ul className="flex flex-wrap items-center gap-1.5" aria-label="Accepted payment methods">
-						{["visa", "mastercard", "amex", "discover", "google-pay", "apple-pay"].map((card) => (
+					<ul
+						className="flex flex-wrap items-center gap-1.5"
+						aria-label="Accepted payment methods"
+					>
+						{[
+							"visa",
+							"mastercard",
+							"amex",
+							"discover",
+							"google-pay",
+							"apple-pay",
+						].map((card) => (
 							<li key={card} className="rounded-[4px] border bg-white p-0.5">
-								<Image src={`/images/cards/${card}.png`} alt={card} width={35} height={20} />
+								<Image
+									src={`/images/cards/${card}.png`}
+									alt={card}
+									width={35}
+									height={20}
+								/>
 							</li>
 						))}
-						<li className="text-body ms-1 text-xs">Secure payment by Stripe</li>
 					</ul>
 				</div>
 			</div>
 
 			{delivery && (
 				<p className="mt-4 rounded-[10px] border border-[#6c4cf1]/25 bg-[#6c4cf1]/5 p-4 text-[14px] leading-relaxed text-foreground">
-					<span className="mr-2 rounded-full bg-[#6c4cf1] px-2.5 py-0.5 text-xs font-semibold text-white">Pre-order</span>
+					<span className="mr-2 rounded-full bg-[#6c4cf1] px-2.5 py-0.5 text-xs font-semibold text-white">
+						Pre-order
+					</span>
 					{presaleNote(formatStoreDay(delivery))}
 				</p>
 			)}
@@ -135,15 +254,21 @@ export function Bundle({ data }: { data: HomeData }) {
 			{/* Product legal lines, in small type near "What's inside" (Legal doc). */}
 			<div className="text-body mt-6 grid gap-2 text-xs leading-relaxed">
 				<p>
-					<span className="text-foreground font-semibold">Medical Binder: </span>
+					<span className="text-foreground font-semibold">
+						Medical Binder:{" "}
+					</span>
 					{BINDER_LEGAL_LINE}
 				</p>
 				<p>
-					<span className="text-foreground font-semibold">Shared Family Care Sheet: </span>
+					<span className="text-foreground font-semibold">
+						Shared Family Care Sheet:{" "}
+					</span>
 					{SHEET_LEGAL_LINE}
 				</p>
 				<p>
-					<span className="text-foreground font-semibold">Caregiver Agreement: </span>
+					<span className="text-foreground font-semibold">
+						Caregiver Agreement:{" "}
+					</span>
 					{AGREEMENT_LEGAL_LINE}
 				</p>
 			</div>

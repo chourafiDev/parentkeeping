@@ -1,24 +1,49 @@
+import { Copy, Scale, UserPlus } from "lucide-react";
 import { ONLY_CHILD_NOTE, SHARING_STEPS, SHARING_TITLE } from "@/lib/offer";
-import { container, eyebrow, section, sectionTitle } from "../ui";
+import { container, eyebrow, media, section, sectionTitle } from "../ui";
+import { MediaSlot } from "./media-slot";
 
-/** How sharing works: three numbered steps (Glozin icon-box rhythm). */
+/** Same order as SHARING_STEPS; shown until public/images/home/sharing-<n> exists. */
+const STEP_ICONS = [Copy, UserPlus, Scale];
+
+/** How sharing works: three solid step cards, picture on the left, text on a sage tint. */
 export function HowItWorks() {
 	return (
 		<section id="how-it-works" className={`${container} ${section} scroll-mt-28`}>
-			<div className="mb-8 grid gap-2 text-center md:mb-10">
+			<div className="mb-8 text-center grid gap-2 md:mb-10">
 				<p className={`${eyebrow} text-primary`}>How sharing works</p>
 				<h2 className={sectionTitle}>{SHARING_TITLE}</h2>
 			</div>
-			<ol className="grid gap-[30px] md:grid-cols-3">
-				{SHARING_STEPS.map((step, i) => (
-					<li key={step.title} className="grid content-start gap-3">
-						<span className="text-primary text-[44px] leading-none font-semibold tracking-[-0.04em]">0{i + 1}</span>
-						<h3 className="text-foreground text-[18px] font-semibold tracking-[-0.02em]">{step.title}</h3>
-						<p className="text-body text-[15px] leading-[1.714]">{step.text}</p>
-					</li>
-				))}
+			<ol className="grid gap-5 md:grid-cols-3 lg:gap-[30px]">
+				{SHARING_STEPS.map((step, i) => {
+					const Icon = STEP_ICONS[i] ?? Copy;
+					return (
+						<li key={step.title} className="bg-accent grid grid-cols-[40%_1fr] overflow-hidden rounded-[10px]">
+							<div className={`${media} from-deep to-primary min-h-[220px] rounded-none bg-gradient-to-br`}>
+								<MediaSlot name={`sharing-${i + 1}`} alt={step.title} sizes="(min-width: 768px) 15vw, 40vw">
+									<span
+										aria-hidden
+										className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_30%_20%,rgb(255_255_255/0.18)_0%,transparent_70%)]"
+									/>
+									<div className="absolute inset-0 flex items-center justify-center">
+										<span className="grid size-16 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/25">
+											<Icon aria-hidden className="size-7" strokeWidth={1.6} />
+										</span>
+									</div>
+								</MediaSlot>
+							</div>
+							<div className="grid content-start justify-items-start gap-3 p-5 lg:p-6">
+								<span className="text-primary rounded-md bg-white px-3 py-1.5 text-[13px] font-bold tracking-[0.02em] uppercase">
+									Step {i + 1}
+								</span>
+								<h3 className="text-foreground text-[19px] leading-tight font-semibold tracking-[-0.02em]">{step.title}</h3>
+								<p className="text-body text-[15px] leading-[1.6]">{step.text}</p>
+							</div>
+						</li>
+					);
+				})}
 			</ol>
-			<p className="bg-muted/70 text-body mt-10 rounded-[10px] p-5 text-center text-[15px]">{ONLY_CHILD_NOTE}</p>
+			<p className="text-body text-center mt-8 text-[15px] leading-[1.714]">{ONLY_CHILD_NOTE}</p>
 		</section>
 	);
 }

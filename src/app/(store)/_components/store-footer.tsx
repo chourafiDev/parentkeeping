@@ -103,7 +103,7 @@ export async function StoreFooter() {
 					))}
 				</nav>
 				<div className="flex flex-col justify-between">
-					<div className="grid content-start gap-4">
+					<div className="grid content-start gap-4 mb-3">
 						<h2 className={heading}>Get the free Medication List</h2>
 						<p className="text-body text-[15px] leading-[1.714]">
 							A printable medication list and daily chart for your parent, then

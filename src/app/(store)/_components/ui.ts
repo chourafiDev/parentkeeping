@@ -3,8 +3,8 @@
 // 15px soft ink, headings 600 with -0.034em tracking, pill buttons (30px
 // radius, 600), media with 10px corners inside the page margins.
 
-/** Page width: 1410px max, side padding grows with the screen. */
-export const container = "mx-auto w-full max-w-[1410px] px-4 sm:px-6 lg:px-[30px]";
+/** Page width: 1360px max, side padding grows with the screen. */
+export const container = "mx-auto w-full max-w-[1360px] px-4 sm:px-6 lg:px-[30px]";
 
 /** Vertical rhythm between sections. */
 export const section = "py-12 md:py-[70px]";

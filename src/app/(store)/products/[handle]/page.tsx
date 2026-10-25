@@ -55,7 +55,6 @@ import {
 	getStoreProduct,
 	type StoreProduct,
 } from "@/server/queries/storefront";
-import { CopyBlock } from "../../_components/copy-block";
 import { type DocKind, DocMockup } from "../../_components/home/doc-mockup";
 import { PagePreviews } from "../../_components/page-previews";
 import { ProblemTabs } from "../../_components/problem-tabs";
@@ -83,9 +82,10 @@ import {
 } from "../../_components/product/reviews";
 import { ShareDialog } from "../../_components/product/share-dialog";
 import { ProductSteps } from "../../_components/product/steps";
+import { ProductStory } from "../../_components/product/story";
 import { StickyBuyBar } from "../../_components/product/sticky-buy-bar";
 import { jsonLdHtml, productJsonLd } from "../../_components/product-data";
-import { container, pillDark, pillLight, section } from "../../_components/ui";
+import { container, pillDark, pillLight } from "../../_components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -590,7 +590,7 @@ export default async function ProductPage({
 			{/* )} */}
 
 			{isBundle && <ProblemTabs />}
-			<ProductSteps steps={copy.steps} />
+			<ProductSteps slug={product.slug} steps={copy.steps} />
 			<ProductHighlights
 				slug={product.slug}
 				highlights={copy.highlights}
@@ -600,22 +600,11 @@ export default async function ProductPage({
 				groupIds={PREVIEWS_BY_PRODUCT[product.slug] ?? []}
 				bordered
 			/>
-			{copy.firstMonth && <ProductFirstMonth timeline={copy.firstMonth} />}
-
-			{copy.sections.length > 0 && (
-				<section className={`${container} ${section} border-t`}>
-					<div
-						className={cn(
-							"grid gap-10 md:gap-[60px]",
-							copy.sections.length > 1 && "md:grid-cols-2",
-						)}
-					>
-						{copy.sections.map((block) => (
-							<CopyBlock key={block.title} block={block} />
-						))}
-					</div>
-				</section>
+			{copy.firstMonth && (
+				<ProductFirstMonth timeline={copy.firstMonth} buy={buyButton(pillLight)} />
 			)}
+
+			<ProductStory sections={copy.sections} buy={buyButton(pillDark)} />
 
 			<ProductDownloadCard
 				inside={copy.inside}

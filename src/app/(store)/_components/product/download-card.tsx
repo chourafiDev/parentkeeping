@@ -33,7 +33,7 @@ export function ProductDownloadCard({
 				<p className={`${eyebrow} text-primary`}>What you get</p>
 				<h2 className={sectionTitle}>{inside.title}</h2>
 			</div>
-			<div className="mx-auto grid max-w-[760px] gap-8 rounded-[10px] border bg-deep p-6 shadow-[0_20px_50px_-30px_rgb(0_0_0/0.25)] md:p-10">
+			<div className="mx-auto grid max-w-[760px] grid-cols-[minmax(0,1fr)] gap-8 rounded-[10px] border bg-deep p-6 shadow-[0_20px_50px_-30px_rgb(0_0_0/0.25)] md:p-10">
 				<ul className="grid gap-5">
 					{inside.items.map((item, i) => (
 						<li key={item.name} className="flex gap-3.5">
@@ -57,7 +57,7 @@ export function ProductDownloadCard({
 				</ul>
 
 				{assets.length > 0 && (
-					<ul className="grid gap-2 rounded-[10px] bg-[#f5f5f5] p-4" aria-label="Files">
+					<ul className="grid grid-cols-[minmax(0,1fr)] gap-2 rounded-[10px] bg-[#f5f5f5] p-4" aria-label="Files">
 						{assets.map((a) => {
 							const Icon = a.kind === "pdf" ? FileText : FileArchive;
 							return (

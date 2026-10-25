@@ -24,7 +24,8 @@ export function PagePreviewsCarousel({ groups }: { groups: Group[] }) {
 	const group = groups[active];
 
 	return (
-		<div className="grid gap-6">
+		// minmax(0,1fr): without it the grid column grows to the slides' width and the page scrolls sideways on phones.
+		<div className="grid grid-cols-[minmax(0,1fr)] gap-6">
 			{groups.length > 1 && (
 				<div
 					role="tablist"

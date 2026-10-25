@@ -1,15 +1,23 @@
 import Link from "next/link";
 import type { CopySection } from "@/lib/product-copy";
+import { cn } from "@/lib/utils";
 import { Inline } from "./blog/inline";
 import { eyebrow } from "./ui";
 
 const body = "text-body text-[15px] leading-[1.714]";
 
-/** One block of page copy: heading, then steps, paragraphs, lists, a sample and a link. */
-export function CopyBlock({ block }: { block: CopySection }) {
+/** One block of page copy: heading, then steps, paragraphs, lists, a sample and a link. `large` = section-sized heading. */
+export function CopyBlock({ block, large = false }: { block: CopySection; large?: boolean }) {
 	return (
 		<div className="grid content-start gap-4">
-			<h2 className="text-foreground text-[22px] leading-tight font-semibold tracking-[-0.03em] md:text-[24px]">{block.title}</h2>
+			<h2
+				className={cn(
+					"text-foreground leading-tight font-semibold tracking-[-0.03em]",
+					large ? "text-[28px] tracking-[-0.034em] md:text-[35px]" : "text-[22px] md:text-[24px]",
+				)}
+			>
+				{block.title}
+			</h2>
 			{block.steps && (
 				<ol className="grid gap-5">
 					{block.steps.map((step, i) => (
