@@ -6,6 +6,15 @@ import { container, eyebrow, media, section, sectionTitle } from "../ui";
 /** Steps are usually three columns; two steps split the row in half instead of leaving a gap. */
 const COLS = { 1: "md:grid-cols-1", 2: "md:grid-cols-2", 3: "md:grid-cols-3", 4: "md:grid-cols-4" } as const;
 
+/** Per product, same order as its steps: what public/images/products/<slug>-step-<n> shows. */
+const STEP_IMAGE_ALTS: Record<string, string[]> = {
+	"family-care-system": [
+		"Family Meeting Kit agenda with a list of jobs agreed and a name on each job",
+		"Medical Binder pages filled in on screen: About Mom or Dad and Who does what",
+		"Shared care sheet job board showing each sibling's job, owner and status",
+	],
+};
+
 /**
  * "How it works": solid step cards, picture on the left, text on a sage tint
  * (same look as the home page's sharing steps). Pictures come from
@@ -25,7 +34,14 @@ export function ProductSteps({ slug, steps }: { slug: string; steps: ProductCopy
 					return (
 						<li key={step.title} className="bg-accent grid grid-cols-[40%_1fr] overflow-hidden rounded-[10px]">
 							<div className={`${media} from-deep to-primary min-h-[220px] rounded-none bg-gradient-to-br`}>
-								<MediaSlot dir="products" name={`${slug}-step-${i + 1}`} alt={step.title} sizes="(min-width: 768px) 15vw, 40vw">
+								{/* Portrait pictures on their own green: contain, so nothing is cut off. */}
+								<MediaSlot
+									dir="products"
+									name={`${slug}-step-${i + 1}`}
+									alt={STEP_IMAGE_ALTS[slug]?.[i] ?? step.title}
+									sizes="(min-width: 768px) 15vw, 40vw"
+									className="object-contain"
+								>
 									<span
 										aria-hidden
 										className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_30%_20%,rgb(255_255_255/0.18)_0%,transparent_70%)]"

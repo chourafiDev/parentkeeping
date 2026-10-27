@@ -6,6 +6,13 @@ import { MediaSlot } from "./media-slot";
 /** Same order as SHARING_STEPS; shown until public/images/home/sharing-<n> exists. */
 const STEP_ICONS = [Copy, UserPlus, Scale];
 
+/** Same order as SHARING_STEPS: what public/images/home/sharing-<n> shows. */
+const STEP_IMAGE_ALTS = [
+	"Make a copy of the Shared Family Care Sheet into your own Google account in one click",
+	"Share the care sheet with siblings as editors, on a phone or laptop",
+	"Care sheet showing each sibling's hours this month and who pays whom to even up the costs",
+];
+
 /** How sharing works: three solid step cards, picture on the left, text on a sage tint. */
 export function HowItWorks() {
 	return (
@@ -20,7 +27,13 @@ export function HowItWorks() {
 					return (
 						<li key={step.title} className="bg-accent grid grid-cols-[40%_1fr] overflow-hidden rounded-[10px]">
 							<div className={`${media} from-deep to-primary min-h-[220px] rounded-none bg-gradient-to-br`}>
-								<MediaSlot name={`sharing-${i + 1}`} alt={step.title} sizes="(min-width: 768px) 15vw, 40vw">
+								{/* Portrait pictures on their own green: contain, so nothing is cut off. */}
+								<MediaSlot
+									name={`sharing-${i + 1}`}
+									alt={STEP_IMAGE_ALTS[i] ?? step.title}
+									sizes="(min-width: 768px) 15vw, 40vw"
+									className="object-contain"
+								>
 									<span
 										aria-hidden
 										className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_30%_20%,rgb(255_255_255/0.18)_0%,transparent_70%)]"
