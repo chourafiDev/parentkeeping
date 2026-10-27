@@ -30,10 +30,16 @@ export function ProductFirstMonth({
 					<div className="grid gap-3">
 						<p className={`${eyebrow} text-white/60`}>What to expect</p>
 						<h2 className={cn(sectionTitle, "text-white")}>{timeline.title}</h2>
-						<p className="text-[15px] leading-[1.714] text-white/75">{timeline.text}</p>
+						<p className="text-[15px] leading-[1.714] text-white/75">
+							{timeline.text}
+						</p>
 					</div>
 
-					<div role="tablist" aria-label={timeline.title} className="grid grid-cols-2 gap-2">
+					<div
+						role="tablist"
+						aria-label={timeline.title}
+						className="grid grid-cols-2 gap-2"
+					>
 						{items.map((item, i) => (
 							<button
 								key={item.when}
@@ -45,7 +51,9 @@ export function ProductFirstMonth({
 								onClick={() => setActive(i)}
 								className={cn(
 									"h-11 rounded-md px-3 text-[14px] font-semibold transition-colors",
-									i === active ? "bg-primary text-white" : "bg-white/[0.07] text-white/75 hover:bg-white/15 hover:text-white",
+									i === active
+										? "bg-primary text-white"
+										: "bg-white/[0.07] text-white/75 hover:bg-white/15 hover:text-white",
 								)}
 							>
 								{item.when}
@@ -62,15 +70,22 @@ export function ProductFirstMonth({
 							hidden={i !== active}
 							className="grid min-h-[120px] content-start gap-2"
 						>
-							<h3 className="text-[20px] leading-tight font-semibold tracking-[-0.02em]">{item.title}</h3>
-							<p className="text-[15px] leading-[1.714] text-white/75">{item.text}</p>
+							<h3 className="text-[20px] leading-tight font-semibold tracking-[-0.02em]">
+								{item.title}
+							</h3>
+							<p className="text-[15px] leading-[1.714] text-white/75">
+								{item.text}
+							</p>
 						</div>
 					))}
 
 					<div className="grid justify-items-start gap-3">
 						{buy}
 						<p className="flex items-center gap-1.5 text-[13px] text-white/60">
-							<ShieldCheck aria-hidden className="size-4 shrink-0 text-white/70" />
+							<ShieldCheck
+								aria-hidden
+								className="size-4 shrink-0 text-white/70"
+							/>
 							{BUY_GUARANTEE_LINE}
 						</p>
 					</div>
@@ -86,11 +101,17 @@ export function ProductFirstMonth({
 							</span>
 						</div>
 						<div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-							<div className="h-full rounded-full bg-white transition-[width] duration-500" style={{ width: `${progress}%` }} />
+							<div
+								className="h-full rounded-full bg-white transition-[width] duration-500"
+								style={{ width: `${progress}%` }}
+							/>
 						</div>
 					</div>
 					<ol className="relative grid gap-1">
-						<span aria-hidden className="absolute top-5 bottom-5 left-[19px] w-px bg-white/15" />
+						<span
+							aria-hidden
+							className="absolute top-5 bottom-5 left-[27px] w-px bg-white/5"
+						/>
 						{items.map((item, i) => {
 							const done = i <= active;
 							return (
@@ -99,21 +120,49 @@ export function ProductFirstMonth({
 										type="button"
 										onClick={() => setActive(i)}
 										className={cn(
-											"relative grid w-full grid-cols-[40px_1fr] items-center gap-4 rounded-md py-3 pe-3 text-start transition-colors",
-											i === active ? "bg-white/[0.07]" : "hover:bg-white/[0.04]",
+											"relative px-2 grid w-full grid-cols-[40px_1fr] items-center gap-4 rounded-md py-3 pe-3 text-start transition-colors",
+											i === active
+												? "bg-white/[0.07]"
+												: "hover:bg-white/[0.04]",
 										)}
 									>
 										<span
 											className={cn(
 												"bg-deep relative grid size-10 place-items-center rounded-full ring-1 transition-colors",
-												done ? "bg-primary text-white ring-primary" : "text-white/50 ring-white/25",
+												done
+													? "bg-primary text-white ring-primary"
+													: "text-white/50 ring-white/25",
 											)}
 										>
-											{done ? <Check aria-hidden className="size-4" strokeWidth={2.5} /> : <span className="text-[13px] font-semibold tabular-nums">{i + 1}</span>}
+											{done ? (
+												<Check
+													aria-hidden
+													className="size-4"
+													strokeWidth={2.5}
+												/>
+											) : (
+												<span className="text-[13px] font-semibold tabular-nums">
+													{i + 1}
+												</span>
+											)}
 										</span>
 										<span className="grid gap-0.5">
-											<span className={cn(eyebrow, done ? "text-white/70" : "text-white/45")}>{item.when}</span>
-											<span className={cn("text-[16px] font-semibold tracking-[-0.02em]", done ? "text-white" : "text-white/60")}>{item.title}</span>
+											<span
+												className={cn(
+													eyebrow,
+													done ? "text-white/70" : "text-white/45",
+												)}
+											>
+												{item.when}
+											</span>
+											<span
+												className={cn(
+													"text-[16px] font-semibold tracking-[-0.02em]",
+													done ? "text-white" : "text-white/60",
+												)}
+											>
+												{item.title}
+											</span>
 										</span>
 									</button>
 								</li>
