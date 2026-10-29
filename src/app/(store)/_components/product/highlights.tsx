@@ -5,13 +5,52 @@ import { cn } from "@/lib/utils";
 import { type DocKind, DocMockup } from "../home/doc-mockup";
 import { container, eyebrow, media, section, sectionTitle } from "../ui";
 
-/** Same order as the highlight rows (the System's are OFFER_PARTS). 4:3, like the card. */
-const HIGHLIGHT_IMAGES: Record<string, string[]> = {
+/**
+ * Same order as the highlight rows (the System's are OFFER_PARTS). 4:3, like
+ * the card. Without an alt, the row's title stands in.
+ */
+const HIGHLIGHT_IMAGES: Record<string, { src: string; alt?: string }[]> = {
 	[BUNDLE_SLUG]: [
-		"/images/inside/part-1-medical-binder.png",
-		"/images/inside/part-2-shared-family-care-sheet.png",
-		"/images/inside/part-3-caregiver-agreement.png",
-		"/images/inside/part-4-family-meeting-kit.png",
+		{ src: "/images/inside/part-1-medical-binder.png" },
+		{ src: "/images/inside/part-2-shared-family-care-sheet.png" },
+		{ src: "/images/inside/part-3-caregiver-agreement.png" },
+		{ src: "/images/inside/part-4-family-meeting-kit.png" },
+	],
+	"medical-binder": [
+		{
+			src: "/images/inside/medical-binder-1-medications.webp",
+			alt: "Prescription medication list and changes log from the Medical Binder, ready for a pharmacist review",
+		},
+		{
+			src: "/images/inside/medical-binder-2-appointments.webp",
+			alt: "Visit prep and notes page and monthly calendar for an elderly parent's doctor appointments",
+		},
+		{
+			src: "/images/inside/medical-binder-3-who-does-what.webp",
+			alt: "Who does what page naming the sibling who handles refills, rides, bills and calls",
+		},
+		{
+			src: "/images/inside/medical-binder-4-sunday-check-in.webp",
+			alt: "Sunday check-in page: what changed, what's coming up and what needs a hand",
+		},
+	],
+	"caregiver-agreement": [
+		{
+			src: "/images/inside/caregiver-agreement-1-the-care.webp",
+			alt: "Caregiver agreement page listing the care to be provided: rides, meals, medication pickups and bills",
+		},
+		{
+			src: "/images/inside/caregiver-agreement-2-pay.webp",
+			alt: "Caregiver agreement pay section: paid or unpaid, how the rate was chosen and how often it's paid",
+		},
+		{
+			src: "/images/inside/caregiver-agreement-3-logs.webp",
+			alt: "Time and task log and payment log pages from the family caregiver agreement template",
+		},
+		{
+			src: "/images/inside/caregiver-agreement-4-questions.webp",
+			alt: "Talk-first questions for the family and questions for the elder-law attorney before signing",
+		},
 	],
 };
 
@@ -54,8 +93,8 @@ export function ProductHighlights({
 							>
 								{image ? (
 									<Image
-										src={image}
-										alt={alt}
+										src={image.src}
+										alt={image.alt ?? alt}
 										fill
 										sizes="(min-width: 768px) 50vw, 100vw"
 										className="object-cover"

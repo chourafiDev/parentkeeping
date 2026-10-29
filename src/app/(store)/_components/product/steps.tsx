@@ -13,6 +13,15 @@ const STEP_IMAGE_ALTS: Record<string, string[]> = {
 		"Medical Binder pages filled in on screen: About Mom or Dad and Who does what",
 		"Shared care sheet job board showing each sibling's job, owner and status",
 	],
+	"medical-binder": [
+		"Three printed copies of the Medical Binder, one for each sibling and one for Mom's house",
+		"Who does what page from the Medical Binder, with a named sibling and a day for every job",
+	],
+	"caregiver-agreement": [
+		"Talk-first page of the family caregiver agreement with a checklist of questions to agree as a family",
+		"Family caregiver agreement template pages filled in, 17 sections in plain words, fillable PDF and Word",
+		"List of questions to bring to an elder-law attorney before signing a caregiver agreement",
+	],
 };
 
 /**
