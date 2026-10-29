@@ -17,6 +17,11 @@ const STEP_IMAGE_ALTS: Record<string, string[]> = {
 		"Three printed copies of the Medical Binder, one for each sibling and one for Mom's house",
 		"Who does what page from the Medical Binder, with a named sibling and a day for every job",
 	],
+	"emergency-binder": [
+		"Emergency summary page filled in together, starting with contacts, the house, pets and insurance cards",
+		"Emergency information fridge sheet, with where the fridge sheet, door label, binder and wallet card go",
+		"Grab-and-go checklist and the four steps when the call comes: call the emergency number, hand over the summary, grab the bag, start the phone tree",
+	],
 	"caregiver-agreement": [
 		"Talk-first page of the family caregiver agreement with a checklist of questions to agree as a family",
 		"Family caregiver agreement template pages filled in, 17 sections in plain words, fillable PDF and Word",

@@ -34,6 +34,24 @@ const HIGHLIGHT_IMAGES: Record<string, { src: string; alt?: string }[]> = {
 			alt: "Sunday check-in page: what changed, what's coming up and what needs a hand",
 		},
 	],
+	"emergency-binder": [
+		{
+			src: "/images/inside/emergency-binder-1-paramedic-summary.webp",
+			alt: "Emergency summary page for the paramedics: conditions, allergies, devices, wishes and who to call, on one page",
+		},
+		{
+			src: "/images/inside/emergency-binder-2-fridge-sheet.webp",
+			alt: "Emergency information fridge sheet with a big box for the local emergency number, plus wallet cards and door labels",
+		},
+		{
+			src: "/images/inside/emergency-binder-3-legal-documents.webp",
+			alt: "Legal documents locator showing where the advance directive and other originals are kept and who has copies",
+		},
+		{
+			src: "/images/inside/emergency-binder-4-grab-and-go.webp",
+			alt: "Grab-and-go checklist for the hospital bag, the first 24 hours page and a family phone tree",
+		},
+	],
 	"caregiver-agreement": [
 		{
 			src: "/images/inside/caregiver-agreement-1-the-care.webp",
