@@ -68,7 +68,7 @@ export function PagePreviewsCarousel({ groups }: { groups: Group[] }) {
 									{page.image ? (
 										<Image
 											src={page.image}
-											alt={`${group.product}: ${page.name} section`}
+											alt={page.alt ?? `${group.product}: ${page.name} section`}
 											fill
 											sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 80vw"
 											className="object-cover"

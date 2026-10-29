@@ -428,7 +428,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
         { name: "Grab-and-Go Checklist", text: "for whoever gets there first" },
         { name: "The First 24 Hours", text: "what to do, plus a family phone tree" },
         { name: "Hospital Stay Log", text: "what the doctors said, written down while you're there" },
-        { name: "2 Wallet Cards and 2 Door Labels", text: "\"Medical information is on the fridge\"" },
+        { name: "2 Wallet Cards and 2 Door Labels", text: "one for the wallet, one for the front door, so crews know where to look" },
         { name: "How to Bring This Up with Mom or Dad", text: "words that work, and what to do if they say no" },
         { name: "Review & Update Log", text: "when to update it, and who has the latest copy" },
       ],

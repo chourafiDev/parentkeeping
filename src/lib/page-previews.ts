@@ -8,7 +8,8 @@
 import type { DocKind } from "@/app/(store)/_components/home/doc-mockup";
 import { PRODUCT_COPY } from "./product-copy";
 
-export type PreviewPage = { name: string; text: string; slug: string };
+/** `alt` describes the page image; without it the card says "<product>: <name> section". */
+export type PreviewPage = { name: string; text: string; slug: string; alt?: string };
 /** `product` is the full product name, used in each card's alt text. */
 export type PreviewGroup = { id: string; label: string; product: string; kind: DocKind; pages: PreviewPage[] };
 
@@ -22,6 +23,25 @@ export const pageSlug = (name: string) =>
 
 const fromCopy = (slug: string) =>
   PRODUCT_COPY[slug].inside.items.map((i) => ({ name: i.name, text: i.text, slug: pageSlug(i.name) }));
+
+/** Same order as the Emergency Binder's "What's inside" list: image file name and alt text. */
+const EMERGENCY_LOOK: [slug: string, alt: string][] = [
+  ["em-look-01-emergency-summary", "Emergency summary page to hand to paramedics, with conditions, allergies, medications, devices and contacts"],
+  ["em-look-02-fridge-sheet", "Emergency information fridge sheet with a big box for the local emergency number"],
+  ["em-look-03-emergency-contacts", "Emergency contacts page for family, neighbors with a key, doctors and pharmacy"],
+  ["em-look-04-medication-list", "Blank medication list to copy from the labels, with a pharmacist review box"],
+  ["em-look-05-conditions-allergies-devices", "Conditions, allergies and devices page behind the emergency summary"],
+  ["em-look-06-insurance", "Insurance page with plan phone numbers and boxes to tape copies of the cards"],
+  ["em-look-07-legal-documents-locator", "Legal documents locator for the advance directive, POLST/DNR and powers of attorney"],
+  ["em-look-08-hospital-care-preferences", "Hospital and care preferences page: preferred hospital, language, faith and what calms them"],
+  ["em-look-09-house-and-pets", "House and pets page for keys, pets and shut-offs, recording where codes are kept"],
+  ["em-look-10-grab-and-go-checklist", "Grab-and-go hospital bag checklist for whoever gets there first"],
+  ["em-look-11-first-24-hours", "First 24 hours checklist and family phone tree for a parent's emergency"],
+  ["em-look-12-hospital-stay-log", "Hospital stay log to write down what the doctors said"],
+  ["em-look-13-wallet-cards-door-labels", "Two wallet cards and two door labels saying medical information is on the fridge"],
+  ["em-look-14-how-to-bring-it-up", "How to bring up an emergency binder with Mom or Dad, and what to do if they say no"],
+  ["em-look-15-review-update-log", "Review and update log showing when to update the binder and who has the latest copy"],
+];
 
 // The four System parts: word for word from "Parentkeeping What's Inside Cards".
 // `slug` is the image file name in public/images/pages/<group>/.
@@ -200,7 +220,9 @@ export const PREVIEW_GROUPS: Record<string, PreviewGroup> = {
     label: "Emergency Binder",
     product: "Emergency Binder for an Aging Parent",
     kind: "binder",
-    pages: fromCopy("emergency-binder"),
+    pages: fromCopy("emergency-binder").map((p, i) =>
+      EMERGENCY_LOOK[i] ? { ...p, slug: EMERGENCY_LOOK[i][0], alt: EMERGENCY_LOOK[i][1] } : p,
+    ),
   },
 };
 
