@@ -3,13 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { SITE } from "@/lib/site";
-import { cn } from "@/lib/utils";
 import { getFoundingPrice } from "@/server/queries/settings";
 import { type Announcement, AnnouncementBar } from "./announcement-bar";
 import { container } from "./ui";
 
 // Spec nav. No cart: every Buy button goes straight to Stripe Checkout.
-const NAV = [
+const PRODUCT_NAV = [
 	{ href: "/products/family-care-system", label: "Family Care System" },
 	{ href: "/products/medical-binder", label: "Medical Binder" },
 	{
@@ -17,8 +16,8 @@ const NAV = [
 		label: "Caregiver Agreement",
 	},
 	{ href: "/products/emergency-binder", label: "Emergency Binder" },
-	{ href: FREE_LIST_PATH, label: "Free Medication List" },
 ];
+const FREE_LIST_LINK = { href: FREE_LIST_PATH, label: "Free Medication List" };
 
 const fmtDay = (d: Date) =>
 	d.toLocaleDateString("en-US", {
@@ -52,64 +51,58 @@ export async function StoreHeader() {
 		<header className="bg-background sticky top-0 z-30">
 			<AnnouncementBar messages={messages} />
 			<div className="border-b">
+				{/* Logo left, product links centered, the main button right. */}
 				<div
 					className={`${container} grid h-[70px] grid-cols-[1fr_auto_1fr] items-center gap-4`}
 				>
-					{/* Left: nav on desktop, disclosure menu on phones (works without JavaScript). */}
+					<Link href="/" className="justify-self-start">
+						<Image src="/logo.svg" alt={SITE.name} width={110} height={68} loading="eager" />
+					</Link>
+
 					<nav
 						aria-label="Main"
-						className="hidden items-center gap-4 text-[14px] lg:flex"
+						className="hidden items-center gap-6 text-[15px] lg:flex xl:gap-8"
 					>
-						{/* As many product links as fit beside the centered logo; all of them are in the menu. */}
-						{NAV.slice(0, 4).map((item, i) => (
+						{PRODUCT_NAV.map((item) => (
 							<Link
 								key={item.href}
 								href={item.href}
-								className={cn(
-									"text-foreground hover:text-primary font-medium whitespace-nowrap transition-colors",
-									i === 3 && "hidden min-[1360px]:inline",
-								)}
+								className="text-foreground hover:text-primary font-medium whitespace-nowrap transition-colors"
 							>
 								{item.label}
 							</Link>
 						))}
 					</nav>
-					<details className="group relative lg:hidden">
-						<summary className="hover:bg-muted flex size-10 cursor-pointer list-none items-center justify-center rounded-full [&::-webkit-details-marker]:hidden">
-							<Menu className="size-5" />
-							<span className="sr-only">Menu</span>
-						</summary>
-						<nav
-							aria-label="Main"
-							className="bg-popover absolute start-0 z-20 mt-2 grid w-64 gap-1 rounded-xl border p-2 shadow-lg"
-						>
-							{NAV.map((item) => (
-								<Link
-									key={item.href}
-									href={item.href}
-									className="hover:bg-muted rounded-lg px-3 py-2.5 text-[15px] font-medium"
-								>
-									{item.label}
-								</Link>
-							))}
-						</nav>
-					</details>
 
-					<Link
-						href="/"
-						className="text-foreground text-[26px] leading-none font-semibold tracking-[-0.04em]"
-					>
-						<Image src="/logo.svg" alt={SITE.name} width={130} height={80} loading="eager" />
-					</Link>
-
-					<div className="flex justify-end">
-						{/* The main path; the free list stays in the menu and the footer. */}
+					<div className="col-start-3 flex items-center justify-end gap-2">
+						{/* The main path; the free list is in the menu and the footer. */}
 						<Link
-							href={NAV[0].href}
-							className="bg-foreground text-background hover:bg-primary hidden h-10 items-center rounded-full px-5 text-sm font-semibold transition-colors sm:inline-flex"
+							href={PRODUCT_NAV[0].href}
+							className="bg-foreground text-background hover:bg-primary hidden h-10 items-center rounded-full px-5 text-sm font-semibold whitespace-nowrap transition-colors sm:inline-flex"
 						>
 							Get the System
 						</Link>
+						{/* Phones and tablets: a disclosure menu (works without JavaScript). */}
+						<details className="group relative lg:hidden">
+							<summary className="hover:bg-muted flex size-10 cursor-pointer list-none items-center justify-center rounded-full [&::-webkit-details-marker]:hidden">
+								<Menu className="size-5" />
+								<span className="sr-only">Menu</span>
+							</summary>
+							<nav
+								aria-label="Main"
+								className="bg-popover absolute end-0 z-20 mt-2 grid w-64 gap-1 rounded-xl border p-2 shadow-lg"
+							>
+								{[...PRODUCT_NAV, FREE_LIST_LINK].map((item) => (
+									<Link
+										key={item.href}
+										href={item.href}
+										className="hover:bg-muted rounded-lg px-3 py-2.5 text-[15px] font-medium"
+									>
+										{item.label}
+									</Link>
+								))}
+							</nav>
+						</details>
 					</div>
 				</div>
 			</div>
