@@ -49,8 +49,8 @@ export type ProductCopy = {
   steps?: { title: string; items: readonly { title: string; text: string }[]; note?: string };
   /** "What it does": zig-zag rows, the strongest parts of "What's inside". */
   highlights: { title: string; items: Highlight[] };
-  /** "Everything in the download": the full list. */
-  inside: { title: string; items: { name: string; text: string; meta?: string }[] };
+  /** "Everything in the download": the full list. `listed: false` leaves it to the "Look inside" carousel, which shows the same items. */
+  inside: { title: string; items: { name: string; text: string; meta?: string }[]; listed?: false };
   /** The System parts this product is (comparison table); the System has all four. */
   parts: string[];
   /** Story sections that don't fit the blocks above (the Agreement's "Why families write one"). */
@@ -388,9 +388,10 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       "In an emergency, the questions come fast. What medications does she take? Any allergies? Who's her doctor? Is there an advance directive? Which hospital?",
       "If the answers live in your head, or in a drawer at Mom's house, the person standing there may not have them. This 18-page binder puts them on paper anyone can hand over, with a one-page summary for the paramedics and a sheet for the fridge.",
     ],
-    // Word for word from the product brief ("What's inside").
+    // Word for word from the product brief ("What's inside"). Shown by the carousel only.
     inside: {
       title: "What's inside",
+      listed: false,
       items: [
         { name: "Emergency Summary", text: "One page to hand to the paramedics or ER, with conditions, allergies, key medications, devices, memory or hearing needs, wishes and who to call." },
         { name: "Fridge Sheet", text: "The key facts for the front of the fridge, where emergency crews often look, with a big box for your local emergency number." },

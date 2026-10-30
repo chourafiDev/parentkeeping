@@ -559,14 +559,16 @@ export default async function ProductPage({
 			{!isBundle && (
 				<>
 					<ProductStory sections={copy.sections} buy={buyButton(pillDark)} />
-					<ProductDownloadCard
-						inside={copy.inside}
-						assets={assets}
-						price={data.price}
-						compareAt={data.compareAt}
-						buy={buyButton(pillLight)}
-						smallPrint={underButton}
-					/>
+					{copy.inside.listed !== false && (
+						<ProductDownloadCard
+							inside={copy.inside}
+							assets={assets}
+							price={data.price}
+							compareAt={data.compareAt}
+							buy={buyButton(pillLight)}
+							smallPrint={underButton}
+						/>
+					)}
 				</>
 			)}
 
