@@ -50,7 +50,7 @@ function remember() {
  */
 export function SignupPopup({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();
-	const [open, setOpen] = useState(false);
+	const [open, setOpen] = useState(true);
 	const [mobile, setMobile] = useState(false);
 	const panelRef = useRef<HTMLDivElement>(null);
 

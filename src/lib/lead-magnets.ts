@@ -137,7 +137,7 @@ export const FREE_LIST: LeadMagnet = {
     h1: "Your medication list is ready",
     line: "We've also emailed it to you. Check your spam folder if it isn't there in five minutes.",
     next: {
-      title: "The medication list is one page. Your parent's care is a whole system.",
+      title: "The medication list is one piece. Your parent's care is a whole system.",
       text: "Doctors, appointments, insurance, paperwork, who is doing what and who is paying. Most of it lives in one person's head, and that person is usually you.",
     },
   },
