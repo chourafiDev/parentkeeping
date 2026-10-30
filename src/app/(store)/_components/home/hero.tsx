@@ -1,15 +1,27 @@
-import { ShieldCheck } from "lucide-react";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { PRODUCT_DISCLAIMER_SHORT } from "@/lib/legal";
+import { formatStorePrice } from "@/lib/money";
 import { OFFER_HEADLINES, OFFER_SUBHEAD } from "@/lib/offer";
+import { cn } from "@/lib/utils";
 import { container, eyebrow, media, pillLight } from "../ui";
 import { BuyForm } from "./buy-form";
 import { DocMockup } from "./doc-mockup";
 import { MediaSlot } from "./media-slot";
-import type { HomeData } from "./types";
+import { deliveryDate, type HomeData } from "./types";
+
+/** The System's main image (all four parts), so the product is in the first screen. */
+function ProductCard({ src, className }: { src: string; className?: string }) {
+	return (
+		<div className={cn("overflow-hidden rounded-[10px] bg-white shadow-[0_20px_50px_-20px_rgb(0_0_0/0.5)] ring-1 ring-white/20", className)}>
+			{/* eslint-disable-next-line @next/next/no-img-element */}
+			<img src={src} alt="Family Care System: Medical Binder, Care Sheet, Caregiver Agreement and Meeting Kit" className="block h-auto w-full" />
+		</div>
+	);
+}
 
 export function HomeHero({ data }: { data: HomeData }) {
 	const { system } = data;
+	const delivery = deliveryDate(data);
 
 	return (
 		<section className={`${container} pt-3`}>
@@ -103,6 +115,14 @@ export function HomeHero({ data }: { data: HomeData }) {
                     "
 				/>
 
+				{/* PRODUCT: beside the headline on desktop, over the table, clear of the faces. */}
+				{system.image && (
+					<ProductCard
+						src={system.image}
+						className="absolute right-10 bottom-10 z-20 hidden w-[260px] lg:block xl:w-[300px]"
+					/>
+				)}
+
 				{/* HERO CONTENT */}
 				<div
 					className="
@@ -160,19 +180,25 @@ export function HomeHero({ data }: { data: HomeData }) {
 						</a>
 					</div>
 
-					{/* DISCLAIMERS */}
-					<div className="space-y-2 text-xs text-white/80">
-						<p>
-							{PRODUCT_DISCLAIMER_SHORT}
-						</p>
+					{/* PRICE: what it costs and how it arrives, in one line. */}
+					<p className="text-[15px] text-white/90 tabular-nums">
+						<span className="font-semibold text-white">{formatStorePrice(system.price)}</span>
+						{system.compareAt && (
+							<span className="ml-1.5 text-white/60 line-through">{formatStorePrice(system.compareAt)}</span>
+						)}{" "}
+						one time · 14-day guarantee · {delivery ? "pre-order" : "instant download"}
+					</p>
 
-						<div className="bg-primary/30 rounded-md p-2 inline-flex">
-							<p className="flex items-center gap-1.5">
-								<ShieldCheck className="size-3.5" />
-								14-day “if it doesn&apos;t help” guarantee
-							</p>
-						</div>
-					</div>
+					{/* DISCLAIMER */}
+					<p className="text-xs text-white/80">{PRODUCT_DISCLAIMER_SHORT}</p>
+
+					{/* PRODUCT: on phones and tablets, under the button so it stays in the first screen. */}
+					{system.image && (
+						<ProductCard
+							src={system.image}
+							className="w-[220px] sm:w-[260px] lg:hidden"
+						/>
+					)}
 				</div>
 			</div>
 		</section>

@@ -12,8 +12,9 @@ const STORAGE_KEY = "pk_signup_popup";
 const DELAY_MS = 40_000;
 const QUIET_DAYS = 30;
 
-/** Pages where an interruption would be wrong: sign-up pages themselves, legal, contact, after purchase. */
+/** Pages where an interruption would be wrong: sign-up pages themselves, product pages (people deciding to buy), legal, contact, after purchase. */
 const NEVER = [
+	"/products",
 	FREE_LIST_PATH,
 	"/pages/caregiver-checklists",
 	"/pages/contact",
@@ -45,8 +46,7 @@ function remember() {
  * The free Medication List, offered once: after 40 seconds or when the mouse
  * heads for the browser bar (desktop), as a small slide-in on phones. Never
  * a discount, never on the quiz, and quiet for 30 days after "No thanks" or
- * a sign-up. Product pages only get the leaving-the-page version (and never
- * on phones, where the sticky buy bar lives).
+ * a sign-up. Never on product pages, where people are deciding to buy.
  */
 export function SignupPopup({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();
@@ -59,8 +59,6 @@ export function SignupPopup({ children }: { children: React.ReactNode }) {
 		const isMobile = window.matchMedia(
 			"(max-width: 767px), (pointer: coarse)",
 		).matches;
-		const productPage = pathname.startsWith("/products/");
-		if (isMobile && productPage) return;
 
 		const show = () => {
 			if (recentlySeen()) return;
@@ -72,7 +70,7 @@ export function SignupPopup({ children }: { children: React.ReactNode }) {
 		const onLeave = (e: MouseEvent) => {
 			if (!e.relatedTarget && e.clientY <= 0) show();
 		};
-		const timer = productPage ? undefined : setTimeout(show, DELAY_MS);
+		const timer = setTimeout(show, DELAY_MS);
 		if (!isMobile) document.addEventListener("mouseout", onLeave);
 		function cleanup() {
 			clearTimeout(timer);
