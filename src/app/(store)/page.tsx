@@ -15,6 +15,7 @@ import { getProductReviews } from "@/server/queries/reviews";
 import { getFoundingPrice, getSettings } from "@/server/queries/settings";
 import { getSocialProof } from "@/server/queries/social-proof";
 import { getPackageExtras } from "@/server/queries/storefront";
+import { CareSheetDemo } from "./_components/care-sheet-demo";
 import { Bundle } from "./_components/home/bundle";
 import { ClosingBanner } from "./_components/home/closing-banner";
 import { ClosingStrips } from "./_components/home/closing-strips";
@@ -252,6 +253,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			<MomentBanner />
 			<ProblemTabs />
 			<HowItWorks />
+			<CareSheetDemo />
 			<PagePreviews groupIds={PREVIEWS_BY_PRODUCT[BUNDLE_SLUG]} />
 			<Bundle data={data} />
 			<SoundFamiliar />

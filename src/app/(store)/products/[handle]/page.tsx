@@ -83,6 +83,7 @@ import { ProductSteps } from "../../_components/product/steps";
 import { ProductStory } from "../../_components/product/story";
 import { StickyBuyBar } from "../../_components/product/sticky-buy-bar";
 import { jsonLdHtml, productJsonLd } from "../../_components/product-data";
+import { CareSheetDemo } from "../../_components/care-sheet-demo";
 import { container, pillDark, pillLight } from "../../_components/ui";
 
 export const dynamic = "force-dynamic";
@@ -543,6 +544,7 @@ export default async function ProductPage({
 			{isBundle && <ProductStory sections={copy.sections} buy={buyButton(pillDark)} />}
 			{isBundle && <ProblemTabs />}
 			{copy.steps && <ProductSteps slug={product.slug} steps={copy.steps} />}
+			{isBundle && <CareSheetDemo />}
 			<ProductHighlights
 				slug={product.slug}
 				highlights={copy.highlights}
