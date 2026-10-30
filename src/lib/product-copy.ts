@@ -278,26 +278,9 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       text: "Go at your family's pace. Nobody signs anything until an attorney has reviewed it.",
       items: [
         { when: "Week 1", title: "Talk first", text: "Settle the six questions as a family: what care is needed, how many hours, what it's worth, who decides, and what happens when health changes." },
-        { when: "Week 2", title: "Fill it in and book the attorney", text: "Fill in the 17 short sections, then book an elder-law attorney. Bring the 14-question tick list so the meeting is shorter." },
+        { when: "Week 2", title: "Fill it in and book the attorney", text: "Fill in the 17 short sections in plain words: the care and hours, pay and a fair rate, backup care, and how it changes or ends. Then book an elder-law attorney, and bring the 14-question tick list so the meeting is shorter." },
         { when: "Before signing", title: "Attorney review, then signatures", text: "An elder-law attorney where your parent lives reviews it before anyone signs or any payment is made. Then sign, with space for witnesses and a notary." },
         { when: "From then on", title: "Keep the records", text: "Log hours, tasks and payments, and send each sibling the one-page “What We Agreed” summary." },
-      ],
-    },
-    steps: {
-      title: "From the kitchen table to a signed agreement",
-      items: [
-        {
-          title: "Talk first",
-          text: "Settle the six questions as a family: what care is needed, how many hours, what it's worth, who decides, and what happens when health changes.",
-        },
-        {
-          title: "Fill in the agreement",
-          text: "17 short sections in plain words with blanks: who is involved, the care and hours, pay and a fair rate, backup care, and how it changes or ends.",
-        },
-        {
-          title: "Take it to an elder-law attorney",
-          text: "Bring the 14-question tick list, and have an attorney where your parent lives review it before anyone signs or any payment is made.",
-        },
       ],
     },
     highlights: {

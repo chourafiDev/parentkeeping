@@ -18,11 +18,6 @@ const STEP_IMAGE_ALTS: Record<string, string[]> = {
 		"Emergency information fridge sheet, with where the fridge sheet, door label, binder and wallet card go",
 		"Grab-and-go checklist and the four steps when the call comes: call the emergency number, hand over the summary, grab the bag, start the phone tree",
 	],
-	"caregiver-agreement": [
-		"Talk-first page of the family caregiver agreement with a checklist of questions to agree as a family",
-		"Family caregiver agreement template pages filled in, 17 sections in plain words, fillable PDF and Word",
-		"List of questions to bring to an elder-law attorney before signing a caregiver agreement",
-	],
 };
 
 /**
