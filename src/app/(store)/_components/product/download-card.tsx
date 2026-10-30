@@ -11,7 +11,6 @@ type Asset = { id: string; kind: string; label: string; fileName: string | null;
 /** "Everything in the download": the full list, the files, the price and the Buy button. */
 export function ProductDownloadCard({
 	inside,
-	arrivesBy,
 	assets,
 	price,
 	compareAt,
@@ -19,8 +18,6 @@ export function ProductDownloadCard({
 	smallPrint,
 }: {
 	inside: ProductCopy["inside"];
-	/** Per item: its pre-sale date, if any. */
-	arrivesBy: (Date | null)[];
 	assets: Asset[];
 	price: number;
 	compareAt: number | null;
@@ -35,7 +32,7 @@ export function ProductDownloadCard({
 			</div>
 			<div className="mx-auto grid max-w-[760px] grid-cols-[minmax(0,1fr)] gap-8 rounded-[10px] border bg-deep p-6 shadow-[0_20px_50px_-30px_rgb(0_0_0/0.25)] md:p-10">
 				<ul className="grid gap-5">
-					{inside.items.map((item, i) => (
+					{inside.items.map((item) => (
 						<li key={item.name} className="flex gap-3.5">
 							<span className="bg-white mt-0.5 grid size-5 shrink-0 place-items-center rounded-full text-primary">
 								<Check className="size-3" strokeWidth={3} />
@@ -43,11 +40,6 @@ export function ProductDownloadCard({
 							<div className="grid gap-0.5">
 								<p className="text-white flex flex-wrap items-center gap-2 text-[15px] font-semibold">
 									{item.name}
-									{arrivesBy[i] && (
-										<span className="rounded-full bg-[#6c4cf1] px-2 py-0.5 text-[11px] font-semibold text-white">
-											Arrives by {formatStoreDay(arrivesBy[i]!)}
-										</span>
-									)}
 								</p>
 								<p className="text-white/50 text-[14px] leading-relaxed">{item.text}</p>
 								{item.meta && <p className="text-white/70 text-[13px] font-medium">{item.meta}</p>}

@@ -17,7 +17,6 @@ import { assetStatus } from "@/lib/assets";
 import {
 	BUNDLE_SLUG,
 	BUY_LABELS,
-	fileMatchesPart,
 	PRODUCT_PATHS,
 	SLUG_BY_HANDLE,
 } from "@/lib/catalog";
@@ -249,17 +248,6 @@ export default async function ProductPage({
 		</>
 	);
 
-	// "Everything in the download": pre-sale dates per item (System parts only).
-	const arrivesBy = copy.inside.items.map((_, i) =>
-		isBundle
-			? (assets.find(
-					(a) =>
-						fileMatchesPart(a.label, OFFER_PARTS[i]?.fileLabel ?? "") &&
-						a.availableAt,
-				)?.availableAt ?? null)
-			: null,
-	);
-
 	// Pre-order: the date the last file arrives.
 	const lastArrival = assets
 		.map((a) => a.availableAt)
@@ -273,7 +261,8 @@ export default async function ProductPage({
 				? `Pre-order: your files arrive by ${formatStoreDay(lastArrival)}. If we miss that date, you can have a full refund.`
 				: null;
 
-	const details: BuyDetail[] = [
+	// The System's parts and steps each have their own section below, so its buy box skips them.
+	const details: BuyDetail[] = ([
 		{
 			title: "What it is",
 			body: description ? (
@@ -285,7 +274,7 @@ export default async function ProductPage({
 				(copy.intro ?? [copy.subhead]).map((p) => <p key={p}>{p}</p>)
 			),
 		},
-		{
+		!isBundle && {
 			title: "What's inside",
 			body: (
 				<ul className="grid gap-2">
@@ -303,7 +292,7 @@ export default async function ProductPage({
 				</ul>
 			),
 		},
-		{
+		!isBundle && {
 			title: "How to use it",
 			body: (
 				<ol className="grid gap-2">
@@ -332,7 +321,7 @@ export default async function ProductPage({
 				/>
 			),
 		},
-	];
+	] as (BuyDetail | false)[]).filter((d) => d !== false);
 
 	// Comparison rows.
 	const upgradeBy = system ? system.price - data.price : 0;
@@ -589,6 +578,8 @@ export default async function ProductPage({
 			{/* <ProductReviews /> */}
 			{/* )} */}
 
+			{/* The System: the brother story right after the buy box, where it explains why. */}
+			{isBundle && <ProductStory sections={copy.sections} buy={buyButton(pillDark)} />}
 			{isBundle && <ProblemTabs />}
 			<ProductSteps slug={product.slug} steps={copy.steps} />
 			<ProductHighlights
@@ -604,17 +595,19 @@ export default async function ProductPage({
 				<ProductFirstMonth timeline={copy.firstMonth} buy={buyButton(pillLight)} />
 			)}
 
-			<ProductStory sections={copy.sections} buy={buyButton(pillDark)} />
-
-			<ProductDownloadCard
-				inside={copy.inside}
-				arrivesBy={arrivesBy}
-				assets={isBundle ? [] : assets}
-				price={data.price}
-				compareAt={data.compareAt}
-				buy={buyButton(pillLight)}
-				smallPrint={underButton}
-			/>
+			{!isBundle && (
+				<>
+					<ProductStory sections={copy.sections} buy={buyButton(pillDark)} />
+					<ProductDownloadCard
+						inside={copy.inside}
+						assets={assets}
+						price={data.price}
+						compareAt={data.compareAt}
+						buy={buyButton(pillLight)}
+						smallPrint={underButton}
+					/>
+				</>
+			)}
 
 			{isBundle && separately > 0 && (
 				<ProductCompare

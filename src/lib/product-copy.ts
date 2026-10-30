@@ -81,12 +81,12 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
     },
     schemaName: "Parentkeeping Family Care System",
     name: "Family Care System",
-    h1: OFFER_HEADLINES.fairness,
-    subhead:
-      "Everything about Mom or Dad's care in one place, and the work and costs shared fairly between siblings, so it doesn't all fall on you.",
+    h1: "Family Care System for an Aging Parent",
+    // The tagline, under the product name.
+    subhead: OFFER_HEADLINES.fairness,
     underButton: PRODUCT_DISCLAIMER_SHORT,
     inside: {
-      // DRAFT heading (the zig-zag above already uses "Four parts that work together").
+      // Not shown on the System page (the cards and the carousel cover the parts); kept for the type.
       title: "Everything in the download",
       items: OFFER_PARTS.map((p) => ({ name: p.name, text: p.what, meta: p.format })),
     },
