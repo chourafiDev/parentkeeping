@@ -32,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		...Object.values(LEAD_MAGNETS).map((m) => m.path),
 		QUIZ_PATH,
 		BLOG_PATH,
+		"/pages/about",
 		"/pages/contact",
 		"/pages/disclaimer",
 		"/policies/terms-of-service",

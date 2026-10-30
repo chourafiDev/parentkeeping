@@ -17,7 +17,8 @@ export function LegalPage({
 }: {
 	eyebrowText: string;
 	title: string;
-	lastUpdated: string;
+	/** Policies only (the About page has none). */
+	lastUpdated?: string;
 	intro?: string[];
 	sections: CopySection[];
 }) {
@@ -36,7 +37,7 @@ export function LegalPage({
 					<div className="grid gap-3">
 						<p className={`${eyebrow} text-primary`}>{eyebrowText}</p>
 						<h1 className="text-foreground text-[32px] leading-[1.1] font-semibold tracking-[-0.034em] md:text-[40px]">{title}</h1>
-						<p className="text-body text-[13px]">Last updated: {lastUpdated}</p>
+						{lastUpdated && <p className="text-body text-[13px]">Last updated: {lastUpdated}</p>}
 						{intro?.map((p) => (
 							<p key={p} className="text-body mt-2 text-[15px] leading-[1.714]">
 								{p}

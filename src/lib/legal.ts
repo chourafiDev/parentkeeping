@@ -52,3 +52,7 @@ export const CHECKLISTS_CRISIS_LINE = `These checklists are general information,
 /** Short line in the footer of every store page. */
 export const FOOTER_LEGAL_LINE =
   "Parentkeeping makes organizing tools for families caring for an aging parent. Nothing on this site is medical, legal or financial advice.";
+
+/** Who runs the store (Privacy Policy, Terms, About). */
+export const OPERATOR_LINE =
+  "Parentkeeping is operated by Abdelmonaime Chourafi LLC, a Wyoming limited liability company, 30 N Gould St Ste R, Sheridan, WY 82801.";

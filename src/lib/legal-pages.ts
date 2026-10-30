@@ -14,6 +14,7 @@ import {
   EMERGENCY_LEGAL_LINE,
   GENERAL_INFO_LINE,
   MEDICATION_LEGAL_LINE,
+  OPERATOR_LINE,
   PRODUCT_DISCLAIMER_SHORT,
   QUIZ_RESULT_FOOTER,
   SHEET_LEGAL_LINE,
@@ -44,7 +45,7 @@ export const TERMS_SECTIONS: CopySection[] = [
     title: "Who we are",
     paragraphs: [
       "Parentkeeping (“we,” “us” or “our”) makes printable and fillable organizing tools for adult children caring for an aging parent. These terms cover your use of parentkeeping.com and the products you buy here.",
-      "Parentkeeping is operated by Abdelmonaime Chourafi LLC, a Wyoming limited liability company, 30 N Gould St Ste R, Sheridan, WY 82801. When you buy from us, your agreement is with Abdelmonaime Chourafi LLC.",
+      `${OPERATOR_LINE} When you buy from us, your agreement is with Abdelmonaime Chourafi LLC.`,
       "By placing an order or using this site, you agree to these terms. If you don't agree, please don't use the site or buy a product.",
     ],
   },
@@ -141,7 +142,7 @@ export const PRIVACY_SECTIONS: CopySection[] = [
   {
     title: "Who we are",
     paragraphs: [
-      "Parentkeeping is operated by Abdelmonaime Chourafi LLC, a Wyoming limited liability company, 30 N Gould St Ste R, Sheridan, WY 82801. It decides how your personal information is used, and is responsible for it under this policy.",
+      `${OPERATOR_LINE} It decides how your personal information is used, and is responsible for it under this policy.`,
     ],
   },
   {
@@ -307,4 +308,52 @@ export const DISCLAIMER_SECTIONS: CopySection[] = [
   { title: "Emergency Binder", paragraphs: [EMERGENCY_LEGAL_LINE] },
   { title: "Free Medication List & Daily Medication Chart", paragraphs: [MEDICATION_LEGAL_LINE] },
   { title: "Caregiver Burnout Quiz", paragraphs: [QUIZ_RESULT_FOOTER] },
+];
+
+// "About" in the tab ("· Parentkeeping" is added); the H1 says "About Parentkeeping".
+export const ABOUT_SEO = {
+  title: "About",
+  description: "What Parentkeeping makes, why, who runs it, and how support works.",
+};
+
+export const ABOUT_INTRO = [
+  "Parentkeeping makes printable and fillable organizing tools for adult children caring for an aging parent, and for the brothers and sisters sharing that care.",
+];
+
+// Plain facts only: what we make, why, who runs it, how support works. No invented backstory.
+export const ABOUT_SECTIONS: CopySection[] = [
+  {
+    title: "What we make",
+    paragraphs: ["Everything is a digital download. Nothing to install, no app, no subscription."],
+    bullets: [
+      { lead: "The Family Care System.", text: "A Medical Binder, a Shared Family Care Sheet in Google Sheets, a Family Caregiver Agreement Template and a Family Meeting Kit, sold together." },
+      { lead: "The Medical Binder and the Caregiver Agreement", text: "on their own, for families who need one part." },
+      { lead: "The Emergency Binder.", text: "18 pages for the day the paramedics come: a summary to hand over, a fridge sheet and wallet cards." },
+      { lead: "Free downloads.", text: "A Medication List & Daily Medication Chart, Caregiver Checklists, and the Caregiver Burnout Quiz." },
+    ],
+  },
+  {
+    title: "Why",
+    paragraphs: [
+      "Caring for a parent usually lands on one person. The medications, the doctors, the refills and the bills end up in one head, and the siblings who want to help don't know where to start.",
+      "Parentkeeping puts that information in one place anyone in the family can pick up, and makes the jobs and the costs visible, so they can be shared fairly.",
+    ],
+  },
+  {
+    title: "What we're not",
+    paragraphs: [
+      "Our products are organizing tools, not medical, legal or financial advice. Follow your parent's own doctors and pharmacist, and any attorney or financial professional your family works with. The Caregiver Agreement is a starting point to take to an elder-law attorney, not a finished contract. See our [Disclaimer](/pages/disclaimer).",
+    ],
+  },
+  {
+    title: "Who runs it",
+    paragraphs: [OPERATOR_LINE],
+  },
+  {
+    title: "How support works",
+    paragraphs: [
+      "Email [support email] and a person will answer, usually within one business day. You can also use our [Contact page](/pages/contact), including to ask whether a product is right for you before you buy.",
+      "If a file won't open or has an error, we fix it or send a new copy. Every product has a 14-day “if it doesn't help” guarantee: email us within 14 days and we'll refund you in full, no reason needed. See the [Refund Policy](/policies/refund-policy).",
+    ],
+  },
 ];

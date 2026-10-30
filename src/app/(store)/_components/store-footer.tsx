@@ -78,9 +78,12 @@ export async function StoreFooter() {
 							</p>
 						)}
 					</div>
-					<div>
+					<div className="flex flex-wrap items-center gap-x-5 gap-y-3">
 						<Link href="/pages/contact" className={pillDark}>
 							Contact us
+						</Link>
+						<Link href="/pages/about" className={`${linkClass} text-[15px] underline underline-offset-4`}>
+							About Parentkeeping
 						</Link>
 					</div>
 				</div>
