@@ -1,6 +1,7 @@
 import { Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { BLOG_PATH } from "@/lib/blog";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { SITE } from "@/lib/site";
 import { getFoundingPrice } from "@/server/queries/settings";
@@ -8,7 +9,7 @@ import { type Announcement, AnnouncementBar } from "./announcement-bar";
 import { container } from "./ui";
 
 // Spec nav. No cart: every Buy button goes straight to Stripe Checkout.
-const PRODUCT_NAV = [
+const NAV = [
 	{ href: "/products/family-care-system", label: "Family Care System" },
 	{ href: "/products/medical-binder", label: "Medical Binder" },
 	{
@@ -16,6 +17,7 @@ const PRODUCT_NAV = [
 		label: "Caregiver Agreement",
 	},
 	{ href: "/products/emergency-binder", label: "Emergency Binder" },
+	{ href: BLOG_PATH, label: "Guides" },
 ];
 const FREE_LIST_LINK = { href: FREE_LIST_PATH, label: "Free Medication List" };
 
@@ -51,7 +53,7 @@ export async function StoreHeader() {
 		<header className="bg-background sticky top-0 z-30">
 			<AnnouncementBar messages={messages} />
 			<div className="border-b">
-				{/* Logo left, product links centered, the main button right. */}
+				{/* Logo left, links centered, the main button right. */}
 				<div
 					className={`${container} grid h-[70px] grid-cols-[1fr_auto_1fr] items-center gap-4`}
 				>
@@ -61,9 +63,9 @@ export async function StoreHeader() {
 
 					<nav
 						aria-label="Main"
-						className="hidden items-center gap-6 text-[15px] lg:flex xl:gap-8"
+						className="hidden items-center gap-5 text-[15px] lg:flex xl:gap-8"
 					>
-						{PRODUCT_NAV.map((item) => (
+						{NAV.map((item) => (
 							<Link
 								key={item.href}
 								href={item.href}
@@ -77,7 +79,7 @@ export async function StoreHeader() {
 					<div className="col-start-3 flex items-center justify-end gap-2">
 						{/* The main path; the free list is in the menu and the footer. */}
 						<Link
-							href={PRODUCT_NAV[0].href}
+							href={NAV[0].href}
 							className="bg-foreground text-background hover:bg-primary hidden h-10 items-center rounded-full px-5 text-sm font-semibold whitespace-nowrap transition-colors sm:inline-flex"
 						>
 							Get the System
@@ -92,7 +94,7 @@ export async function StoreHeader() {
 								aria-label="Main"
 								className="bg-popover absolute end-0 z-20 mt-2 grid w-64 gap-1 rounded-xl border p-2 shadow-lg"
 							>
-								{[...PRODUCT_NAV, FREE_LIST_LINK].map((item) => (
+								{[...NAV, FREE_LIST_LINK].map((item) => (
 									<Link
 										key={item.href}
 										href={item.href}
