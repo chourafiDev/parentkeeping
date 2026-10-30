@@ -58,16 +58,16 @@ export async function StoreHeader() {
 					{/* Left: nav on desktop, disclosure menu on phones (works without JavaScript). */}
 					<nav
 						aria-label="Main"
-						className="hidden items-center gap-6 text-[15px] lg:flex"
+						className="hidden items-center gap-4 text-[14px] lg:flex"
 					>
-						{/* The 4th product link only where there's room beside the logo; all of them are in the phone menu. */}
+						{/* As many product links as fit beside the centered logo; all of them are in the menu. */}
 						{NAV.slice(0, 4).map((item, i) => (
 							<Link
 								key={item.href}
 								href={item.href}
 								className={cn(
-									"text-foreground hover:text-primary font-medium transition-colors",
-									i === 3 && "hidden xl:inline",
+									"text-foreground hover:text-primary font-medium whitespace-nowrap transition-colors",
+									i === 3 && "hidden min-[1360px]:inline",
 								)}
 							>
 								{item.label}
@@ -103,11 +103,12 @@ export async function StoreHeader() {
 					</Link>
 
 					<div className="flex justify-end">
+						{/* The main path; the free list stays in the menu and the footer. */}
 						<Link
-							href={FREE_LIST_PATH}
-							className="border-foreground hover:bg-foreground hover:text-background hidden h-10 items-center rounded-full border px-5 text-sm font-semibold transition-colors sm:inline-flex"
+							href={NAV[0].href}
+							className="bg-foreground text-background hover:bg-primary hidden h-10 items-center rounded-full px-5 text-sm font-semibold transition-colors sm:inline-flex"
 						>
-							Free Medication List
+							Get the System
 						</Link>
 					</div>
 				</div>

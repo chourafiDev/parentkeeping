@@ -2,7 +2,7 @@ import { ShieldCheck } from "lucide-react";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { PRODUCT_DISCLAIMER_SHORT } from "@/lib/legal";
 import { OFFER_HEADLINES, OFFER_SUBHEAD } from "@/lib/offer";
-import { container, eyebrow, media, pillButton, pillLight } from "../ui";
+import { container, eyebrow, media, pillLight } from "../ui";
 import { BuyForm } from "./buy-form";
 import { DocMockup } from "./doc-mockup";
 import { MediaSlot } from "./media-slot";
@@ -145,8 +145,8 @@ export function HomeHero({ data }: { data: HomeData }) {
 						</p>
 					)}
 
-					{/* CTA BUTTONS */}
-					<div className="flex flex-wrap gap-3">
+					{/* CTA: one main button; the free list is a quieter text link. */}
+					<div className="flex flex-wrap items-center gap-x-6 gap-y-3">
 						<BuyForm
 							product={system}
 							className={pillLight}
@@ -154,16 +154,9 @@ export function HomeHero({ data }: { data: HomeData }) {
 
 						<a
 							href={FREE_LIST_PATH}
-							className={`
-                                ${pillButton}
-                                border border-white/60
-                                text-white
-                                transition-colors duration-300
-                                hover:bg-white
-                                hover:text-foreground
-                            `}
+							className="text-[15px] font-medium text-white/90 underline underline-offset-4 transition-colors hover:text-white"
 						>
-							Free Medication List
+							Or start with the free Medication List
 						</a>
 					</div>
 

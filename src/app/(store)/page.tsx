@@ -249,7 +249,6 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			<HomeHero data={data} />
 			<Marquee messages={MARQUEE} />
 			<PartsHighlights data={data} />
-			<ShopGrid cards={cards} />
 			<MomentBanner />
 			<ProblemTabs />
 			<HowItWorks />
@@ -257,6 +256,8 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 			<Bundle data={data} />
 			<SoundFamiliar />
 			<UsualWay />
+			{/* The other products near the bottom, so the page stays about one offer. */}
+			<ShopGrid cards={cards} />
 			<Faq data={data} />
 			<ClosingStrips data={data} />
 			<ClosingBanner data={data} />
