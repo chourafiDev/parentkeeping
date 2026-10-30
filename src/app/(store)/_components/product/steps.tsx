@@ -13,10 +13,6 @@ const STEP_IMAGE_ALTS: Record<string, string[]> = {
 		"Medical Binder pages filled in on screen: About Mom or Dad and Who does what",
 		"Shared care sheet job board showing each sibling's job, owner and status",
 	],
-	"medical-binder": [
-		"Three printed copies of the Medical Binder, one for each sibling and one for Mom's house",
-		"Who does what page from the Medical Binder, with a named sibling and a day for every job",
-	],
 	"emergency-binder": [
 		"Emergency summary page filled in together, starting with contacts, the house, pets and insurance cards",
 		"Emergency information fridge sheet, with where the fridge sheet, door label, binder and wallet card go",
@@ -35,7 +31,7 @@ const STEP_IMAGE_ALTS: Record<string, string[]> = {
  * public/images/products/<slug>-step-<n>.webp|jpg|png; until then the step
  * number stands in.
  */
-export function ProductSteps({ slug, steps }: { slug: string; steps: ProductCopy["steps"] }) {
+export function ProductSteps({ slug, steps }: { slug: string; steps: NonNullable<ProductCopy["steps"]> }) {
 	return (
 		<section className={`${container} ${section}`}>
 			<div className="mx-auto mb-10 grid max-w-[760px] gap-3 text-center md:mb-14">

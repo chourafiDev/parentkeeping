@@ -45,8 +45,8 @@ export type ProductCopy = {
   facts: { icon: FactIcon; text: string }[];
   /** "Your first month": what the first weeks look like (answers "is this a lot of work?"). */
   firstMonth?: { title: string; text: string; items: { when: string; title: string; text: string }[] };
-  /** "How it works": three steps. */
-  steps: { title: string; items: readonly { title: string; text: string }[]; note?: string };
+  /** "How it works": three steps. Left out where "Your first month" already walks through them. */
+  steps?: { title: string; items: readonly { title: string; text: string }[]; note?: string };
   /** "What it does": zig-zag rows, the strongest parts of "What's inside". */
   highlights: { title: string; items: Highlight[] };
   /** "Everything in the download": the full list. */
@@ -190,15 +190,8 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       items: [
         { when: "Day 1", title: "Start with the medications", text: "Fill in the medications page first, on your computer or by hand. It's the page you'll use most." },
         { when: "First weekend", title: "Add doctors and paperwork", text: "Doctors, upcoming appointments, insurance and benefits. Then print it." },
-        { when: "Week 1", title: "Give every job a name", text: "Fill in the “Who does what” page and print a copy for each sibling, or keep one at Mom's house." },
+        { when: "Week 1", title: "Give every job a name", text: "Fill in the “Who does what” page, so every job has a name and a day. Print a copy for each sibling, or keep one at Mom's house by the phone." },
         { when: "Week 4", title: "Keep it current on Sundays", text: "The 10-minute Sunday check-in page: what changed, what's coming up, what needs a hand." },
-      ],
-    },
-    steps: {
-      title: "How sharing works",
-      items: [
-        { title: "Print a copy for each sibling", text: "Or keep one at Mom's house by the phone." },
-        { title: "Give every job a name", text: "The “Who does what” page turns “let me know if you need anything” into a named job with a date." },
       ],
     },
     highlights: {

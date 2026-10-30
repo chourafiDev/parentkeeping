@@ -1,6 +1,5 @@
 import {
 	ArrowRight,
-	Check,
 	Download,
 	FileText,
 	Printer,
@@ -261,8 +260,8 @@ export default async function ProductPage({
 				? `Pre-order: your files arrive by ${formatStoreDay(lastArrival)}. If we miss that date, you can have a full refund.`
 				: null;
 
-	// The System's parts and steps each have their own section below, so its buy box skips them.
-	const details: BuyDetail[] = ([
+	// The parts and the steps each have their own section below the buy box.
+	const details: BuyDetail[] = [
 		{
 			title: "What it is",
 			body: description ? (
@@ -274,44 +273,6 @@ export default async function ProductPage({
 				(copy.intro ?? [copy.subhead]).map((p) => <p key={p}>{p}</p>)
 			),
 		},
-		!isBundle && {
-			title: "What's inside",
-			body: (
-				<ul className="grid gap-2">
-					{copy.inside.items.map((item) => (
-						<li key={item.name} className="flex gap-2.5">
-							<Check className="text-primary mt-1 size-3.5 shrink-0" />
-							<span>
-								<span className="text-foreground font-medium">
-									{item.name}.
-								</span>{" "}
-								{item.text}
-							</span>
-						</li>
-					))}
-				</ul>
-			),
-		},
-		!isBundle && {
-			title: "How to use it",
-			body: (
-				<ol className="grid gap-2">
-					{copy.steps.items.map((step, i) => (
-						<li key={step.title} className="flex gap-2.5">
-							<span className="text-foreground font-semibold tabular-nums">
-								{i + 1}.
-							</span>
-							<span>
-								<span className="text-foreground font-medium">
-									{step.title}.
-								</span>{" "}
-								{step.text}
-							</span>
-						</li>
-					))}
-				</ol>
-			),
-		},
 		{
 			title: "Delivery & refunds",
 			body: (
@@ -321,7 +282,7 @@ export default async function ProductPage({
 				/>
 			),
 		},
-	] as (BuyDetail | false)[]).filter((d) => d !== false);
+	];
 
 	// Comparison rows.
 	const upgradeBy = system ? system.price - data.price : 0;
@@ -581,7 +542,7 @@ export default async function ProductPage({
 			{/* The System: the brother story right after the buy box, where it explains why. */}
 			{isBundle && <ProductStory sections={copy.sections} buy={buyButton(pillDark)} />}
 			{isBundle && <ProblemTabs />}
-			<ProductSteps slug={product.slug} steps={copy.steps} />
+			{copy.steps && <ProductSteps slug={product.slug} steps={copy.steps} />}
 			<ProductHighlights
 				slug={product.slug}
 				highlights={copy.highlights}
