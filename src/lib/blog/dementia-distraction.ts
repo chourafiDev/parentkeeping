@@ -33,6 +33,7 @@ export const dementiaDistraction: Post = {
       type: "p",
       text: "That's why correcting rarely helps. “Dad died six years ago” is a fact to you. To her, it can be fresh grief, every single time. Distraction skips the argument and works on the feeling instead.",
     },
+    { type: "signup", magnet: "medication-list" },
     { type: "h2", text: "The three-step method: acknowledge, join, redirect" },
     {
       type: "p",
@@ -146,6 +147,7 @@ export const dementiaDistraction: Post = {
       ],
       button: { label: "See the Medical Binder", href: "/products/medical-binder" },
     },
+    { type: "signup", magnet: "medication-list" },
     {
       type: "small",
       text: "General information only. Every family's situation is different, so check with the professionals involved in your parent's care.",

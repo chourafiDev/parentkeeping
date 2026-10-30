@@ -10,6 +10,8 @@ export type Block =
   | { type: "table"; head: string[]; rows: string[][]; note?: string }
   /** Glozin's grey quote box: the post's call to action. */
   | { type: "cta"; title: string; text: string[]; button?: { label: string; href: string } }
+  /** A free download's email form, right in the post (no trip to its page). Title and text default to the magnet's. */
+  | { type: "signup"; magnet: "medication-list" | "checklists"; title?: string; text?: string[] }
   /** Small print (the general-information line). */
   | { type: "small"; text: string };
 

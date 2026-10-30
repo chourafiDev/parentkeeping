@@ -20,6 +20,8 @@ export type LeadMagnet = {
   subheads: Record<"fairness" | "one_place", string>;
   intro?: string;
   button: string;
+  /** The sign-up box inside a guide (the guide's own `signup` block can reword it). */
+  inline: { title: string; text: string };
   /** "We'll email you {what}, then our weekly caregiving emails." */
   noticeWhat: string;
   inside: { title: string; items: { title: string; text: string }[] };
@@ -55,6 +57,10 @@ export const FREE_LIST: LeadMagnet = {
   intro:
     "A free medication list template made for adult children keeping track of a parent's medications. Fill it in on your computer or print it, bring it to every appointment, and keep a copy in Mom's wallet. 9 pages, fillable PDF, in US Letter and A4.",
   button: "Send me the free list",
+  inline: {
+    title: "Get the free Medication List",
+    text: "The master list, a weekly chart to initial, a changes log and two wallet cards. 9 pages, fillable PDF, in US Letter and A4.",
+  },
   noticeWhat: "the list",
   inside: {
     title: "What's inside the free PDF",
@@ -163,6 +169,10 @@ export const CHECKLISTS: LeadMagnet = {
   intro:
     "Made for adult children helping an aging parent. Print what you need or type straight into the PDF, then share a section with each sibling. 7 pages, fillable PDF, in US Letter and A4.",
   button: "Send me the checklists",
+  inline: {
+    title: "Get the free Caregiver Checklists",
+    text: "A daily checklist, 30 questions to ask aging parents, a finances and documents list and a self-care check. 7 pages, fillable PDF, in US Letter and A4.",
+  },
   noticeWhat: "the checklists",
   inside: {
     title: "What's inside the free PDF",

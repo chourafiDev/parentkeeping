@@ -50,6 +50,7 @@ export const costOfInHomeCare: Post = {
       type: "p",
       text: "If your parent needs a nurse (for wound care, injections or monitoring), CareScout's 2025 national median for a private duty nurse is $90 an hour, or $160 per visit for short task-based visits.",
     },
+    { type: "signup", magnet: "checklists" },
     { type: "h2", text: "How it compares with other options" },
     {
       type: "table",
@@ -141,6 +142,7 @@ export const costOfInHomeCare: Post = {
       ],
       button: { label: "See the Family Care System", href: "/products/family-care-system" },
     },
+    { type: "signup", magnet: "checklists" },
     {
       type: "small",
       text: "General information only, not financial, legal or tax advice. Costs and program rules change and vary by state, so check with the professionals involved in your parent's care.",

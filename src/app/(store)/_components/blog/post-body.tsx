@@ -1,8 +1,12 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { Block } from "@/lib/blog";
+import { CHECKLISTS, FREE_LIST } from "@/lib/lead-magnets";
+import { LeadForm } from "../lead/lead-form";
 import { pillDark } from "../ui";
 import { Inline } from "./inline";
+
+const MAGNETS = { "medication-list": FREE_LIST, checklists: CHECKLISTS };
 
 const text = "text-body text-[16px] leading-[1.75]";
 
@@ -103,6 +107,27 @@ export function PostBody({ blocks }: { blocks: Block[] }) {
 								)}
 							</aside>
 						);
+					case "signup": {
+						const magnet = MAGNETS[b.magnet];
+						return (
+							<aside
+								key={i}
+								className="border-primary/20 bg-primary/[0.06] mx-auto my-6 grid w-full max-w-[600px] gap-3 rounded-[10px] border px-6 py-8 md:px-10"
+							>
+								<p className="text-foreground text-center text-[22px] leading-snug font-semibold tracking-[-0.03em]">
+									{b.title ?? magnet.inline.title}
+								</p>
+								{(b.text ?? [magnet.inline.text]).map((t) => (
+									<p key={t} className="text-body text-center text-[15px] leading-[1.7]">
+										<Inline text={t} />
+									</p>
+								))}
+								<div className="mt-2">
+									<LeadForm magnet={magnet} id={`post-signup-${i}`} />
+								</div>
+							</aside>
+						);
+					}
 					case "small":
 						return (
 							<p key={i} className="text-body text-[13px] leading-relaxed">

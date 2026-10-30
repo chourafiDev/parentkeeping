@@ -24,6 +24,7 @@ export const thingsNotToSay: Post = {
     { type: "p", text: "It sounds like a verdict, and nobody accepts a verdict without an argument." },
     { type: "p", text: "**Say instead:** “What's getting harder lately? What would make it easier?”" },
     { type: "p", text: "Start with what they've noticed. People accept help far more readily for a problem they named themselves." },
+    { type: "signup", magnet: "checklists" },
     { type: "h2", text: "2. “Don't you remember? I already told you.”" },
     { type: "p", text: "If they remembered, they wouldn't be asking. Pointing it out only adds embarrassment to confusion." },
     {
@@ -108,6 +109,7 @@ export const thingsNotToSay: Post = {
       ],
       button: { label: "See the Family Care System", href: "/products/family-care-system" },
     },
+    { type: "signup", magnet: "checklists" },
     {
       type: "small",
       text: "General information only. Every family's situation is different, so check with the professionals involved in your parent's care.",

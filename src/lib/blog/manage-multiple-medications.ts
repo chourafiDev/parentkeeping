@@ -38,6 +38,7 @@ export const manageMultipleMedications: Post = {
       type: "p",
       text: "Our [free printable Medication List](/pages/free-medication-list) has these columns ready, plus a page for allergies and doctors.",
     },
+    { type: "signup", magnet: "medication-list" },
     { type: "h2", text: "2. Do a brown-bag review" },
     {
       type: "p",
@@ -113,13 +114,13 @@ export const manageMultipleMedications: Post = {
       text: "A medication reminder app can help if your parent uses a smartphone confidently. But apps don't help the ER nurse, the home health aide or the brother who never installed it. Most families do best with paper for the house and the wallet, plus one shared sheet for the people helping.",
     },
     {
-      type: "cta",
+      type: "signup",
+      magnet: "medication-list",
       title: "Start with the list.",
       text: [
         "Get our free printable Medication List & Daily Medication Chart: the master list, a weekly chart to initial, a changes log and two wallet cards.",
         "When you're ready for the rest (doctors, appointments, insurance and a “Who does what” page), see the [Medical Binder for an Elderly Parent](/products/medical-binder), or the [Family Care System](/products/family-care-system) with a shared Google Sheet for medications, jobs and costs.",
       ],
-      button: { label: "Send me the free list", href: "/pages/free-medication-list" },
     },
     {
       type: "small",
