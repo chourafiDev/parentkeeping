@@ -20,7 +20,7 @@ import {
 } from "./legal";
 import type { CopySection } from "./product-copy";
 
-export const LAST_UPDATED = "October 16, 2026";
+export const LAST_UPDATED = "October 30, 2026";
 
 /** Fills in "[support email]" etc. with the real values from Settings → Business details. */
 export function fillContact(sections: CopySection[], contact: { supportEmail: string | null; privacyEmail: string | null }) {
@@ -44,6 +44,7 @@ export const TERMS_SECTIONS: CopySection[] = [
     title: "Who we are",
     paragraphs: [
       "Parentkeeping (“we,” “us” or “our”) makes printable and fillable organizing tools for adult children caring for an aging parent. These terms cover your use of parentkeeping.com and the products you buy here.",
+      "Parentkeeping is operated by Abdelmonaime Chourafi LLC, a Wyoming limited liability company, 30 N Gould St Ste R, Sheridan, WY 82801. When you buy from us, your agreement is with Abdelmonaime Chourafi LLC.",
       "By placing an order or using this site, you agree to these terms. If you don't agree, please don't use the site or buy a product.",
     ],
   },
@@ -87,12 +88,6 @@ export const TERMS_SECTIONS: CopySection[] = [
     title: "Our 14-day guarantee",
     paragraphs: [
       "Use what you bought for 14 days. If it doesn't help your family, email us and we'll refund you in full. No forms, no reason needed. See our full Refund Policy for how to ask for one.",
-    ],
-  },
-  {
-    title: "Parts marked “arrives by” a date",
-    paragraphs: [
-      "Some parts of a bundle may not be finished yet when you buy. If a part shows an “arrives by” date, you'll get it by email, at no extra cost, by that date. If we miss the date, you can ask for a full refund, even if it's been more than 14 days.",
     ],
   },
   {
@@ -143,6 +138,12 @@ export const PRIVACY_SEO = {
 };
 
 export const PRIVACY_SECTIONS: CopySection[] = [
+  {
+    title: "Who we are",
+    paragraphs: [
+      "Parentkeeping is operated by Abdelmonaime Chourafi LLC, a Wyoming limited liability company, 30 N Gould St Ste R, Sheridan, WY 82801. It decides how your personal information is used, and is responsible for it under this policy.",
+    ],
+  },
   {
     title: "What this covers",
     paragraphs: [
@@ -271,12 +272,6 @@ export const REFUND_SECTIONS: CopySection[] = [
     title: "Who processes your order",
     paragraphs: [
       "Orders are sold through Link, Stripe's checkout, which acts as the seller of record and sends your receipt. You can ask us or Link support for a refund; either way, our guarantee applies.",
-    ],
-  },
-  {
-    title: "Parts marked “arrives by” a date",
-    paragraphs: [
-      "If a part of your order is marked with an “arrives by” date and it's late, you can ask for a full refund at any time until it's delivered, even if more than 14 days have passed.",
     ],
   },
   {

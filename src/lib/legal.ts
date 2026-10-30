@@ -43,8 +43,11 @@ export const GENERAL_INFO_LINE =
 /** Burnout quiz: before question 1, and under every result. */
 export const QUIZ_INTRO_LINE =
   "This quiz is a self-reflection tool, not a diagnosis or a medical or mental health assessment. Your result is not a clinical score.";
-export const QUIZ_RESULT_FOOTER =
-  "This quiz is a self-reflection tool, not a diagnosis. If you feel overwhelmed, talk to your doctor or a counselor. If you are in crisis or thinking about harming yourself, contact a crisis line now: in the US call or text 988; in the UK and Ireland call Samaritans on 116 123; elsewhere find your local line at findahelpline.com. In an emergency, call your local emergency number.";
+const CRISIS_LINES =
+  "If you feel overwhelmed, talk to your doctor or a counselor. If you are in crisis or thinking about harming yourself, contact a crisis line now: in the US call or text 988; in the UK and Ireland call Samaritans on 116 123; elsewhere find your local line at findahelpline.com. In an emergency, call your local emergency number.";
+export const QUIZ_RESULT_FOOTER = `This quiz is a self-reflection tool, not a diagnosis. ${CRISIS_LINES}`;
+/** Caregiver Checklists: under the self-care checklist. */
+export const CHECKLISTS_CRISIS_LINE = `These checklists are general information, not a diagnosis. ${CRISIS_LINES}`;
 
 /** Short line in the footer of every store page. */
 export const FOOTER_LEGAL_LINE =

@@ -19,6 +19,7 @@ const SHOP = [
 		href: "/products/caregiver-agreement-template",
 		label: "Caregiver Agreement",
 	},
+	{ href: "/products/emergency-binder", label: "Emergency Binder" },
 	{ href: FREE_LIST_PATH, label: "Free Medication List" },
 	{ href: "/pages/caregiver-checklists", label: "Free Caregiver Checklists" },
 	{ href: "/pages/caregiver-burnout-quiz", label: "Caregiver Burnout Quiz" },

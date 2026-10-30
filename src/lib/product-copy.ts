@@ -197,7 +197,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
     steps: {
       title: "How sharing works",
       items: [
-        { title: "Print a copy for each sibling", text: "Print a copy for each sibling, or keep one at Mom's house by the phone." },
+        { title: "Print a copy for each sibling", text: "Or keep one at Mom's house by the phone." },
         { title: "Give every job a name", text: "The “Who does what” page turns “let me know if you need anything” into a named job with a date." },
       ],
     },
@@ -416,25 +416,25 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
     inside: {
       title: "What's inside",
       items: [
-        { name: "Emergency Summary", text: "one page to hand to the paramedics or ER, with conditions, allergies, key medications, devices, memory or hearing needs, wishes and who to call" },
-        { name: "Fridge Sheet", text: "the key facts for the front of the fridge, where emergency crews often look, with a big box for your local emergency number" },
-        { name: "Emergency Contacts", text: "family, neighbors with a key, doctors and pharmacy" },
-        { name: "Medication List", text: "copied straight from the labels, with space for pharmacist reviews" },
-        { name: "Conditions, Allergies & Devices", text: "the details behind the summary page" },
-        { name: "Insurance", text: "plans, phone numbers and boxes to tape copies of the cards" },
-        { name: "Legal Documents Locator", text: "where the advance directive, POLST/DNR and powers of attorney are kept, and who has copies" },
-        { name: "Hospital & Care Preferences", text: "preferred hospital, language, faith, and what calms them" },
-        { name: "The House & Pets", text: "keys, pets and shut-offs. It records where codes are kept, never the codes" },
-        { name: "Grab-and-Go Checklist", text: "for whoever gets there first" },
-        { name: "The First 24 Hours", text: "what to do, plus a family phone tree" },
-        { name: "Hospital Stay Log", text: "what the doctors said, written down while you're there" },
-        { name: "2 Wallet Cards and 2 Door Labels", text: "one for the wallet, one for the front door, so crews know where to look" },
-        { name: "How to Bring This Up with Mom or Dad", text: "words that work, and what to do if they say no" },
-        { name: "Review & Update Log", text: "when to update it, and who has the latest copy" },
+        { name: "Emergency Summary", text: "One page to hand to the paramedics or ER, with conditions, allergies, key medications, devices, memory or hearing needs, wishes and who to call." },
+        { name: "Fridge Sheet", text: "The key facts for the front of the fridge, where emergency crews often look, with a big box for your local emergency number." },
+        { name: "Emergency Contacts", text: "Family, neighbors with a key, doctors and pharmacy." },
+        { name: "Medication List", text: "Copied straight from the labels, with space for pharmacist reviews." },
+        { name: "Conditions, Allergies & Devices", text: "The details behind the summary page." },
+        { name: "Insurance", text: "Plans, phone numbers and boxes to tape copies of the cards." },
+        { name: "Legal Documents Locator", text: "Where the advance directive, POLST/DNR and powers of attorney are kept, and who has copies." },
+        { name: "Hospital & Care Preferences", text: "Preferred hospital, language, faith, and what calms them." },
+        { name: "The House & Pets", text: "Keys, pets and shut-offs. It records where codes are kept, never the codes." },
+        { name: "Grab-and-Go Checklist", text: "For whoever gets there first." },
+        { name: "The First 24 Hours", text: "What to do, plus a family phone tree." },
+        { name: "Hospital Stay Log", text: "What the doctors said, written down while you're there." },
+        { name: "2 Wallet Cards and 2 Door Labels", text: "One for the wallet, one for the front door, so crews know where to look." },
+        { name: "How to Bring This Up with Mom or Dad", text: "Words that work, and what to do if they say no." },
+        { name: "Review & Update Log", text: "When to update it, and who has the latest copy." },
       ],
     },
     // No badges: kept consistent with the other products.
-    // From the brief's "What you get" and "Why families choose it".
+    // From the brief's "What you get" and "Why families choose it" (shown as "Why this binder").
     facts: [
       { icon: "format", text: "Fillable: type on screen, or print and write by hand" },
       { icon: "print", text: "18 pages, in US Letter and A4" },
@@ -485,7 +485,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
     parts: [],
     sections: [
       {
-        title: "Why families choose it",
+        title: "Why this binder",
         bullets: [
           { text: "Set it up in one afternoon, together with your parent" },
           { text: "Fillable: type on screen, or print and write by hand" },

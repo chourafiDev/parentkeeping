@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FREE_LIST_PATH } from "@/lib/free-list";
 import { SITE } from "@/lib/site";
+import { cn } from "@/lib/utils";
 import { getFoundingPrice } from "@/server/queries/settings";
 import { type Announcement, AnnouncementBar } from "./announcement-bar";
 import { container } from "./ui";
@@ -15,6 +16,7 @@ const NAV = [
 		href: "/products/caregiver-agreement-template",
 		label: "Caregiver Agreement",
 	},
+	{ href: "/products/emergency-binder", label: "Emergency Binder" },
 	{ href: FREE_LIST_PATH, label: "Free Medication List" },
 ];
 
@@ -58,11 +60,15 @@ export async function StoreHeader() {
 						aria-label="Main"
 						className="hidden items-center gap-6 text-[15px] lg:flex"
 					>
-						{NAV.slice(0, 3).map((item) => (
+						{/* The 4th product link only where there's room beside the logo; all of them are in the phone menu. */}
+						{NAV.slice(0, 4).map((item, i) => (
 							<Link
 								key={item.href}
 								href={item.href}
-								className="text-foreground hover:text-primary font-medium transition-colors"
+								className={cn(
+									"text-foreground hover:text-primary font-medium transition-colors",
+									i === 3 && "hidden xl:inline",
+								)}
 							>
 								{item.label}
 							</Link>

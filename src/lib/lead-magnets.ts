@@ -2,7 +2,7 @@
 // copy. Each has its own page, thank-you page, subscriber source and PDF.
 
 import { FREE_LIST_PATH, FREE_LIST_PDF, FREE_LIST_PDF_A4, FREE_LIST_SOURCE } from "./free-list";
-import { GENERAL_INFO_LINE, MEDICATION_LEGAL_LINE, QUIZ_RESULT_FOOTER } from "./legal";
+import { CHECKLISTS_CRISIS_LINE, GENERAL_INFO_LINE, MEDICATION_LEGAL_LINE } from "./legal";
 import type { FaqItem } from "./offer";
 import type { CopySection } from "./product-copy";
 
@@ -221,7 +221,7 @@ export const CHECKLISTS: LeadMagnet = {
       title: "A caregiver self-care checklist that takes two minutes",
       paragraphs: [
         "Tick four things each day: sleep, real meals, moving, and a few minutes that were just yours. Once a week, check that you talked to a friend about something else, kept your own appointments, asked for help with one thing and said no to one thing.",
-        QUIZ_RESULT_FOOTER,
+        CHECKLISTS_CRISIS_LINE,
       ],
     },
     {
