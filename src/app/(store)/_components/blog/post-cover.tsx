@@ -19,7 +19,16 @@ export function PostCover({ post, className, sizes, priority }: { post: Post; cl
 	const tone = TONES[post.category] ?? { bg: "bg-deep", Icon: BookOpen };
 	return (
 		<div className={cn(media, tone.bg, "flex items-center justify-center text-white", className)}>
-			<MediaSlot dir="blog" name={post.slug} alt={post.title} sizes={sizes} priority={priority} className="transition-transform duration-700 group-hover:scale-105">
+			<MediaSlot
+				dir="blog"
+				name={post.cover ? post.cover.file.replace(/\.[a-z]+$/, "") : post.slug}
+				alt={post.cover?.alt ?? post.title}
+				title={post.cover?.title}
+				sizes={sizes}
+				priority={priority}
+				// A named cover keeps faces in the wide page banner (it crops top and bottom).
+				className={cn("transition-transform duration-700 group-hover:scale-105", post.cover && "object-[50%_20%]")}
+			>
 				<span aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_70%_at_70%_20%,rgb(255_255_255/0.18)_0%,transparent_70%)]" />
 				<tone.Icon aria-hidden className="size-14 opacity-80 transition-transform duration-700 group-hover:scale-110" strokeWidth={1.25} />
 			</MediaSlot>

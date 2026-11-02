@@ -27,6 +27,11 @@ export type Post = {
   /** "YYYY-MM-DD" */
   publishedAt: string;
   updatedAt?: string;
+  /**
+   * A named cover in public/images/blog, used on the page, the cards and when the
+   * post is shared. Without one, public/images/blog/<slug>.webp|jpg|png, then a colored panel.
+   */
+  cover?: { file: string; width: number; height: number; alt: string; title?: string };
   /** Sources named at the end (statistics always carry their source). */
   sources: string[];
   body: Block[];

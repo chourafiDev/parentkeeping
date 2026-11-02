@@ -9,6 +9,7 @@ export function MediaSlot({
 	name,
 	dir = "home",
 	alt = "",
+	title,
 	sizes = "100vw",
 	priority = false,
 	className,
@@ -18,6 +19,8 @@ export function MediaSlot({
 	/** Folder under public/images ("home", "blog"). */
 	dir?: string;
 	alt?: string;
+	/** Tooltip text (rarely needed; the alt does the describing). */
+	title?: string;
 	sizes?: string;
 	priority?: boolean;
 	className?: string;
@@ -31,6 +34,7 @@ export function MediaSlot({
 		<Image
 			src={`/images/${dir}/${name}.${ext}`}
 			alt={alt}
+			title={title}
 			fill
 			sizes={sizes}
 			// Next 16: `preload` replaces the deprecated `priority` (the hero is the LCP image).

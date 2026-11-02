@@ -26,6 +26,11 @@ async function load(params: Promise<{ slug: string }>) {
 export async function generateMetadata({ params }: PageProps<"/blogs/guides/[slug]">): Promise<Metadata> {
 	const post = await load(params);
 	const url = postPath(post.slug);
+	const shareImage = post.cover
+		? { url: `/images/blog/${post.cover.file}`, width: post.cover.width, height: post.cover.height, alt: post.cover.alt }
+		: existsSync(path.join(process.cwd(), "public/images/blog", `${post.slug}.png`))
+			? { url: `/images/blog/${post.slug}.png`, alt: post.seo.title }
+			: DEFAULT_SHARE_IMAGE;
 	return {
 		title: { absolute: post.seo.title },
 		description: post.seo.description,
@@ -37,12 +42,9 @@ export async function generateMetadata({ params }: PageProps<"/blogs/guides/[slu
 			url,
 			publishedTime: post.publishedAt,
 			...(post.updatedAt && { modifiedTime: post.updatedAt }),
-			images: [
-				existsSync(path.join(process.cwd(), "public/images/blog", `${post.slug}.png`))
-					? { url: `/images/blog/${post.slug}.png`, alt: post.seo.title }
-					: DEFAULT_SHARE_IMAGE,
-			],
+			images: [shareImage],
 		},
+		twitter: { card: "summary_large_image", title: post.seo.title, description: post.seo.description, images: [shareImage] },
 	};
 }
 

@@ -14,6 +14,13 @@ export const getPaidCaringForParent: Post = {
   category: "Costs",
   tags: ["Getting paid", "Medicaid", "Caregiver agreement"],
   publishedAt: "2026-11-02",
+  cover: {
+    file: "how-to-get-paid-for-caring-for-elderly-parent.webp",
+    width: 1344,
+    height: 752,
+    alt: "Daughter reviewing a caregiver agreement and care costs with her elderly mother at the kitchen table, planning how to get paid for caring for an elderly parent",
+    title: "How to get paid for caring for an elderly parent",
+  },
   sources: [
     "Caregiving in the US 2025, AARP",
     "Medicaid's Home Care Support for Family Caregivers in 2025, KFF",
