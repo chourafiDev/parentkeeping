@@ -48,7 +48,17 @@ export async function generateMetadata({ params }: PageProps<"/blogs/guides/[slu
 
 const words = (post: Post) =>
 	post.body
-		.flatMap((b) => ("text" in b ? [b.text].flat() : "items" in b ? b.items : "rows" in b ? b.rows.flat() : []))
+		.flatMap((b) =>
+			b.type === "faq"
+				? b.items.flatMap((i) => [i.q, i.a])
+				: "text" in b
+					? [b.text ?? []].flat()
+					: "items" in b
+						? b.items
+						: "rows" in b
+							? b.rows.flat()
+							: [],
+		)
 		.join(" ")
 		.split(/\s+/).length;
 
@@ -61,6 +71,7 @@ export default async function GuidePage({ params }: PageProps<"/blogs/guides/[sl
 	const related = POSTS.filter((p) => p.slug !== post.slug).slice(0, 3);
 	const url = `${siteUrl()}${postPath(post.slug)}`;
 	const minutes = Math.max(1, Math.round(words(post) / 230));
+	const faq = post.body.flatMap((b) => (b.type === "faq" ? b.items : []));
 	const jsonLd = [
 		{
 			"@context": "https://schema.org",
@@ -82,6 +93,19 @@ export default async function GuidePage({ params }: PageProps<"/blogs/guides/[sl
 				{ "@type": "ListItem", position: 3, name: post.title, item: url },
 			],
 		},
+		...(faq.length > 0
+			? [
+					{
+						"@context": "https://schema.org",
+						"@type": "FAQPage",
+						mainEntity: faq.map((item) => ({
+							"@type": "Question",
+							name: item.q,
+							acceptedAnswer: { "@type": "Answer", text: item.a.replace(/\*\*|\[|\]\([^)]*\)/g, "") },
+						})),
+					},
+				]
+			: []),
 	];
 
 	return (

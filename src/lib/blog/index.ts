@@ -3,6 +3,7 @@
 
 import { costOfInHomeCare } from "./cost-of-in-home-care";
 import { dementiaDistraction } from "./dementia-distraction";
+import { getPaidCaringForParent } from "./get-paid-caring-for-parent";
 import { manageMultipleMedications } from "./manage-multiple-medications";
 import { thingsNotToSay } from "./things-not-to-say";
 import type { Post } from "./types";
@@ -20,11 +21,19 @@ export const BLOG = {
 };
 
 /** Newest first; on a tie, this order. */
-export const POSTS: Post[] = [manageMultipleMedications, dementiaDistraction, costOfInHomeCare, thingsNotToSay].sort((a, b) =>
+export const POSTS: Post[] = [getPaidCaringForParent, manageMultipleMedications, dementiaDistraction, costOfInHomeCare, thingsNotToSay].sort((a, b) =>
   b.publishedAt.localeCompare(a.publishedAt),
 );
 
 export const postPath = (slug: string) => `${BLOG_PATH}/${slug}`;
+
+/** A heading's anchor: "Before you're paid: talk to your siblings" → "before-youre-paid-talk-to-your-siblings". */
+export const headingId = (text: string) =>
+  text
+    .toLowerCase()
+    .replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 export const getPost = (slug: string) => POSTS.find((p) => p.slug === slug) ?? null;
 
 /** "2026-10-12" → "Oct 12, 2026" (no time zone shift). */

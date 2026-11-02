@@ -63,7 +63,7 @@ export const thingsNotToSay: Post = {
     { type: "p", text: "**Say instead:** “I want to help with this properly. Can we do it Saturday morning?”" },
     {
       type: "p",
-      text: "Then protect that time. And if you genuinely have no time, that's a sign the work needs to be shared with your siblings, not a sign you should try harder.",
+      text: "Then protect that time. And if you genuinely have no time, that's a sign the work needs to be [shared with your siblings](/blogs/guides/get-paid-caring-for-parent#before-youre-paid-talk-to-your-siblings), not a sign you should try harder.",
     },
     { type: "h2", text: "7. “Mom can't manage her pills.” (To the doctor, in front of Mom)" },
     { type: "p", text: "Talking about someone as if they aren't in the room is one of the fastest ways to make them shut down." },

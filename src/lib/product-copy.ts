@@ -350,6 +350,7 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
       {
         q: "Do we need this if nobody is being paid?",
         a: "It still helps. Writing down who does what is the fairest way to split care, and it gives you a starting point if payment comes up later.",
+        link: { label: "How to get paid for caring for an elderly parent", href: "/blogs/guides/get-paid-caring-for-parent" },
       },
       {
         q: "Does paying a family caregiver affect taxes?",

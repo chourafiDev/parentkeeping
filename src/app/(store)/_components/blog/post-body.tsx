@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import type { Block } from "@/lib/blog";
+import { type Block, headingId } from "@/lib/blog";
 import { CHECKLISTS, FREE_LIST } from "@/lib/lead-magnets";
 import { LeadForm } from "../lead/lead-form";
 import { pillDark } from "../ui";
@@ -24,7 +24,7 @@ export function PostBody({ blocks }: { blocks: Block[] }) {
 						);
 					case "h2":
 						return (
-							<h2 key={i} className="text-foreground mt-6 text-[24px] leading-tight font-semibold tracking-[-0.03em] md:text-[28px]">
+							<h2 key={i} id={headingId(b.text)} className="text-foreground mt-6 scroll-mt-32 text-[24px] leading-tight font-semibold tracking-[-0.03em] md:text-[28px]">
 								{b.text}
 							</h2>
 						);
@@ -128,6 +128,19 @@ export function PostBody({ blocks }: { blocks: Block[] }) {
 							</aside>
 						);
 					}
+					case "faq":
+						return (
+							<div key={i} className="grid gap-6">
+								{b.items.map((item) => (
+									<div key={item.q} className="grid gap-2">
+										<h3 className="text-foreground text-[19px] leading-snug font-semibold tracking-[-0.02em]">{item.q}</h3>
+										<p className={text}>
+											<Inline text={item.a} />
+										</p>
+									</div>
+								))}
+							</div>
+						);
 					case "small":
 						return (
 							<p key={i} className="text-body text-[13px] leading-relaxed">

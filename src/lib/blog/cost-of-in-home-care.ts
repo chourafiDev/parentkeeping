@@ -119,6 +119,10 @@ export const costOfInHomeCare: Post = {
       type: "p",
       text: "**4. The family.** This is where it gets hard. In many families, one sibling gives the time, another gives money, and a third gives neither. Nobody has written any of it down.",
     },
+    {
+      type: "p",
+      text: "Can a family member be paid instead? See [how to get paid for caring for an elderly parent](/blogs/guides/get-paid-caring-for-parent).",
+    },
     { type: "h2", text: "How siblings can split the cost fairly" },
     {
       type: "p",

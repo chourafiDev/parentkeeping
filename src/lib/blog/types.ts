@@ -12,6 +12,8 @@ export type Block =
   | { type: "cta"; title: string; text: string[]; button?: { label: string; href: string } }
   /** A free download's email form, right in the post (no trip to its page). Title and text default to the magnet's. */
   | { type: "signup"; magnet: "medication-list" | "checklists"; title?: string; text?: string[] }
+  /** Questions and answers; also the page's FAQPage structured data. */
+  | { type: "faq"; items: { q: string; a: string }[] }
   /** Small print (the general-information line). */
   | { type: "small"; text: string };
 
